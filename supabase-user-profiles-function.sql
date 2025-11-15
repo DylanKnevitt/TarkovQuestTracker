@@ -22,7 +22,7 @@ BEGIN
   RETURN QUERY
   SELECT 
     u.id,
-    u.email,
+    u.email::VARCHAR(255),
     COUNT(*) as total_quests,
     SUM(CASE WHEN qp.completed THEN 1 ELSE 0 END) as completed_count
   FROM auth.users u
