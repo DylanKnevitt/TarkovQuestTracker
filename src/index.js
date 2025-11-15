@@ -11,6 +11,7 @@ import { getSupabaseClient, isSupabaseAvailable } from './api/supabase-client.js
 import { AuthUI } from './components/auth-ui.js';
 import { SyncIndicator } from './components/sync-indicator.js';
 import { getComparisonService } from './services/comparison-service.js';
+import { UserComparison } from './components/user-comparison.js';
 
 class TarkovQuestApp {
     constructor() {
@@ -21,6 +22,7 @@ class TarkovQuestApp {
         this.authUI = null;
         this.syncIndicator = null;
         this.comparisonService = null;
+        this.userComparison = null;
         this.currentTab = 'list';
     }
 
@@ -82,6 +84,7 @@ class TarkovQuestApp {
             this.questList = new QuestList('quest-list', this.questManager);
             this.questGraph = new QuestGraph('quest-graph', this.questManager);
             this.questOptimizer = new QuestOptimizer(this.questManager);
+            this.userComparison = new UserComparison('comparison-view', this.questManager);
 
             // Set up graph click handler
             this.questGraph.onNodeClick = (questId) => {
@@ -215,6 +218,11 @@ class TarkovQuestApp {
             setTimeout(() => {
                 this.questGraph.fit();
             }, 100);
+        }
+
+        // Initialize comparison view when switching to it
+        if (tabName === 'comparison' && this.userComparison) {
+            this.userComparison.initialize();
         }
     }
 
