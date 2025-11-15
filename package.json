@@ -4,10 +4,12 @@
     "description": "Interactive static SPA for tracking Escape from Tarkov quests with path optimization to Lightkeeper, Setup, and Test Drive",
     "main": "src/index.js",
     "scripts": {
-        "start": "npx http-server . -p 8080 -o",
-        "dev": "npx http-server . -p 8080 -c-1",
+        "start": "vite",
+        "dev": "vite",
         "fetch-data": "node scripts/fetch-quest-data.js",
-        "build": "npm run fetch-data"
+        "build": "npm run fetch-data && vite build",
+        "preview": "vite preview",
+        "vercel-build": "npm run fetch-data && vite build"
     },
     "keywords": [
         "tarkov",
@@ -18,9 +20,11 @@
     "author": "",
     "license": "MIT",
     "devDependencies": {
-        "http-server": "^14.1.1"
+        "http-server": "^14.1.1",
+        "vite": "^5.0.0"
     },
     "dependencies": {
+        "@supabase/supabase-js": "^2.81.1",
         "cytoscape": "^3.28.1",
         "cytoscape-dagre": "^2.5.0"
     }

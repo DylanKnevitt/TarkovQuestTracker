@@ -32,9 +32,22 @@ cd TarkovQuest
 npm install
 ```
 
-3. **Start the development server:**
+3. **Configure environment variables (optional for cloud sync):**
 ```bash
-npm start
+# Copy the example environment file
+cp .env.example .env.local
+
+# Edit .env.local and add your Supabase credentials
+# Get these from https://app.supabase.com/project/_/settings/api
+VITE_SUPABASE_URL=your_supabase_url_here
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+```
+
+**Note**: The app works in LocalStorage-only mode without these credentials. Cloud sync and multi-user features require a Supabase account (free tier available).
+
+4. **Start the development server:**
+```bash
+npm run dev
 ```
 
 The app will open at `http://localhost:8080`
@@ -130,11 +143,32 @@ npm run dev
 ```
 
 ### Build for Production
-Simply deploy the entire directory to any static hosting service:
+```bash
+npm run build
+npm run preview  # Test production build locally
+```
+
+## Deployment
+
+### Vercel Deployment (Recommended)
+
+This app is optimized for deployment on Vercel with automatic CI/CD from GitHub.
+
+**Live URL**: [To be added after deployment]
+
+**Deploy your own:**
+1. Push code to GitHub repository
+2. Import project to Vercel (https://vercel.com/new)
+3. Add environment variables in Vercel dashboard (optional for cloud sync):
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+4. Deploy automatically on push to main branch
+
+### Other Hosting Options
 - GitHub Pages
 - Netlify
-- Vercel
 - AWS S3
+- Any static web server
 - Any web server
 
 ## Key Quest Paths

@@ -7,6 +7,7 @@ import { QuestManager } from './models/quest.js';
 import { QuestList } from './components/quest-list.js';
 import { QuestGraph } from './components/quest-graph.js';
 import { QuestOptimizer } from './components/quest-optimizer.js';
+import { getSupabaseClient, isSupabaseAvailable } from './api/supabase-client.js';
 
 class TarkovQuestApp {
     constructor() {
@@ -19,6 +20,14 @@ class TarkovQuestApp {
 
     async init() {
         console.log('Initializing Tarkov Quest Tracker...');
+
+        // Initialize Supabase client (checks for environment variables)
+        const supabase = getSupabaseClient();
+        if (supabase) {
+            console.log('Supabase client available - cloud sync enabled');
+        } else {
+            console.log('Running in LocalStorage-only mode (no cloud sync)');
+        }
 
         try {
             // Try to load from cache first
