@@ -9,6 +9,7 @@ import { QuestGraph } from './components/quest-graph.js';
 import { QuestOptimizer } from './components/quest-optimizer.js';
 import { getSupabaseClient, isSupabaseAvailable } from './api/supabase-client.js';
 import { AuthUI } from './components/auth-ui.js';
+import { SyncIndicator } from './components/sync-indicator.js';
 
 class TarkovQuestApp {
     constructor() {
@@ -17,6 +18,7 @@ class TarkovQuestApp {
         this.questGraph = null;
         this.questOptimizer = null;
         this.authUI = null;
+        this.syncIndicator = null;
         this.currentTab = 'list';
     }
 
@@ -34,6 +36,9 @@ class TarkovQuestApp {
         // Initialize authentication UI
         this.authUI = new AuthUI('auth-container');
 
+        // Initialize sync indicator
+        this.syncIndicator = new SyncIndicator('sync-indicator-container');
+
         try {
             // Try to load from cache first
             let questData = questCache.get();
@@ -49,6 +54,7 @@ class TarkovQuestApp {
 
             // Initialize quest manager
             this.questManager.setQuests(questData);
+            await this.questManager.initialize();
 
             // Initialize components
             this.questList = new QuestList('quest-list', this.questManager);

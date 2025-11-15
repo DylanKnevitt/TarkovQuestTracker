@@ -60,6 +60,13 @@ body {
     flex-grow: 1;
 }
 
+.header-auth-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
 .auth-container {
     flex-shrink: 0;
 }

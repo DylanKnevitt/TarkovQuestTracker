@@ -150,9 +150,9 @@ export class QuestList {
     attachEventListeners() {
         // Toggle complete buttons
         this.container.querySelectorAll('.btn-toggle-complete').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 const questId = e.target.dataset.questId;
-                this.questManager.toggleComplete(questId);
+                await this.questManager.toggleComplete(questId);
                 this.render();
                 // Trigger custom event for other components to update
                 document.dispatchEvent(new CustomEvent('questUpdated', { detail: { questId } }));

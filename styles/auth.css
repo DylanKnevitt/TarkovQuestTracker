@@ -280,6 +280,79 @@
 }
 
 /* ============================================================================
+   Sync Indicator
+   ============================================================================ */
+
+#sync-indicator-container {
+  display: flex;
+  align-items: center;
+  margin-left: 12px;
+}
+
+.sync-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.sync-icon {
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sync-text {
+  font-size: 12px;
+}
+
+/* Syncing state */
+.sync-indicator-syncing {
+  background: rgba(74, 158, 255, 0.1);
+  border: 1px solid rgba(74, 158, 255, 0.3);
+  color: #4a9eff;
+}
+
+.sync-indicator-syncing .sync-icon {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Synced state */
+.sync-indicator-synced {
+  background: rgba(72, 187, 120, 0.1);
+  border: 1px solid rgba(72, 187, 120, 0.3);
+  color: #48bb78;
+}
+
+/* Offline state */
+.sync-indicator-offline {
+  background: rgba(237, 137, 54, 0.1);
+  border: 1px solid rgba(237, 137, 54, 0.3);
+  color: #ed8936;
+}
+
+/* Error state */
+.sync-indicator-error {
+  background: rgba(245, 101, 101, 0.1);
+  border: 1px solid rgba(245, 101, 101, 0.3);
+  color: #f56565;
+}
+
+/* ============================================================================
    Utility Classes
    ============================================================================ */
 

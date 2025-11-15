@@ -1,6 +1,7 @@
 /**
  * Quest data model and utility functions
  */
+import { storageService } from '../services/storage-service.js';
 
 export class Quest {
     constructor(data) {
@@ -34,7 +35,11 @@ export class QuestManager {
     constructor() {
         this.quests = [];
         this.completedQuests = new Set();
-        this.loadProgress();
+        // Load progress will be called async after initialization
+    }
+
+    async initialize() {
+        await this.loadProgress();
     }
 
     setQuests(questData) {
@@ -66,20 +71,23 @@ export class QuestManager {
         );
     }
 
-    toggleComplete(questId) {
+    async toggleComplete(questId) {
         const quest = this.getQuestById(questId);
         if (!quest) return;
 
-        if (this.completedQuests.has(questId)) {
+        const wasCompleted = this.completedQuests.has(questId);
+
+        if (wasCompleted) {
             this.completedQuests.delete(questId);
             quest.completed = false;
+            await storageService.markIncomplete(questId);
         } else {
             this.completedQuests.add(questId);
             quest.completed = true;
+            await storageService.markComplete(questId);
         }
 
         this.updateUnlockedStatus();
-        this.saveProgress();
     }
 
     updateUnlockedStatus(playerLevel = 79) {
@@ -189,23 +197,32 @@ export class QuestManager {
         };
     }
 
-    saveProgress() {
-        localStorage.setItem('quest_progress',
-            JSON.stringify(Array.from(this.completedQuests))
+    async loadProgress() {
+        // Load progress from storage service (merges LocalStorage + Supabase)
+        const progress = await storageService.loadProgress();
+        
+        // Convert progress object to Set of completed quest IDs
+        this.completedQuests = new Set(
+            Object.keys(progress).filter(questId => progress[questId]?.completed)
         );
+
+        // Update quest objects with completion status
+        this.quests.forEach(quest => {
+            quest.completed = this.completedQuests.has(quest.id);
+        });
+
+        this.updateUnlockedStatus();
     }
 
-    loadProgress() {
-        const saved = localStorage.getItem('quest_progress');
-        if (saved) {
-            this.completedQuests = new Set(JSON.parse(saved));
-        }
-    }
+    async resetProgress() {
+        // Mark all quests as incomplete
+        const resetPromises = Array.from(this.completedQuests).map(questId =>
+            storageService.markIncomplete(questId)
+        );
+        await Promise.all(resetPromises);
 
-    resetProgress() {
         this.completedQuests.clear();
         this.quests.forEach(q => q.completed = false);
         this.updateUnlockedStatus();
-        this.saveProgress();
     }
 }
