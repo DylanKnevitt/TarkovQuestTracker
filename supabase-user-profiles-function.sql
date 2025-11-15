@@ -23,12 +23,12 @@ BEGIN
   SELECT 
     u.id,
     u.email,
-    COUNT(qp.id) as total_quests,
+    COUNT(*) as total_quests,
     SUM(CASE WHEN qp.completed THEN 1 ELSE 0 END) as completed_count
   FROM auth.users u
-  LEFT JOIN quest_progress qp ON qp.user_id = u.id
+  INNER JOIN public.quest_progress qp ON qp.user_id = u.id
   GROUP BY u.id, u.email
-  HAVING COUNT(qp.id) > 0
+  HAVING COUNT(*) > 0
   ORDER BY completed_count DESC;
 END;
 $$;
