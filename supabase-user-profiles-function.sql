@@ -10,7 +10,7 @@
 CREATE OR REPLACE FUNCTION public.get_user_profiles_with_stats()
 RETURNS TABLE (
   id UUID,
-  email TEXT,
+  email VARCHAR(255),
   total_quests BIGINT,
   completed_count BIGINT
 ) 
