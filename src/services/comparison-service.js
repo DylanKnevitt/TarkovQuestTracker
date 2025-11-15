@@ -48,13 +48,16 @@ export class ComparisonService {
 
       if (error) {
         console.error('Error calling get_user_profiles_with_stats:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        console.error('Error details:', error.details);
         
         // If function doesn't exist, provide helpful error message
-        if (error.message?.includes('function') || error.code === '42883') {
+        if (error.message?.includes('function') || error.code === '42883' || error.code === 'PGRST202') {
           return {
             data: null,
             error: new Error(
-              'Database function not found. Please run supabase-user-profiles-function.sql in Supabase SQL Editor.'
+              'Database function not found. Please run supabase-user-profiles-function.sql in Supabase SQL Editor. Error: ' + error.message
             )
           };
         }
