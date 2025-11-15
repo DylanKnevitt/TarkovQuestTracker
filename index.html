@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarkov Quest Tracker - Path to Lightkeeper</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/quest-list.css">
+    <link rel="stylesheet" href="styles/quest-graph.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>Tarkov Quest Tracker</h1>
+                <div class="header-stats">
+                    <span id="quest-count">Loading quests...</span>
+                    <span id="completion-rate">0% Complete</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="filter-section">
+                    <h3>Quick Paths</h3>
+                    <button class="path-btn" data-target="lightkeeper">Path to Lightkeeper</button>
+                    <button class="path-btn" data-target="setup">Path to Setup</button>
+                    <button class="path-btn" data-target="test-drive">Path to Test Drive</button>
+                </div>
+
+                <div class="filter-section">
+                    <h3>Filter by Trader</h3>
+                    <label><input type="checkbox" class="trader-filter" value="prapor" checked> Prapor</label>
+                    <label><input type="checkbox" class="trader-filter" value="therapist" checked> Therapist</label>
+                    <label><input type="checkbox" class="trader-filter" value="fence" checked> Fence</label>
+                    <label><input type="checkbox" class="trader-filter" value="skier" checked> Skier</label>
+                    <label><input type="checkbox" class="trader-filter" value="peacekeeper" checked> Peacekeeper</label>
+                    <label><input type="checkbox" class="trader-filter" value="mechanic" checked> Mechanic</label>
+                    <label><input type="checkbox" class="trader-filter" value="ragman" checked> Ragman</label>
+                    <label><input type="checkbox" class="trader-filter" value="jaeger" checked> Jaeger</label>
+                    <label><input type="checkbox" class="trader-filter" value="lightkeeper" checked> Lightkeeper</label>
+                </div>
+
+                <div class="filter-section">
+                    <h3>Level Filter</h3>
+                    <label>Min Level: <input type="number" id="min-level" value="1" min="1" max="79"></label>
+                    <label>Max Level: <input type="number" id="max-level" value="79" min="1" max="79"></label>
+                </div>
+
+                <div class="filter-section">
+                    <h3>Search</h3>
+                    <input type="text" id="quest-search" placeholder="Search quests...">
+                </div>
+
+                <div class="filter-section">
+                    <h3>View Options</h3>
+                    <label><input type="checkbox" id="show-completed"> Show Completed</label>
+                    <label><input type="checkbox" id="kappa-only"> Kappa Required Only</label>
+                    <label><input type="checkbox" id="show-locked"> Show Locked</label>
+                </div>
+
+                <button class="reset-btn">Reset All Filters</button>
+            </aside>
+
+            <!-- Quest Content -->
+            <div class="content-area">
+                <!-- Tab Navigation -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="list">Quest List</button>
+                    <button class="tab-btn" data-tab="optimizer">Quest Optimizer</button>
+                    <button class="tab-btn" data-tab="graph">Dependency Graph</button>
+                    <button class="tab-btn" data-tab="path">Path Finder</button>
+                </div>
+
+                <!-- Tab Content: Quest List -->
+                <div id="list-tab" class="tab-content active">
+                    <div id="quest-list" class="quest-list">
+                        <div class="loading">Loading quests from Tarkov API...</div>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Quest Optimizer -->
+                <div id="optimizer-tab" class="tab-content">
+                    <div class="optimizer-container">
+                        <h2>🎯 Quest Optimizer - Do Multiple Quests Per Raid</h2>
+                        <p>Find quests you can complete simultaneously to save time.</p>
+
+                        <div class="optimizer-controls">
+                            <div class="control-row">
+                                <label>
+                                    Your Level:
+                                    <input type="number" id="optimizer-level" value="1" min="1" max="79">
+                                </label>
+                            </div>
+                            <div class="control-row">
+                                <strong>Include Quest Paths:</strong>
+                                <label><input type="checkbox" class="path-checkbox" value="setup" checked> Path to
+                                    Setup</label>
+                                <label><input type="checkbox" class="path-checkbox" value="lightkeeper"> Path to
+                                    Lightkeeper</label>
+                                <label><input type="checkbox" class="path-checkbox" value="test-drive"> Path to Test
+                                    Drive</label>
+                                <label><input type="checkbox" class="path-checkbox" value="punisher"> Path to
+                                    Punisher</label>
+                            </div>
+                            <button id="analyze-quests" class="primary-btn">Analyze Available Quests</button>
+                        </div>
+
+                        <div id="optimizer-results"></div>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Dependency Graph -->
+                <div id="graph-tab" class="tab-content">
+                    <div class="graph-controls">
+                        <button id="fit-graph">Fit to Screen</button>
+                        <button id="reset-graph">Reset Zoom</button>
+                        <select id="layout-select">
+                            <option value="dagre">Hierarchical</option>
+                            <option value="breadthfirst">Breadth First</option>
+                            <option value="circle">Circle</option>
+                        </select>
+                    </div>
+                    <div id="graph-loading" class="graph-loading">
+                        <div class="spinner"></div>
+                        <p>Loading dependency graph...</p>
+                    </div>
+                    <div id="quest-graph"></div>
+                </div>
+
+                <!-- Tab Content: Path Finder -->
+                <div id="path-tab" class="tab-content">
+                    <div class="path-finder">
+                        <h2>Find Optimal Quest Path</h2>
+                        <div class="path-inputs">
+                            <div class="input-group">
+                                <label for="current-level">Your Current Level:</label>
+                                <input type="number" id="current-level" value="1" min="1" max="79">
+                            </div>
+                            <div class="input-group">
+                                <label for="target-quest">Target Quest:</label>
+                                <select id="target-quest">
+                                    <option value="">Select a quest...</option>
+                                </select>
+                            </div>
+                            <button id="find-path" class="primary-btn">Find Path</button>
+                        </div>
+                        <div id="path-result" class="path-result"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quest Detail Modal -->
+    <div id="quest-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js"></script>
+    <script src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
+    <script src="https://unpkg.com/cytoscape-dagre@2.5.0/cytoscape-dagre.js"></script>
+    <script type="module" src="src/index.js"></script>
+</body>
+
+</html>

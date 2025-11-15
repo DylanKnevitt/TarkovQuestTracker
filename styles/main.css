@@ -1,0 +1,361 @@
+/* Main styles */
+:root {
+    --bg-primary: #1a202c;
+    --bg-secondary: #2d3748;
+    --bg-tertiary: #4a5568;
+    --text-primary: #e2e8f0;
+    --text-secondary: #a0aec0;
+    --accent: #4299e1;
+    --success: #48bb78;
+    --warning: #ed8936;
+    --danger: #f56565;
+    --border: #4a5568;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+.app-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.header {
+    background-color: var(--bg-secondary);
+    border-bottom: 2px solid var(--border);
+    padding: 1rem 2rem;
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    font-size: 1.8rem;
+    color: var(--accent);
+}
+
+.header-stats {
+    display: flex;
+    gap: 2rem;
+}
+
+.header-stats span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    height: fit-content;
+    position: sticky;
+    top: 1rem;
+}
+
+.filter-section {
+    margin-bottom: 1.5rem;
+}
+
+.filter-section h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.filter-section label {
+    display: block;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.filter-section input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+.filter-section input[type="number"],
+.filter-section input[type="text"] {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    margin-top: 0.25rem;
+}
+
+.path-btn {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.path-btn:hover {
+    background-color: #3182ce;
+}
+
+.reset-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.reset-btn:hover {
+    background-color: #e53e3e;
+}
+
+/* Content Area */
+.content-area {
+    flex: 1;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    background-color: var(--bg-primary);
+    border-bottom: 2px solid var(--border);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 1rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+}
+
+.tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+.tab-content {
+    display: none;
+    padding: 1.5rem;
+    height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Loading & Error States */
+.loading,
+.error,
+.no-results {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.error {
+    color: var(--danger);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    background-color: var(--bg-secondary);
+    margin: 5% auto;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.close {
+    color: var(--text-secondary);
+    float: right;
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: var(--text-primary);
+}
+
+.modal-content h2 {
+    margin-bottom: 1rem;
+    color: var(--accent);
+}
+
+.modal-content h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.modal-content ul {
+    margin-left: 1.5rem;
+}
+
+.modal-content li {
+    margin-bottom: 0.5rem;
+}
+
+.modal-content li.optional {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.quest-detail-meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background-color: var(--bg-tertiary);
+    border-radius: 4px;
+}
+
+.highlight {
+    padding: 0.75rem;
+    background-color: var(--warning);
+    color: white;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* Trader Colors */
+.trader-prapor {
+    color: #dc2626;
+}
+
+.trader-therapist {
+    color: #ec4899;
+}
+
+.trader-fence {
+    color: #8b5cf6;
+}
+
+.trader-skier {
+    color: #3b82f6;
+}
+
+.trader-peacekeeper {
+    color: #06b6d4;
+}
+
+.trader-mechanic {
+    color: #10b981;
+}
+
+.trader-ragman {
+    color: #f59e0b;
+}
+
+.trader-jaeger {
+    color: #f97316;
+}
+
+.trader-lightkeeper {
+    color: #eab308;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .header-stats {
+        font-size: 0.8rem;
+        gap: 1rem;
+    }
+
+    .tabs {
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        flex: 1 1 33%;
+        min-width: 100px;
+    }
+}

@@ -1,0 +1,100 @@
+<!-- Quick Fix Instructions -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Clear Cache and Reload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a202c;
+            color: #e2e8f0;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        button:hover {
+            background: #3182ce;
+        }
+
+        .success {
+            background: #48bb78;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔧 Tarkov Quest Tracker - Clear Cache</h1>
+
+    <p>If the app is stuck on "Loading quests from Tarkov API...", try these steps:</p>
+
+    <h2>Option 1: Clear Cache (Recommended)</h2>
+    <button onclick="clearCache()">Clear Cache & Reload</button>
+    <div id="success" class="success">✓ Cache cleared! Redirecting...</div>
+
+    <h2>Option 2: Manual Steps</h2>
+    <ol>
+        <li>Open browser Developer Tools (F12)</li>
+        <li>Go to Console tab</li>
+        <li>Type: <code>localStorage.clear()</code></li>
+        <li>Press Enter</li>
+        <li>Refresh the page (F5)</li>
+    </ol>
+
+    <h2>Option 3: Test API Connection</h2>
+    <button onclick="window.location.href='api-test.html'">Open API Test Page</button>
+
+    <h2>Current Cache Status:</h2>
+    <pre id="cache-status"></pre>
+
+    <script>
+        // Show current cache status
+        const cacheData = localStorage.getItem('tarkov_quest_data');
+        const cacheTime = localStorage.getItem('tarkov_quest_data_time');
+
+        let status = 'Cache Status:\n';
+        if (cacheData) {
+            const data = JSON.parse(cacheData);
+            status += `- Cached quests: ${data.length}\n`;
+        } else {
+            status += '- No cached data\n';
+        }
+
+        if (cacheTime) {
+            const time = new Date(parseInt(cacheTime));
+            const age = Date.now() - parseInt(cacheTime);
+            const ageHours = Math.floor(age / (1000 * 60 * 60));
+            status += `- Cache age: ${ageHours} hours (cached at ${time.toLocaleString()})\n`;
+        } else {
+            status += '- No cache timestamp\n';
+        }
+
+        document.getElementById('cache-status').textContent = status;
+
+        function clearCache() {
+            localStorage.clear();
+            document.getElementById('success').style.display = 'block';
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1500);
+        }
+    </script>
+</body>
+
+</html>

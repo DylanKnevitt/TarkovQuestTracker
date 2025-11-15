@@ -1,0 +1,14 @@
+node_modules/
+data/quests.json
+.DS_Store
+*.log
+.vscode/
+.idea/
+dist/
+build/
+.env
+.env.*
+*.tmp
+*.swp
+Thumbs.db
+coverage/

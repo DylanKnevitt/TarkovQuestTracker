@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>API Test</title>
+</head>
+
+<body>
+    <h1>Tarkov API Test</h1>
+    <button onclick="testAPI()">Test API</button>
+    <pre id="output"></pre>
+
+    <script>
+        async function testAPI() {
+            const output = document.getElementById('output');
+            output.textContent = 'Testing API...\n';
+
+            const query = `
+                query {
+                    tasks {
+                        id
+                        name
+                        trader {
+                            name
+                        }
+                        minPlayerLevel
+                    }
+                }
+            `;
+
+            try {
+                output.textContent += 'Sending request...\n';
+
+                const response = await fetch('https://api.tarkov.dev/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query }),
+                });
+
+                output.textContent += `Status: ${response.status}\n`;
+
+                const data = await response.json();
+
+                if (data.errors) {
+                    output.textContent += 'Errors:\n' + JSON.stringify(data.errors, null, 2);
+                } else if (data.data && data.data.tasks) {
+                    output.textContent += `Success! Received ${data.data.tasks.length} quests\n`;
+                    output.textContent += 'First 3 quests:\n';
+                    output.textContent += JSON.stringify(data.data.tasks.slice(0, 3), null, 2);
+                } else {
+                    output.textContent += 'Unexpected response:\n' + JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                output.textContent += 'Error: ' + error.message + '\n';
+                output.textContent += error.stack;
+            }
+        }
+    </script>
+</body>
+
+</html>
