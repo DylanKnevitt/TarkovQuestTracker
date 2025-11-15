@@ -212,27 +212,27 @@ export class AuthUI {
     toggleMode() {
         this.isSignupMode = !this.isSignupMode;
         this.clearError();
-        
+
         // Update title
         const title = document.querySelector('.auth-title');
         if (title) {
             title.textContent = this.isSignupMode ? 'Create Account' : 'Sign In';
         }
-        
+
         // Update submit button text
         const submitBtn = document.getElementById('auth-submit-btn');
         if (submitBtn) {
             submitBtn.textContent = this.isSignupMode ? 'Sign Up' : 'Sign In';
         }
-        
+
         // Update toggle link text
         const toggleBtn = document.getElementById('toggle-mode-btn');
         if (toggleBtn) {
-            toggleBtn.textContent = this.isSignupMode 
-                ? 'Already have an account? Sign in' 
+            toggleBtn.textContent = this.isSignupMode
+                ? 'Already have an account? Sign in'
                 : "Don't have an account? Sign up";
         }
-        
+
         // Update password autocomplete attribute
         const passwordInput = document.getElementById('auth-password');
         if (passwordInput) {

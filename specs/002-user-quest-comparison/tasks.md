@@ -109,15 +109,15 @@ description: "Task list for User Quest Progress Comparison feature"
 
 ### Implementation for User Story 3
 
-- [ ] T031 [US3] Update UserComparison.handleUserSelection() to support multi-select (array of user IDs)
-- [ ] T032 [US3] Implement intersection algorithm in UserComparison.calculateQuestIntersection() - filter quests incomplete for ALL users
-- [ ] T033 [US3] Add max selection limit (10 users) with warning message "Maximum 10 users can be selected"
-- [ ] T034 [US3] Update quest count display to show "X quests incomplete for all N selected users"
-- [ ] T035 [US3] Add "No common incomplete quests" message when intersection is empty
-- [ ] T036 [US3] Add "Clear Selection" button to UserComparison header
-- [ ] T037 [US3] Implement UserComparison.handleClearSelection() - reset selected users array, refresh quest list
-- [ ] T038 [US3] Style Clear Selection button in styles/user-comparison.css
-- [ ] T039 [US3] Add visual indicator showing count of selected users (e.g., badge on user list header)
+- [X] T031 [US3] Update UserComparison.handleUserSelection() to support multi-select (array of user IDs)
+- [X] T032 [US3] Implement intersection algorithm in UserComparison.calculateQuestIntersection() - filter quests incomplete for ALL users
+- [X] T033 [US3] Add max selection limit (10 users) with warning message "Maximum 10 users can be selected"
+- [X] T034 [US3] Update quest count display to show "X quests incomplete for all N selected users"
+- [X] T035 [US3] Add "No common incomplete quests" message when intersection is empty
+- [X] T036 [US3] Add "Clear Selection" button to UserComparison header
+- [X] T037 [US3] Implement UserComparison.handleClearSelection() - reset selected users array, refresh quest list
+- [X] T038 [US3] Style Clear Selection button in styles/user-comparison.css
+- [X] T039 [US3] Add visual indicator showing count of selected users (e.g., badge on user list header)
 
 **Checkpoint**: Multi-user selection works, intersection calculates correctly, clear selection works
 
