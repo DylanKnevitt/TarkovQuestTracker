@@ -39,9 +39,16 @@ export class SyncService {
 
     try {
       const timestamp = new Date().toISOString();
-      
+
+      // Get current session to ensure we have the right user_id
+      const { data: { session } } = await this.supabase.auth.getSession();
+      if (!session) {
+        console.error('No active session found');
+        return { success: false, error: new Error('Not authenticated') };
+      }
+
       const payload = {
-        user_id: userId,
+        user_id: session.user.id,
         quest_id: questId,
         completed: completed,
         completed_at: completed ? (completedAt || timestamp) : null,
@@ -79,9 +86,16 @@ export class SyncService {
       return { success: false, synced: 0, failed: items?.length || 0, errors: ['Supabase not available or invalid input'] };
     }
 
+    // Get current session to ensure we have the right user_id
+    const { data: { session } } = await this.supabase.auth.getSession();
+    if (!session) {
+      console.error('No active session found');
+      return { success: false, synced: 0, failed: items.length, errors: [new Error('Not authenticated')] };
+    }
+
     const timestamp = new Date().toISOString();
     const payload = items.map(item => ({
-      user_id: userId,
+      user_id: session.user.id,
       quest_id: item.questId,
       completed: item.completed,
       completed_at: item.completed ? (item.completedAt || timestamp) : null,
@@ -159,9 +173,9 @@ export class SyncService {
    */
   addToQueue(userId, questId, completed, completedAt = null) {
     const queue = this.getQueue();
-    
+
     // Check if this quest is already in the queue
-    const existingIndex = queue.findIndex(item => 
+    const existingIndex = queue.findIndex(item =>
       item.userId === userId && item.questId === questId
     );
 
