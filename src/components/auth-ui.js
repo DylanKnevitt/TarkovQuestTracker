@@ -11,6 +11,7 @@ export class AuthUI {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.currentUser = null;
+        this.isSignupMode = false;
 
         if (!this.container) {
             console.error(`Auth UI container #${containerId} not found`);
@@ -80,14 +81,14 @@ export class AuthUI {
     renderUnauthenticated() {
         this.container.innerHTML = `
       <div class="auth-status unauthenticated">
-        <button id="show-auth-modal-btn" class="btn btn-primary">Sign Upin</button>
+        <button id="show-auth-modal-btn" class="btn btn-primary">Sign In</button>
       </div>
       
       <div id="auth-modal" class="auth-modal hidden">
         <div class="auth-modal-content">
           <button id="close-modal-btn" class="close-modal">&times;</button>
           
-          <h2 class="auth-title">Sign Upin</h2>
+          <h2 class="auth-title">${this.isSignupMode ? 'Create Account' : 'Sign In'}</h2>
           
           <form id="auth-form" class="auth-form">
             <div class="form-group">
@@ -108,7 +109,7 @@ export class AuthUI {
                 id="auth-password" 
                 placeholder="••••••••" 
                 required 
-                autocomplete="current-password"
+                autocomplete="${this.isSignupMode ? 'new-password' : 'current-password'}"
               />
               <small class="form-hint">Minimum 6 characters</small>
             </div>
@@ -116,9 +117,15 @@ export class AuthUI {
             <div id="auth-error" class="auth-error hidden"></div>
             
             <button type="submit" class="btn btn-primary btn-block" id="auth-submit-btn">
-              Sign Upin
+              ${this.isSignupMode ? 'Sign Up' : 'Sign In'}
             </button>
           </form>
+          
+          <div class="auth-footer">
+            <button id="toggle-mode-btn" class="btn-link">
+              ${this.isSignupMode ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -146,6 +153,7 @@ export class AuthUI {
         const closeModalBtn = document.getElementById('close-modal-btn');
         const modal = document.getElementById('auth-modal');
         const authForm = document.getElementById('auth-form');
+        const toggleModeBtn = document.getElementById('toggle-mode-btn');
 
         if (showModalBtn) {
             showModalBtn.addEventListener('click', () => this.showModal());
@@ -165,6 +173,10 @@ export class AuthUI {
 
         if (authForm) {
             authForm.addEventListener('submit', (e) => this.handleSubmit(e));
+        }
+
+        if (toggleModeBtn) {
+            toggleModeBtn.addEventListener('click', () => this.toggleMode());
         }
     }
 
@@ -195,7 +207,16 @@ export class AuthUI {
     }
 
     /**
-     * Handle form submission (auto sign in or sign up)
+     * Toggle between sign in and sign up modes
+     */
+    toggleMode() {
+        this.isSignupMode = !this.isSignupMode;
+        this.clearError();
+        this.render();
+    }
+
+    /**
+     * Handle form submission - STRICTLY separates sign in and sign up
      */
     async handleSubmit(e) {
         e.preventDefault();
@@ -226,25 +247,30 @@ export class AuthUI {
         // Disable submit button during request
         if (submitBtn) {
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Signing upin...';
+            submitBtn.textContent = this.isSignupMode ? 'Signing up...' : 'Signing in...';
         }
 
         try {
-            // Try to sign in first
-            let result = await authService.signIn(email, password);
+            let result;
 
-            // If sign in fails with invalid credentials, try to sign up
-            if (result.error && result.error.message?.includes('Invalid login credentials')) {
-                console.log('User not found, creating new account...');
+            // STRICTLY SEPARATE: Either sign in OR sign up, never both
+            if (this.isSignupMode) {
+                // Sign up mode - create new account
                 result = await authService.signUp(email, password);
+            } else {
+                // Sign in mode - authenticate existing user
+                result = await authService.signIn(email, password);
             }
 
+            // Handle result
             if (result.error) {
                 this.showError(this.formatAuthError(result.error));
-            } else {
+            } else if (result.user) {
                 // Success - modal will close via auth state change
                 this.hideModal();
                 console.log('Authentication successful:', result.user.email);
+            } else {
+                this.showError('Authentication failed. Please try again.');
             }
         } catch (err) {
             console.error('Auth error:', err);
@@ -253,7 +279,7 @@ export class AuthUI {
             // Re-enable submit button
             if (submitBtn) {
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Sign Upin';
+                submitBtn.textContent = this.isSignupMode ? 'Sign Up' : 'Sign In';
             }
         }
     }
@@ -302,13 +328,13 @@ export class AuthUI {
 
         // Common error mappings
         if (message.includes('Invalid login credentials')) {
-            return 'Invalid email or password';
+            return 'Invalid email or password. Please check your credentials or sign up for a new account.';
         }
         if (message.includes('Email not confirmed')) {
             return 'Please check your email and confirm your account';
         }
         if (message.includes('User already registered')) {
-            return 'Account created successfully! Please check your email to confirm.';
+            return 'This email is already registered. Please sign in instead.';
         }
         if (message.includes('Password should be at least 6 characters')) {
             return 'Password must be at least 6 characters';
