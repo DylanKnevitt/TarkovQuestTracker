@@ -10,6 +10,7 @@ import { QuestOptimizer } from './components/quest-optimizer.js';
 import { getSupabaseClient, isSupabaseAvailable } from './api/supabase-client.js';
 import { AuthUI } from './components/auth-ui.js';
 import { SyncIndicator } from './components/sync-indicator.js';
+import { getComparisonService } from './services/comparison-service.js';
 
 class TarkovQuestApp {
     constructor() {
@@ -19,6 +20,7 @@ class TarkovQuestApp {
         this.questOptimizer = null;
         this.authUI = null;
         this.syncIndicator = null;
+        this.comparisonService = null;
         this.currentTab = 'list';
     }
 
@@ -38,6 +40,10 @@ class TarkovQuestApp {
 
         // Initialize sync indicator
         this.syncIndicator = new SyncIndicator('sync-indicator-container');
+
+        // Initialize comparison service
+        this.comparisonService = getComparisonService();
+        console.log('Comparison service initialized');
 
         // Listen for auth state changes to reload progress
         const { authService } = await import('./services/auth-service.js');
