@@ -41,65 +41,40 @@ export class ComparisonService {
     }
 
     try {
-      // Query: Get all users with quest progress aggregated
-      // Note: This uses a custom RPC function or direct query
-      // For now, we'll fetch separately and aggregate client-side for simplicity
-      
-      // First, get all unique user IDs from quest_progress
-      const { data: progressData, error: progressError } = await this.supabase
-        .from('quest_progress')
-        .select('user_id, completed');
+      // Use Supabase RPC function to get user profiles with stats
+      // This function has SECURITY DEFINER privileges to access auth.users
+      const { data, error } = await this.supabase
+        .rpc('get_user_profiles_with_stats');
 
-      if (progressError) {
-        console.error('Error fetching quest progress:', progressError);
-        return { data: null, error: progressError };
+      if (error) {
+        console.error('Error calling get_user_profiles_with_stats:', error);
+        
+        // If function doesn't exist, provide helpful error message
+        if (error.message?.includes('function') || error.code === '42883') {
+          return {
+            data: null,
+            error: new Error(
+              'Database function not found. Please run supabase-user-profiles-function.sql in Supabase SQL Editor.'
+            )
+          };
+        }
+        
+        return { data: null, error };
       }
 
-      if (!progressData || progressData.length === 0) {
+      if (!data || data.length === 0) {
         return { data: [], error: null };
       }
 
-      // Aggregate by user_id
-      const userStatsMap = new Map();
-      progressData.forEach(record => {
-        const userId = record.user_id;
-        if (!userStatsMap.has(userId)) {
-          userStatsMap.set(userId, { total: 0, completed: 0 });
-        }
-        const stats = userStatsMap.get(userId);
-        stats.total++;
-        if (record.completed) {
-          stats.completed++;
-        }
-      });
+      // Convert to UserProfile instances
+      const userProfiles = data.map(row => new UserProfile({
+        id: row.id,
+        email: row.email,
+        total_quests: row.total_quests,
+        completed_count: row.completed_count
+      }));
 
-      // Get current session to access auth.users
-      const { data: { session }, error: sessionError } = await this.supabase.auth.getSession();
-      
-      if (sessionError || !session) {
-        console.error('Not authenticated:', sessionError);
-        return { data: null, error: new Error('Authentication required') };
-      }
-
-      // Fetch user details using auth admin API
-      // Since we can't directly query auth.users, we'll use the user IDs we have
-      // and get email from the session for current user, others we'll show ID
-      const userIds = Array.from(userStatsMap.keys());
-      
-      // Build user profiles - for current user we have email from session
-      const userProfiles = userIds.map(userId => {
-        const stats = userStatsMap.get(userId);
-        const email = userId === session.user.id ? session.user.email : `user-${userId.slice(0, 8)}`;
-        
-        return new UserProfile({
-          id: userId,
-          email: email,
-          total_quests: stats.total,
-          completed_count: stats.completed
-        });
-      });
-
-      // Sort by completion percentage descending
+      // Already sorted by completion in SQL, but sort again to be sure
       userProfiles.sort((a, b) => b.completionPercentage - a.completionPercentage);
 
       // Cache results
