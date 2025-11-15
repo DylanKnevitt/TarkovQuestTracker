@@ -45,7 +45,20 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
 
 **Note**: The app works in LocalStorage-only mode without these credentials. Cloud sync and multi-user features require a Supabase account (free tier available).
 
-4. **Start the development server:**
+4. **Set up Supabase database (required for cloud sync and user comparison):**
+
+If you configured Supabase credentials in step 3, you need to run the SQL migrations:
+
+```bash
+# 1. Go to your Supabase Dashboard > SQL Editor
+# 2. Create a new query and run the contents of:
+#    - supabase-setup.sql (quest_progress table and RLS policies)
+#    - supabase-user-profiles-function.sql (user comparison support)
+```
+
+These files are in the repository root. Copy and paste their contents into Supabase SQL Editor and run them.
+
+5. **Start the development server:**
 ```bash
 npm run dev
 ```
