@@ -196,12 +196,12 @@ US5: Migration (T049-T052)
 
 ### Tasks
 
-- [ ] T018 [US1] Push code to GitHub repository (ensure remote is set up)
-- [ ] T019 [P] [US1] Create vercel.json configuration file with SPA rewrites and security headers
-- [ ] T020 [P] [US1] Update package.json with "build" script for production build
-- [ ] T021 [P] [US1] Update README.md with deployment section (link to Vercel URL after deployment)
-- [ ] T022 [US1] Create Vercel project and link to GitHub repository
-- [ ] T023 [US1] Verify initial deployment succeeds and app loads at Vercel URL
+- [x] T018 [US1] Push code to GitHub repository (ensure remote is set up)
+- [x] T019 [P] [US1] Create vercel.json configuration file with SPA rewrites and security headers
+- [x] T020 [P] [US1] Update package.json with "build" script for production build
+- [x] T021 [P] [US1] Update README.md with deployment section (link to Vercel URL after deployment)
+- [ ] T022 [US1] **MANUAL STEP**: Create Vercel project and link to GitHub repository (see DEPLOYMENT_GUIDE.md)
+- [ ] T023 [US1] **MANUAL STEP**: Verify initial deployment succeeds and app loads at Vercel URL
 
 **Completion Criteria**:
 - [x] Code is pushed to GitHub main branch
