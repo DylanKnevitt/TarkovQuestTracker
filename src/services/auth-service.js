@@ -54,11 +54,15 @@ export class AuthService {
         return { user: null, error };
       }
 
-      const user = User.fromSupabase(data.user);
-      this.currentUser = user;
-      this._notifyAuthStateChange(user);
+      // Only set current user and notify if signup was successful
+      if (data.user) {
+        const user = User.fromSupabase(data.user);
+        this.currentUser = user;
+        this._notifyAuthStateChange(user);
+        return { user, error: null };
+      }
 
-      return { user, error: null };
+      return { user: null, error: new Error('No user data returned') };
     } catch (err) {
       console.error('Sign up exception:', err);
       return { user: null, error: err };
@@ -90,11 +94,15 @@ export class AuthService {
         return { user: null, error };
       }
 
-      const user = User.fromSupabase(data.user);
-      this.currentUser = user;
-      this._notifyAuthStateChange(user);
+      // Only set current user and notify if login was successful
+      if (data.user) {
+        const user = User.fromSupabase(data.user);
+        this.currentUser = user;
+        this._notifyAuthStateChange(user);
+        return { user, error: null };
+      }
 
-      return { user, error: null };
+      return { user: null, error: new Error('No user data returned') };
     } catch (err) {
       console.error('Sign in exception:', err);
       return { user: null, error: err };
