@@ -73,24 +73,27 @@ export class ComparisonService {
         }
       });
 
-      // Now fetch user details for each unique user_id
-      const userIds = Array.from(userStatsMap.keys());
-      const { data: usersData, error: usersError } = await this.supabase
-        .from('users')
-        .select('id, email')
-        .in('id', userIds);
-
-      if (usersError) {
-        console.error('Error fetching users:', usersError);
-        return { data: null, error: usersError };
+      // Get current session to access auth.users
+      const { data: { session }, error: sessionError } = await this.supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        console.error('Not authenticated:', sessionError);
+        return { data: null, error: new Error('Authentication required') };
       }
 
-      // Combine user data with stats
-      const userProfiles = usersData.map(user => {
-        const stats = userStatsMap.get(user.id);
+      // Fetch user details using auth admin API
+      // Since we can't directly query auth.users, we'll use the user IDs we have
+      // and get email from the session for current user, others we'll show ID
+      const userIds = Array.from(userStatsMap.keys());
+      
+      // Build user profiles - for current user we have email from session
+      const userProfiles = userIds.map(userId => {
+        const stats = userStatsMap.get(userId);
+        const email = userId === session.user.id ? session.user.email : `user-${userId.slice(0, 8)}`;
+        
         return new UserProfile({
-          id: user.id,
-          email: user.email,
+          id: userId,
+          email: email,
           total_quests: stats.total,
           completed_count: stats.completed
         });
