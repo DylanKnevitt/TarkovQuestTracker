@@ -252,7 +252,7 @@ export class AuthService {
   onAuthStateChange(callback) {
     if (!this.supabase) {
       console.warn('Supabase not configured. Auth state changes not available.');
-      return () => {};
+      return () => { };
     }
 
     // Add to local callbacks
@@ -262,7 +262,7 @@ export class AuthService {
     const { data: { subscription } } = this.supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('Auth state change:', event, session?.user?.email);
-        
+
         if (session?.user) {
           const user = User.fromSupabase(session.user);
           this.currentUser = user;

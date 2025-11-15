@@ -99,7 +99,7 @@ export class StorageService {
       }
 
       const progress = JSON.parse(progressJson);
-      
+
       // Ensure all entries have timestamps (for old data)
       Object.keys(progress).forEach(questId => {
         if (!progress[questId].updatedAt) {
@@ -166,7 +166,7 @@ export class StorageService {
    */
   async markComplete(questId) {
     const timestamp = new Date().toISOString();
-    
+
     // Update cache
     this.progressCache[questId] = {
       completed: true,
@@ -212,7 +212,7 @@ export class StorageService {
    */
   async markIncomplete(questId) {
     const timestamp = new Date().toISOString();
-    
+
     // Update cache
     this.progressCache[questId] = {
       completed: false,

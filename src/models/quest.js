@@ -200,7 +200,7 @@ export class QuestManager {
     async loadProgress() {
         // Load progress from storage service (merges LocalStorage + Supabase)
         const progress = await storageService.loadProgress();
-        
+
         // Convert progress object to Set of completed quest IDs
         this.completedQuests = new Set(
             Object.keys(progress).filter(questId => progress[questId]?.completed)
