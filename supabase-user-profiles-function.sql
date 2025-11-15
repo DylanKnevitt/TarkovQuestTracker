@@ -7,7 +7,7 @@
 
 -- Create a function to get all user profiles with quest stats
 -- This function runs with security definer privileges to access auth.users
-CREATE OR REPLACE FUNCTION get_user_profiles_with_stats()
+CREATE OR REPLACE FUNCTION public.get_user_profiles_with_stats()
 RETURNS TABLE (
   id UUID,
   email TEXT,
@@ -34,7 +34,8 @@ END;
 $$;
 
 -- Grant execute permission to authenticated users
-GRANT EXECUTE ON FUNCTION get_user_profiles_with_stats() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_user_profiles_with_stats() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_user_profiles_with_stats() TO anon;
 
 -- Test the function (uncomment to test)
 -- SELECT * FROM get_user_profiles_with_stats();
