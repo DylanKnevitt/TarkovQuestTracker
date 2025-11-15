@@ -39,6 +39,22 @@ class TarkovQuestApp {
         // Initialize sync indicator
         this.syncIndicator = new SyncIndicator('sync-indicator-container');
 
+        // Listen for auth state changes to reload progress
+        const { authService } = await import('./services/auth-service.js');
+        authService.onAuthStateChange(async (user) => {
+            if (user && this.questManager) {
+                console.log('Auth state changed, reloading progress...');
+                await this.questManager.loadProgress();
+                if (this.questList) {
+                    this.questList.render();
+                }
+                if (this.questGraph) {
+                    this.questGraph.buildGraph(this.questManager.quests);
+                }
+                this.updateStats();
+            }
+        });
+
         try {
             // Try to load from cache first
             let questData = questCache.get();
