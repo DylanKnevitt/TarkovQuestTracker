@@ -31,10 +31,19 @@ export class ComparisonQuestList {
      * Set selected users and their progress data
      * @param {Array<string>} userIds - Array of selected user IDs
      * @param {Map<string, UserQuestProgress>} progressMap - Map of userId -> UserQuestProgress
+     * @param {Array<UserProfile>} userProfiles - Optional array of UserProfile objects
      */
-    setSelectedUsers(userIds, progressMap) {
+    setSelectedUsers(userIds, progressMap, userProfiles = null) {
         this.selectedUserIds = userIds;
         this.userProgressMap = progressMap;
+        
+        // Build user profiles map for easy lookup
+        this.userProfilesMap = new Map();
+        if (userProfiles) {
+            userProfiles.forEach(profile => {
+                this.userProfilesMap.set(profile.id, profile);
+            });
+        }
     }
 
     /**
@@ -170,6 +179,15 @@ export class ComparisonQuestList {
         level.textContent = `Level ${quest.minPlayerLevel || 1}`;
 
         header.appendChild(name);
+
+        // Add completion summary if multiple users selected (T043)
+        if (this.selectedUserIds.length > 1) {
+            const summary = this.createCompletionSummary(quest.id);
+            if (summary) {
+                header.appendChild(summary);
+            }
+        }
+
         header.appendChild(level);
 
         // Quest objectives summary
@@ -181,12 +199,121 @@ export class ComparisonQuestList {
         item.appendChild(header);
         item.appendChild(objectives);
 
+        // Add completion indicators (T040-T042)
+        if (this.selectedUserIds.length > 0) {
+            const indicators = this.renderCompletionIndicators(quest.id);
+            if (indicators) {
+                item.appendChild(indicators);
+            }
+        }
+
         // Add click handler to show details
         item.addEventListener('click', () => {
             this.showQuestDetails(quest.id);
         });
 
         return item;
+    }
+
+    /**
+     * Create completion summary for quest (T043)
+     * @param {string} questId - Quest ID
+     * @returns {HTMLElement|null} Completion summary element or null
+     */
+    createCompletionSummary(questId) {
+        if (this.selectedUserIds.length === 0) return null;
+
+        let completedCount = 0;
+        this.selectedUserIds.forEach(userId => {
+            const progress = this.userProgressMap.get(userId);
+            if (progress && progress.isQuestCompleted(questId)) {
+                completedCount++;
+            }
+        });
+
+        const summary = document.createElement('span');
+        summary.className = 'completion-summary';
+        summary.textContent = `${completedCount}/${this.selectedUserIds.length} completed`;
+        summary.title = `${completedCount} out of ${this.selectedUserIds.length} users completed this quest`;
+
+        return summary;
+    }
+
+    /**
+     * Render completion indicators for a quest (T041)
+     * Shows checkmark or circle for each selected user
+     * @param {string} questId - Quest ID
+     * @returns {HTMLElement|null} Indicators container or null
+     */
+    renderCompletionIndicators(questId) {
+        if (this.selectedUserIds.length === 0) return null;
+
+        const container = document.createElement('div');
+        container.className = 'completion-indicators';
+
+        // Get user profiles to show initials
+        this.selectedUserIds.forEach(userId => {
+            const progress = this.userProgressMap.get(userId);
+            if (!progress) return; // Skip if no progress data (T046)
+
+            const isCompleted = progress.isQuestCompleted(questId);
+
+            // Create indicator badge (T044-T045)
+            const indicator = document.createElement('div');
+            indicator.className = `indicator ${isCompleted ? 'completed' : 'incomplete'}`;
+
+            // Get user initials from progress object
+            const userEmail = this.getUserEmail(userId);
+            const initials = this.getUserInitials(userEmail);
+
+            // Icon: checkmark for completed, circle for incomplete
+            const icon = document.createElement('span');
+            icon.className = 'indicator-icon';
+            icon.textContent = isCompleted ? '✓' : '○'; // ✓ or ○
+
+            // User initials badge
+            const badge = document.createElement('span');
+            badge.className = 'indicator-badge';
+            badge.textContent = initials;
+
+            indicator.appendChild(icon);
+            indicator.appendChild(badge);
+
+            // Tooltip showing user email and status (T042)
+            const statusText = isCompleted ? 'Completed' : 'Incomplete';
+            indicator.title = `${userEmail}: ${statusText}`;
+
+            container.appendChild(indicator);
+        });
+
+        return container;
+    }
+
+    /**
+     * Get user email from user ID (helper for indicators)
+     * @param {string} userId - User ID
+     * @returns {string} User email or ID
+     */
+    getUserEmail(userId) {
+        const profile = this.userProfilesMap?.get(userId);
+        if (profile) {
+            return profile.email;
+        }
+        return userId.substring(0, 8);
+    }
+
+    /**
+     * Get user initials from email
+     * @param {string} email - User email
+     * @returns {string} Two-letter initials
+     */
+    getUserInitials(email) {
+        if (!email) return '??';
+        const parts = email.split('@')[0].split('.');
+        if (parts.length >= 2) {
+            return (parts[0][0] + parts[1][0]).toUpperCase();
+        }
+        return email.substring(0, 2).toUpperCase();
     }
 
     /**

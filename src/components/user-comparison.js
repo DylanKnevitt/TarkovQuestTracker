@@ -211,7 +211,7 @@ export class UserComparison {
 
         // If no users selected, show empty state
         if (this.selectedUserIds.length === 0) {
-            this.questList.setSelectedUsers([], new Map());
+            this.questList.setSelectedUsers([], new Map(), this.users);
             this.questList.setFilteredQuests([]);
             this.questList.render();
             return;
@@ -220,7 +220,7 @@ export class UserComparison {
         // Get all quests from QuestManager
         const allQuests = this.questManager.quests;
         if (!allQuests || allQuests.length === 0) {
-            this.questList.setSelectedUsers(this.selectedUserIds, this.userProgressMap);
+            this.questList.setSelectedUsers(this.selectedUserIds, this.userProgressMap, this.users);
             this.questList.setFilteredQuests([]);
             this.questList.render();
             return;
@@ -230,7 +230,7 @@ export class UserComparison {
         const incompleteQuests = this.calculateQuestIntersection(allQuests);
 
         // Update quest list component
-        this.questList.setSelectedUsers(this.selectedUserIds, this.userProgressMap);
+        this.questList.setSelectedUsers(this.selectedUserIds, this.userProgressMap, this.users);
         this.questList.setFilteredQuests(incompleteQuests);
         this.questList.render();
     }

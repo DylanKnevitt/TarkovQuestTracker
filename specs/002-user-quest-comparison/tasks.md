@@ -131,13 +131,13 @@ description: "Task list for User Quest Progress Comparison feature"
 
 ### Implementation for User Story 4
 
-- [ ] T040 [P] [US4] Add completion indicator section to ComparisonQuestList quest item template
-- [ ] T041 [US4] Implement ComparisonQuestList.renderCompletionIndicators(questId) - show checkmark or empty circle per user
-- [ ] T042 [US4] Add tooltip on hover showing "Player1: Completed, Player2: Incomplete" using title attribute
-- [ ] T043 [US4] Add completion summary "X/Y completed" next to quest name when multiple users selected
-- [ ] T044 [US4] Style completion indicators in styles/user-comparison.css (checkmark ✓, circle ○, colors)
-- [ ] T045 [US4] Add user initials badges to indicators for clarity (shows who completed it)
-- [ ] T046 [US4] Handle edge case: if user not in selected set, don't show indicator for that user
+- [X] T040 [P] [US4] Add completion indicator section to ComparisonQuestList quest item template
+- [X] T041 [US4] Implement ComparisonQuestList.renderCompletionIndicators(questId) - show checkmark or empty circle per user
+- [X] T042 [US4] Add tooltip on hover showing "Player1: Completed, Player2: Incomplete" using title attribute
+- [X] T043 [US4] Add completion summary "X/Y completed" next to quest name when multiple users selected
+- [X] T044 [US4] Style completion indicators in styles/user-comparison.css (checkmark ✓, circle ○, colors)
+- [X] T045 [US4] Add user initials badges to indicators for clarity (shows who completed it)
+- [X] T046 [US4] Handle edge case: if user not in selected set, don't show indicator for that user
 
 **Checkpoint**: Visual indicators appear, tooltips show details, completion summary accurate
 

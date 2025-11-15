@@ -235,22 +235,51 @@
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    padding: 0.2rem 0.5rem;
+    padding: 0.25rem 0.5rem;
     border-radius: 12px;
     font-size: 0.75rem;
     background: var(--indicator-bg, #333);
+    cursor: help;
+    transition: all 0.2s;
+}
+
+.indicator:hover {
+    background: var(--indicator-hover, #444);
+    transform: scale(1.05);
 }
 
 .indicator.completed {
     color: var(--success-color, #4caf50);
+    border: 1px solid var(--success-color, #4caf50);
 }
 
 .indicator.incomplete {
     color: var(--text-secondary, #aaa);
+    border: 1px solid var(--border-color, #555);
 }
 
 .indicator-icon {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.indicator-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+/* Completion Summary */
+.completion-summary {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    margin-left: 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--info-bg, rgba(74, 158, 255, 0.15));
+    color: var(--info-color, #4a9eff);
+    cursor: help;
 }
 
 /* Loading and Empty States */
