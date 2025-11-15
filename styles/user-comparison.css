@@ -1,0 +1,323 @@
+/* User Comparison View Styles */
+
+.comparison-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.5rem;
+    gap: 1.5rem;
+}
+
+/* Header Section */
+.comparison-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--surface-color, #2a2a2a);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.comparison-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--text-primary, #ffffff);
+}
+
+.comparison-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.comparison-actions button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    background: var(--primary-color, #4a9eff);
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.comparison-actions button:hover {
+    background: var(--primary-hover, #3a8eef);
+}
+
+.comparison-actions button:disabled {
+    background: var(--disabled-color, #555);
+    cursor: not-allowed;
+}
+
+/* Main Layout */
+.comparison-content {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 1.5rem;
+    height: calc(100vh - 250px);
+    overflow: hidden;
+}
+
+/* User List Section */
+.user-list-section {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-color, #2a2a2a);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.user-list-header {
+    padding: 1rem;
+    background: var(--surface-dark, #1e1e1e);
+    border-bottom: 1px solid var(--border-color, #444);
+}
+
+.user-list-header h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    color: var(--text-primary, #ffffff);
+}
+
+.user-list-stats {
+    font-size: 0.85rem;
+    color: var(--text-secondary, #aaa);
+}
+
+.user-list-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+/* User Card */
+.user-card {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: var(--background-color, #1a1a1a);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.user-card:hover {
+    background: var(--hover-color, #2e2e2e);
+    border-color: var(--border-hover, #555);
+}
+
+.user-card.selected {
+    background: var(--selected-bg, #2a4a6a);
+    border-color: var(--primary-color, #4a9eff);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-color, #4a9eff);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-email {
+    font-size: 0.95rem;
+    color: var(--text-primary, #ffffff);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-stats {
+    font-size: 0.8rem;
+    color: var(--text-secondary, #aaa);
+    margin-top: 0.2rem;
+}
+
+.completion-badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    background: var(--badge-bg, #333);
+    color: var(--badge-text, #4a9eff);
+}
+
+/* Quest List Section */
+.quest-list-section {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-color, #2a2a2a);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.quest-list-header {
+    padding: 1rem;
+    background: var(--surface-dark, #1e1e1e);
+    border-bottom: 1px solid var(--border-color, #444);
+}
+
+.quest-list-header h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    color: var(--text-primary, #ffffff);
+}
+
+.quest-count-display {
+    font-size: 0.9rem;
+    color: var(--text-secondary, #aaa);
+}
+
+.quest-list-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+/* Completion Indicators */
+.completion-indicators {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    background: var(--indicator-bg, #333);
+}
+
+.indicator.completed {
+    color: var(--success-color, #4caf50);
+}
+
+.indicator.incomplete {
+    color: var(--text-secondary, #aaa);
+}
+
+.indicator-icon {
+    font-size: 0.85rem;
+}
+
+/* Loading and Empty States */
+.loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: var(--text-secondary, #aaa);
+}
+
+.loading-spinner .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border-color, #444);
+    border-top-color: var(--primary-color, #4a9eff);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+    color: var(--text-secondary, #aaa);
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state-message {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-hint {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .comparison-content {
+        grid-template-columns: 1fr;
+        grid-template-rows: 300px 1fr;
+    }
+
+    .user-list-section {
+        max-height: 300px;
+    }
+
+    .comparison-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .comparison-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .comparison-actions button {
+        flex: 1;
+    }
+}
+
+/* Error State */
+.error-state {
+    padding: 2rem;
+    text-align: center;
+    color: var(--error-color, #f44336);
+    background: var(--error-bg, rgba(244, 67, 54, 0.1));
+    border-radius: 8px;
+    margin: 1rem;
+}
+
+.error-state-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.error-state-message {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.error-state-hint {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}

@@ -29,11 +29,11 @@ description: "Task list for User Quest Progress Comparison feature"
 
 **Purpose**: Add comparison tab to main UI and create necessary directory structure
 
-- [ ] T001 Add "User Comparison" tab button to index.html navigation (after quest-optimizer tab)
-- [ ] T002 Create placeholder comparison view container in index.html (id="comparison-view")
-- [ ] T003 [P] Create styles/user-comparison.css with base styles for comparison view
-- [ ] T004 [P] Create src/models/user-profile.js with UserProfile class (id, email, completion stats)
-- [ ] T005 [P] Create src/models/user-quest-progress.js with UserQuestProgress class (quest map structure)
+- [X] T001 Add "User Comparison" tab button to index.html navigation (after quest-optimizer tab)
+- [X] T002 Create placeholder comparison view container in index.html (id="comparison-view")
+- [X] T003 [P] Create styles/user-comparison.css with base styles for comparison view
+- [X] T004 [P] Create src/models/user-profile.js with UserProfile class (id, email, completion stats)
+- [X] T005 [P] Create src/models/user-quest-progress.js with UserQuestProgress class (quest map structure)
 
 **Checkpoint**: Tab visible, placeholder view exists, model files created
 
