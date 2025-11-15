@@ -338,21 +338,21 @@ CREATE POLICY "Users can delete own quest progress"
 
 ### Tasks
 
-- [ ] T033 [P] [US3] Create src/models/user.js with User class wrapping Supabase auth user
-- [ ] T034 [P] [US3] Create src/services/auth-service.js with AuthService class
-- [ ] T035 [US3] Implement AuthService methods: signUp(email, password)
-- [ ] T036 [US3] Implement AuthService methods: signIn(email, password)
-- [ ] T037 [US3] Implement AuthService methods: signOut()
-- [ ] T038 [US3] Implement AuthService methods: getCurrentUser(), onAuthStateChange(callback)
-- [ ] T039 [P] [US3] Create src/components/auth-ui.js component for login/signup UI
-- [ ] T040 [P] [US3] Create styles/auth.css for authentication UI styling
-- [ ] T041 [P] [US3] Update index.html to include auth UI container (e.g., <div id="auth-container">)
-- [ ] T042 [US3] Integrate auth-ui.js with AuthService (wire up form submissions)
-- [ ] T043 [US3] Add auth state change listener in src/index.js
-- [ ] T044 [US3] Update UI to show login/logout button based on auth state
-- [ ] T045 [US3] Implement password validation (minimum 8 characters) in auth-ui.js
-- [ ] T046 [US3] Add error handling and display for authentication failures
-- [ ] T047 [US3] Test authentication flow: signup → login → logout → login
+- [x] T033 [P] [US3] Create src/models/user.js with User class wrapping Supabase auth user
+- [x] T034 [P] [US3] Create src/services/auth-service.js with AuthService class
+- [x] T035 [US3] Implement AuthService methods: signUp(email, password)
+- [x] T036 [US3] Implement AuthService methods: signIn(email, password)
+- [x] T037 [US3] Implement AuthService methods: signOut()
+- [x] T038 [US3] Implement AuthService methods: getCurrentUser(), onAuthStateChange(callback)
+- [x] T039 [P] [US3] Create src/components/auth-ui.js component for login/signup UI
+- [x] T040 [P] [US3] Create styles/auth.css for authentication UI styling
+- [x] T041 [P] [US3] Update index.html to include auth UI container (e.g., <div id="auth-container">)
+- [x] T042 [US3] Integrate auth-ui.js with AuthService (wire up form submissions)
+- [x] T043 [US3] Add auth state change listener in src/index.js
+- [x] T044 [US3] Update UI to show login/logout button based on auth state
+- [x] T045 [US3] Implement password validation (minimum 8 characters) in auth-ui.js
+- [x] T046 [US3] Add error handling and display for authentication failures
+- [ ] T047 [US3] **MANUAL TEST**: Test authentication flow: signup → login → logout → login
 
 **AuthService Interface** (T034-T038):
 ```javascript

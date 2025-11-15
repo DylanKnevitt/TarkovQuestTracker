@@ -19,40 +19,40 @@ let supabaseClient = null;
  * @returns {Object|null} Supabase client instance, or null if environment variables are missing
  */
 export function getSupabaseClient() {
-  // Return existing client if already initialized
-  if (supabaseClient !== null) {
-    return supabaseClient;
-  }
+    // Return existing client if already initialized
+    if (supabaseClient !== null) {
+        return supabaseClient;
+    }
 
-  // Get environment variables
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    // Get environment variables
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-  // Check if environment variables are configured
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn(
-      'Supabase environment variables not configured. Running in LocalStorage-only mode. ' +
-      'Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to enable cloud sync.'
-    );
-    return null;
-  }
+    // Check if environment variables are configured
+    if (!supabaseUrl || !supabaseAnonKey) {
+        console.warn(
+            'Supabase environment variables not configured. Running in LocalStorage-only mode. ' +
+            'Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to enable cloud sync.'
+        );
+        return null;
+    }
 
-  // Create Supabase client with configuration
-  try {
-    supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-      },
-    });
+    // Create Supabase client with configuration
+    try {
+        supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true,
+            },
+        });
 
-    console.log('Supabase client initialized successfully');
-    return supabaseClient;
-  } catch (error) {
-    console.error('Failed to initialize Supabase client:', error);
-    return null;
-  }
+        console.log('Supabase client initialized successfully');
+        return supabaseClient;
+    } catch (error) {
+        console.error('Failed to initialize Supabase client:', error);
+        return null;
+    }
 }
 
 /**
@@ -61,8 +61,8 @@ export function getSupabaseClient() {
  * @returns {boolean} True if client is available, false otherwise
  */
 export function isSupabaseAvailable() {
-  const client = getSupabaseClient();
-  return client !== null;
+    const client = getSupabaseClient();
+    return client !== null;
 }
 
 /**
@@ -71,5 +71,5 @@ export function isSupabaseAvailable() {
  * @private
  */
 export function _resetSupabaseClient() {
-  supabaseClient = null;
+    supabaseClient = null;
 }

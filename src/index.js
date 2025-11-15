@@ -8,6 +8,7 @@ import { QuestList } from './components/quest-list.js';
 import { QuestGraph } from './components/quest-graph.js';
 import { QuestOptimizer } from './components/quest-optimizer.js';
 import { getSupabaseClient, isSupabaseAvailable } from './api/supabase-client.js';
+import { AuthUI } from './components/auth-ui.js';
 
 class TarkovQuestApp {
     constructor() {
@@ -15,6 +16,7 @@ class TarkovQuestApp {
         this.questList = null;
         this.questGraph = null;
         this.questOptimizer = null;
+        this.authUI = null;
         this.currentTab = 'list';
     }
 
@@ -28,6 +30,9 @@ class TarkovQuestApp {
         } else {
             console.log('Running in LocalStorage-only mode (no cloud sync)');
         }
+
+        // Initialize authentication UI
+        this.authUI = new AuthUI('auth-container');
 
         try {
             // Try to load from cache first
