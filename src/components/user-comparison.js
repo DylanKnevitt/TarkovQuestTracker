@@ -6,6 +6,8 @@
  */
 
 import { UserList } from './user-list.js';
+import { ComparisonQuestList } from './comparison-quest-list.js';
+import { UserQuestProgress } from '../models/user-quest-progress.js';
 import { getComparisonService } from '../services/comparison-service.js';
 
 export class UserComparison {
@@ -20,6 +22,7 @@ export class UserComparison {
     this.comparisonService = getComparisonService();
     
     this.userList = null;
+    this.questList = null;
     this.users = [];
     this.selectedUserIds = [];
     this.userProgressMap = new Map(); // userId -> UserQuestProgress
@@ -111,7 +114,9 @@ export class UserComparison {
     const questListSection = document.createElement('div');
     questListSection.className = 'quest-list-section';
     questListSection.id = 'comparison-quest-list-section';
-    this.renderQuestListPlaceholder(questListSection);
+    
+    this.questList = new ComparisonQuestList(questListSection, this.questManager);
+    this.questList.render();
 
     content.appendChild(userListSection);
     content.appendChild(questListSection);
@@ -147,26 +152,6 @@ export class UserComparison {
   }
 
   /**
-   * Render placeholder for quest list when no users selected
-   * @param {HTMLElement} container - Quest list section container
-   */
-  renderQuestListPlaceholder(container) {
-    container.innerHTML = `
-      <div class="quest-list-header">
-        <h3>Common Incomplete Quests</h3>
-        <div class="quest-count-display">Select users to compare</div>
-      </div>
-      <div class="quest-list-container">
-        <div class="empty-state">
-          <div class="empty-state-icon">🎯</div>
-          <div class="empty-state-message">No users selected</div>
-          <div class="empty-state-hint">Click on one or more users to see their incomplete quests</div>
-        </div>
-      </div>
-    `;
-  }
-
-  /**
    * Handle user selection event
    * @param {string} userId - User ID that was selected/deselected
    */
@@ -195,36 +180,76 @@ export class UserComparison {
 
   /**
    * Update quest list based on selected users
+   * Calculates intersection of incomplete quests for all selected users
    */
   async updateQuestList() {
-    const questListSection = document.getElementById('comparison-quest-list-section');
-    if (!questListSection) return;
+    if (!this.questList) return;
 
-    // If no users selected, show placeholder
+    // If no users selected, show empty state
     if (this.selectedUserIds.length === 0) {
-      this.renderQuestListPlaceholder(questListSection);
+      this.questList.setSelectedUsers([], new Map());
+      this.questList.setFilteredQuests([]);
+      this.questList.render();
       return;
     }
 
-    // TODO: Implement quest list update in next phase (US2)
-    // For now, show selected count
-    questListSection.innerHTML = `
-      <div class="quest-list-header">
-        <h3>Common Incomplete Quests</h3>
-        <div class="quest-count-display">
-          ${this.selectedUserIds.length} user${this.selectedUserIds.length !== 1 ? 's' : ''} selected
-        </div>
-      </div>
-      <div class="quest-list-container">
-        <div class="empty-state">
-          <div class="empty-state-message">Quest filtering coming in next phase...</div>
-          <div class="empty-state-hint">Selected: ${this.selectedUserIds.map(id => {
-            const user = this.users.find(u => u.id === id);
-            return user ? user.getDisplayName() : id;
-          }).join(', ')}</div>
-        </div>
-      </div>
-    `;
+    // Get all quests from QuestManager
+    const allQuests = this.questManager.quests;
+    if (!allQuests || allQuests.length === 0) {
+      this.questList.setSelectedUsers(this.selectedUserIds, this.userProgressMap);
+      this.questList.setFilteredQuests([]);
+      this.questList.render();
+      return;
+    }
+
+    // Calculate intersection of incomplete quests
+    const incompleteQuests = this.calculateQuestIntersection(allQuests);
+
+    // Update quest list component
+    this.questList.setSelectedUsers(this.selectedUserIds, this.userProgressMap);
+    this.questList.setFilteredQuests(incompleteQuests);
+    this.questList.render();
+  }
+
+  /**
+   * Calculate intersection of incomplete quests across selected users
+   * @param {Array} allQuests - All quests from QuestManager
+   * @returns {Array} Quests that are incomplete for ALL selected users
+   */
+  calculateQuestIntersection(allQuests) {
+    if (this.selectedUserIds.length === 0) {
+      return [];
+    }
+
+    // Get UserQuestProgress objects for selected users
+    const selectedProgress = [];
+    for (const userId of this.selectedUserIds) {
+      const progress = this.userProgressMap.get(userId);
+      if (progress) {
+        selectedProgress.push(progress);
+      }
+    }
+
+    // If we don't have progress for all selected users, return empty
+    if (selectedProgress.length !== this.selectedUserIds.length) {
+      return [];
+    }
+
+    // Get all quest IDs
+    const allQuestIds = allQuests.map(q => q.id);
+
+    // Use UserQuestProgress static method to calculate intersection
+    const incompleteQuestIds = UserQuestProgress.calculateIntersection(
+      selectedProgress,
+      allQuestIds
+    );
+
+    // Filter quests to only those in the intersection
+    const incompleteQuests = allQuests.filter(quest => 
+      incompleteQuestIds.includes(quest.id)
+    );
+
+    return incompleteQuests;
   }
 
   /**

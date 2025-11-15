@@ -86,16 +86,16 @@ description: "Task list for User Quest Progress Comparison feature"
 
 ### Implementation for User Story 2
 
-- [ ] T021 [P] [US2] Create src/components/comparison-quest-list.js with ComparisonQuestList component class
-- [ ] T022 [US2] Add click handler to UserList.render() - emit 'user-selected' event with userId
-- [ ] T023 [US2] Implement UserComparison.handleUserSelection(userId) - fetch user progress, update selected users array
-- [ ] T024 [US2] Add visual highlight to selected user card in UserList (CSS class .selected)
-- [ ] T025 [US2] Implement ComparisonQuestList.render() - filter QuestManager quests by incomplete for selected user(s)
-- [ ] T026 [US2] Implement UserComparison.updateQuestList() - calculate intersection and pass to ComparisonQuestList
-- [ ] T027 [US2] Add click handler to deselect user when clicking selected user card again
-- [ ] T028 [US2] Group filtered quests by trader in ComparisonQuestList.render() (use existing QuestList grouping logic)
-- [ ] T029 [US2] Style selected user cards in styles/user-comparison.css (border, background color change)
-- [ ] T030 [US2] Add quest count display "X quests incomplete for selected user" above quest list
+- [X] T021 [P] [US2] Create src/components/comparison-quest-list.js with ComparisonQuestList component class
+- [X] T022 [US2] Add click handler to UserList.render() - emit 'user-selected' event with userId
+- [X] T023 [US2] Implement UserComparison.handleUserSelection(userId) - fetch user progress, update selected users array
+- [X] T024 [US2] Add visual highlight to selected user card in UserList (CSS class .selected)
+- [X] T025 [US2] Implement ComparisonQuestList.render() - filter QuestManager quests by incomplete for selected user(s)
+- [X] T026 [US2] Implement UserComparison.updateQuestList() - calculate intersection and pass to ComparisonQuestList
+- [X] T027 [US2] Add click handler to deselect user when clicking selected user card again
+- [X] T028 [US2] Group filtered quests by trader in ComparisonQuestList.render() (use existing QuestList grouping logic)
+- [X] T029 [US2] Style selected user cards in styles/user-comparison.css (border, background color change)
+- [X] T030 [US2] Add quest count display "X quests incomplete for selected user" above quest list
 
 **Checkpoint**: Single-user selection works, quest list filters correctly, deselection works
 
