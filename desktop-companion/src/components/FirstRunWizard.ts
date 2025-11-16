@@ -115,15 +115,15 @@ export class FirstRunWizard {
     private renderDetectTarkov() {
         this.elements.contentArea.innerHTML = `
       <div class="wizard-step">
-        <h1>Locate Tarkov Installation</h1>
+        <h1>Locate Tarkov Logs Directory</h1>
         <p class="lead">
-          We need to find your Escape from Tarkov installation to monitor quest events.
+          Point to your Escape from Tarkov logs directory to monitor quest events.
         </p>
         
         <div class="detection-container">
           <button id="auto-detect-wizard" class="btn btn-primary btn-large">
             <span class="btn-icon">🔍</span>
-            Auto-detect Installation
+            Auto-detect Logs Directory
           </button>
           
           <div id="detection-status" class="status-message"></div>
@@ -134,7 +134,7 @@ export class FirstRunWizard {
               <input 
                 type="text" 
                 id="manual-path" 
-                placeholder="C:\\Battlestate Games\\EscapeFromTarkov"
+                placeholder="C:\\Battlestate Games\\EscapeFromTarkov\\Logs"
                 class="text-input"
                 value="${this.config.log_directory || ''}"
               />
@@ -147,9 +147,9 @@ export class FirstRunWizard {
         <div class="help-box">
           <strong>Common Locations:</strong>
           <ul>
-            <li>C:\\Battlestate Games\\EscapeFromTarkov</li>
-            <li>D:\\Games\\EscapeFromTarkov</li>
-            <li>C:\\Program Files (x86)\\Steam\\steamapps\\common\\EscapeFromTarkov</li>
+            <li>C:\\Battlestate Games\\EscapeFromTarkov\\Logs</li>
+            <li>D:\\Games\\EscapeFromTarkov\\Logs</li>
+            <li>C:\\Program Files (x86)\\Steam\\steamapps\\common\\EscapeFromTarkov\\Logs</li>
           </ul>
         </div>
       </div>
@@ -278,7 +278,7 @@ export class FirstRunWizard {
             if (detectedPath && detectedPath !== 'not found') {
                 this.config.log_directory = detectedPath;
                 input.value = detectedPath;
-                status.textContent = '✓ Tarkov installation found!';
+                status.textContent = '✓ Tarkov logs directory found!';
                 status.className = 'status-message success';
                 this.elements.nextBtn.disabled = false;
             } else {
@@ -300,7 +300,7 @@ export class FirstRunWizard {
             const selected = await open({
                 directory: true,
                 multiple: false,
-                title: 'Select Tarkov Installation Directory',
+                title: 'Select Tarkov Logs Directory',
             });
 
             if (selected && typeof selected === 'string') {

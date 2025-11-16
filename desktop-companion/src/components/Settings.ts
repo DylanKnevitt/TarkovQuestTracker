@@ -226,7 +226,8 @@ export class SettingsComponent {
     }
 
     private handleCancel() {
-        window.close();
+        // Navigate back to main app view
+        window.location.href = '/index.html';
     }
 
     // Validation helpers
