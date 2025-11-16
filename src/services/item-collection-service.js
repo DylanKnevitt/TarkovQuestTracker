@@ -167,8 +167,9 @@ export class ItemCollectionService {
      * Set collected quantity for an item (syncs to database)
      * @param {string} itemId
      * @param {number} quantity
+     * @param {boolean} dispatchEvent - Whether to dispatch update event (default: false)
      */
-    static async setQuantity(itemId, quantity) {
+    static async setQuantity(itemId, quantity, dispatchEvent = false) {
         const collection = await this.loadCollection();
         
         const status = collection.get(itemId) || { collected: false, quantity: 0 };
@@ -178,8 +179,10 @@ export class ItemCollectionService {
         collection.set(itemId, status);
         await this.saveCollection(collection);
         
-        // Dispatch event for UI updates
-        this.dispatchUpdateEvent(itemId, status.collected, status.quantity);
+        // Only dispatch event if requested (e.g., for external updates)
+        if (dispatchEvent) {
+            this.dispatchUpdateEvent(itemId, status.collected, status.quantity);
+        }
     }
 
     /**
