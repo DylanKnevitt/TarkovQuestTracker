@@ -82,15 +82,5 @@
     "homepage": "https://github.com/DylanKnevitt/TarkovQuestTracker",
     "longDescription": "Automatic quest tracking desktop companion for Escape from Tarkov. Monitors game log files and syncs quest progress to the web tracker in real-time.",
     "shortDescription": "Tarkov Quest Companion - Automatic quest tracking"
-  },
-  "plugins": {
-    "fs": {
-      "scope": [
-        "$HOME/**",
-        "C:\\**",
-        "D:\\**",
-        "E:\\**"
-      ]
-    }
   }
 }
