@@ -132,8 +132,15 @@ export class ItemList {
                 e.preventDefault();
                 const itemId = button.dataset.itemId;
                 const item = this.itemTrackerManager.getItem(itemId);
-                if (item && item.collectedQuantity > 0) {
-                    await this.handleQuantityChange(itemId, item.collectedQuantity - 1);
+                if (!item) return;
+                
+                // Read current quantity from DOM display
+                const card = this.container.querySelector(`.item-card[data-item-id="${itemId}"]`);
+                const quantityDisplay = card?.querySelector('.quantity-display');
+                const currentQuantity = quantityDisplay ? parseInt(quantityDisplay.textContent, 10) : item.collectedQuantity;
+                
+                if (currentQuantity > 0) {
+                    await this.handleQuantityChange(itemId, currentQuantity - 1);
                 }
             });
         });
@@ -144,8 +151,15 @@ export class ItemList {
                 e.preventDefault();
                 const itemId = button.dataset.itemId;
                 const item = this.itemTrackerManager.getItem(itemId);
-                if (item && item.collectedQuantity < item.totalQuantity) {
-                    await this.handleQuantityChange(itemId, item.collectedQuantity + 1);
+                if (!item) return;
+                
+                // Read current quantity from DOM display
+                const card = this.container.querySelector(`.item-card[data-item-id="${itemId}"]`);
+                const quantityDisplay = card?.querySelector('.quantity-display');
+                const currentQuantity = quantityDisplay ? parseInt(quantityDisplay.textContent, 10) : item.collectedQuantity;
+                
+                if (currentQuantity < item.totalQuantity) {
+                    await this.handleQuantityChange(itemId, currentQuantity + 1);
                 }
             });
         });
