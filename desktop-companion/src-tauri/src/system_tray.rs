@@ -1,8 +1,16 @@
 use tauri::{
+    image::Image,
     menu::{Menu, MenuItem},
-    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent},
     AppHandle, Manager, Runtime,
 };
+
+#[derive(Clone, serde::Serialize)]
+pub enum ConnectionStatus {
+    Connected,
+    Disconnected,
+    Syncing,
+}
 
 /// Setup system tray with menu items
 pub fn setup_system_tray<R: Runtime>(app: &AppHandle<R>) -> Result<(), Box<dyn std::error::Error>> {
@@ -64,6 +72,30 @@ pub fn setup_system_tray<R: Runtime>(app: &AppHandle<R>) -> Result<(), Box<dyn s
             }
         })
         .build(app)?;
+
+    Ok(())
+}
+
+/// Update tray icon based on connection status
+pub fn update_tray_icon_status<R: Runtime>(
+    app: &AppHandle<R>,
+    status: ConnectionStatus,
+) -> Result<(), Box<dyn std::error::Error>> {
+    // Get the tray icon
+    if let Some(tray) = app.tray_by_id("main") {
+        // Update tooltip based on status
+        let tooltip = match status {
+            ConnectionStatus::Connected => "Tarkov Quest Companion - Connected",
+            ConnectionStatus::Disconnected => "Tarkov Quest Companion - Disconnected",
+            ConnectionStatus::Syncing => "Tarkov Quest Companion - Syncing...",
+        };
+        
+        tray.set_tooltip(Some(tooltip))?;
+        
+        // Note: To change icon color, you would need different icon files
+        // For now, we update the tooltip to indicate status
+        // Future enhancement: Load different icon files based on status
+    }
 
     Ok(())
 }

@@ -1,43 +1,54 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="/src/styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri App</title>
+    <title>Tarkov Quest Companion</title>
+    <link rel="stylesheet" href="/src/styles/main.css" />
     <script type="module" src="/src/main.ts" defer></script>
   </head>
 
   <body>
     <main class="container">
-      <h1>Welcome to Tauri</h1>
+      <header>
+        <h1>Tarkov Quest Companion</h1>
+        <div class="status-bar">
+          <div class="status-item">
+            <span class="label">Connection:</span>
+            <span id="connection-status" class="status">Disconnected</span>
+          </div>
+          <div class="status-item">
+            <span class="label">Watcher:</span>
+            <span id="watcher-status" class="status">Stopped</span>
+          </div>
+        </div>
+      </header>
 
-      <div class="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/src/assets/vite.svg" class="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img
-            src="/src/assets/tauri.svg"
-            class="logo tauri"
-            alt="Tauri logo"
-          />
-        </a>
-        <a href="https://www.typescriptlang.org/docs" target="_blank">
-          <img
-            src="/src/assets/typescript.svg"
-            class="logo typescript"
-            alt="typescript logo"
-          />
-        </a>
-      </div>
-      <p>Click on the Tauri logo to learn more about the framework</p>
-
-      <form class="row" id="greet-form">
-        <input id="greet-input" placeholder="Enter a name..." />
-        <button type="submit">Greet</button>
-      </form>
-      <p id="greet-msg"></p>
+      <section class="dashboard">
+        <h2>Dashboard</h2>
+        <p>Your Tarkov Quest Companion is running in the background.</p>
+        
+        <div class="info-cards">
+          <div class="card">
+            <h3>🎮 Automatic Tracking</h3>
+            <p>Quest completions are automatically detected from your game logs.</p>
+          </div>
+          
+          <div class="card">
+            <h3>☁️ Cloud Sync</h3>
+            <p>Your progress syncs with the web application in real-time.</p>
+          </div>
+          
+          <div class="card">
+            <h3>🔕 Background Mode</h3>
+            <p>The app runs quietly in your system tray. Close this window anytime.</p>
+          </div>
+        </div>
+        
+        <div class="actions">
+          <button id="open-settings" class="btn btn-primary">⚙️ Open Settings</button>
+        </div>
+      </section>
     </main>
   </body>
 </html>

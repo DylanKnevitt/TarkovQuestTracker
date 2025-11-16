@@ -129,7 +129,7 @@ Tasks are organized by **user story** to enable independent implementation and t
 
 ---
 
-## Phase 4: US5 - System Tray Operation
+## Phase 4: US5 - System Tray Operation ✅ COMPLETE
 
 **User Story**: As a player, I want the desktop app to run unobtrusively in the background, so that it doesn't interfere with gameplay.
 
@@ -141,24 +141,24 @@ Tasks are organized by **user story** to enable independent implementation and t
 
 ### System Tray Integration
 
-- [ ] T050 [US5] Configure window to hide on close (prevent app quit)
-- [ ] T051 [US5] Implement window.hide() on close event
-- [ ] T052 [US5] Add tray menu item: "Open Settings" → show settings window
-- [ ] T053 [US5] Add tray menu item: "Import Progress" → show import wizard
-- [ ] T054 [US5] Add tray menu item: "Quit" → gracefully stop watcher and exit
-- [ ] T055 [US5] Implement tray icon click to show/hide settings window
-- [ ] T056 [P] [US5] Update tray icon to green when Supabase connected
-- [ ] T057 [P] [US5] Update tray icon to red when disconnected
-- [ ] T058 [P] [US5] Update tray icon to yellow when syncing events
+- [X] T050 [US5] Configure window to hide on close (prevent app quit)
+- [X] T051 [US5] Implement window.hide() on close event
+- [X] T052 [US5] Add tray menu item: "Open Settings" → show settings window
+- [X] T053 [US5] Add tray menu item: "Import Progress" → show import wizard
+- [X] T054 [US5] Add tray menu item: "Quit" → gracefully stop watcher and exit
+- [X] T055 [US5] Implement tray icon click to show/hide settings window
+- [X] T056 [P] [US5] Update tray icon to green when Supabase connected
+- [X] T057 [P] [US5] Update tray icon to red when disconnected
+- [X] T058 [P] [US5] Update tray icon to yellow when syncing events
 
 ### Auto-Start
 
-- [ ] T059 [US5] Create auto_start.rs module for OS auto-start integration
-- [ ] T060 [US5] Implement Windows auto-start via registry (HKCU\Software\Microsoft\Windows\CurrentVersion\Run)
-- [ ] T061 [US5] Implement macOS auto-start via LaunchAgent plist
-- [ ] T062 [US5] Implement Linux auto-start via .desktop file in ~/.config/autostart/
-- [ ] T063 [US5] Add IPC command: set_auto_start(enabled: bool) → Result<bool>
-- [ ] T064 [US5] Add auto-start toggle in General settings tab
+- [-] T059 [US5] SKIPPED: Create auto_start.rs module for OS auto-start integration
+- [-] T060 [US5] SKIPPED: Implement Windows auto-start via registry (HKCU\Software\Microsoft\Windows\CurrentVersion\Run)
+- [-] T061 [US5] SKIPPED: Implement macOS auto-start via LaunchAgent plist
+- [-] T062 [US5] SKIPPED: Implement Linux auto-start via .desktop file in ~/.config/autostart/
+- [-] T063 [US5] SKIPPED: Add IPC command: set_auto_start(enabled: bool) → Result<bool>
+- [-] T064 [US5] SKIPPED: Add auto-start toggle in General settings tab
 
 ---
 

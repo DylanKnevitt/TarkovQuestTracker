@@ -16,6 +16,15 @@ fn get_app_config(state: State<AppState>) -> Result<AppConfig, String> {
 }
 
 #[tauri::command]
+fn update_tray_icon(
+    status: system_tray::ConnectionStatus,
+    app: tauri::AppHandle,
+) -> Result<(), String> {
+    system_tray::update_tray_icon_status(&app, status)
+        .map_err(|e| format!("Failed to update tray icon: {}", e))
+}
+
+#[tauri::command]
 fn save_app_config(config: AppConfig, state: State<AppState>) -> Result<bool, String> {
     state.set_config(config);
     Ok(true)
@@ -85,10 +94,12 @@ pub fn run() {
 
             // Prevent window from closing (minimize to tray instead)
             if let Some(window) = app.get_webview_window("main") {
-                window.on_window_event(|event| {
+                let window_clone = window.clone();
+                window.on_window_event(move |event| {
                     if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                         api.prevent_close();
-                        // Window will be hidden via tray menu
+                        // Hide window to tray instead of closing
+                        let _ = window_clone.hide();
                     }
                 });
             }
@@ -103,6 +114,7 @@ pub fn run() {
             start_log_watcher,
             stop_log_watcher,
             get_watcher_status,
+            update_tray_icon,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

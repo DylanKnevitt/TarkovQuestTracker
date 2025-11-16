@@ -1,22 +1,16 @@
-import { invoke } from "@tauri-apps/api/core";
+import { AppController } from './AppController';
 
-let greetInputEl: HTMLInputElement | null;
-let greetMsgEl: HTMLElement | null;
+let appController: AppController;
 
-async function greet() {
-  if (greetMsgEl && greetInputEl) {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsgEl.textContent = await invoke("greet", {
-      name: greetInputEl.value,
+window.addEventListener('DOMContentLoaded', () => {
+  // Initialize app controller
+  appController = new AppController();
+
+  // Attach event listener to settings button
+  const settingsBtn = document.getElementById('open-settings');
+  if (settingsBtn) {
+    settingsBtn.addEventListener('click', () => {
+      window.location.href = '/settings.html';
     });
   }
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-  greetInputEl = document.querySelector("#greet-input");
-  greetMsgEl = document.querySelector("#greet-msg");
-  document.querySelector("#greet-form")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    greet();
-  });
 });

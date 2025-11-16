@@ -20,6 +20,8 @@ export interface LogEvent {
   timestamp: string;
 }
 
+export type ConnectionStatus = 'Connected' | 'Disconnected' | 'Syncing';
+
 // ============================================================================
 // IPC Command Wrappers
 // ============================================================================
@@ -50,4 +52,8 @@ export async function stopLogWatcher(): Promise<boolean> {
 
 export async function getWatcherStatus(): Promise<WatcherStatus> {
   return await invoke('get_watcher_status');
+}
+
+export async function updateTrayIcon(status: ConnectionStatus): Promise<void> {
+  return await invoke('update_tray_icon', { status });
 }
