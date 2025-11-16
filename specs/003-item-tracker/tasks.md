@@ -178,23 +178,23 @@ This document breaks down the Item Tracker feature into atomic, executable tasks
 
 ### Collection UI
 
-- [ ] T067 [P] [US4] Add checkbox input to ItemCard.render() template in src/components/item-card.js
-- [ ] T068 [P] [US4] Style collected items with faded appearance (50% opacity) in styles/item-tracker.css
-- [ ] T069 [P] [US4] Add checkmark overlay icon for collected items in styles/item-tracker.css
+- [X] T067 [P] [US4] Add checkbox input to ItemCard.render() template in src/components/item-card.js
+- [X] T068 [P] [US4] Style collected items with faded appearance (50% opacity) in styles/item-tracker.css
+- [X] T069 [P] [US4] Add checkmark overlay icon for collected items in styles/item-tracker.css
 
 ### Collection Logic
 
-- [ ] T070 [US4] Add checkbox click handler calling ItemStorageService.toggleCollected() in src/components/item-card.js
-- [ ] T071 [US4] Listen to itemCollectionUpdated event in src/components/item-tracker.js
-- [ ] T072 [US4] Re-render item list on itemCollectionUpdated in src/components/item-tracker.js
-- [ ] T073 [US4] Load collection status in ItemTrackerManager.initialize() in src/models/item-tracker-manager.js
-- [ ] T074 [US4] Merge collection status with AggregatedItem.collected property in src/models/item-tracker-manager.js
+- [X] T070 [US4] Add checkbox click handler calling ItemStorageService.toggleCollected() in src/components/item-card.js
+- [X] T071 [US4] Listen to itemCollectionUpdated event in src/components/item-tracker.js
+- [X] T072 [US4] Re-render item list on itemCollectionUpdated in src/components/item-tracker.js
+- [X] T073 [US4] Load collection status in ItemTrackerManager.initialize() in src/models/item-tracker-manager.js
+- [X] T074 [US4] Merge collection status with AggregatedItem.collected property in src/models/item-tracker-manager.js
 
 ### Hide Collected Filter
 
-- [ ] T075 [US4] Add "Hide Collected" toggle button to filter group in src/components/item-tracker.js
-- [ ] T076 [US4] Implement hideCollected filter logic in ItemList.applyFilters() in src/components/item-list.js
-- [ ] T077 [US4] Persist hideCollected filter state to localStorage in src/components/item-tracker.js
+- [X] T075 [US4] Add "Hide Collected" toggle button to filter group in src/components/item-tracker.js
+- [X] T076 [US4] Implement hideCollected filter logic in ItemList.applyFilters() in src/components/item-list.js
+- [X] T077 [US4] Persist hideCollected filter state to localStorage in src/components/item-tracker.js
 
 ---
 
@@ -208,21 +208,21 @@ This document breaks down the Item Tracker feature into atomic, executable tasks
 
 ### Modal Component
 
-- [ ] T078 [P] [US5] Create src/components/item-detail-modal.js with ItemDetailModal class
-- [ ] T079 [P] [US5] Implement ItemDetailModal.show() method rendering modal HTML in src/components/item-detail-modal.js
-- [ ] T080 [P] [US5] Add large item icon (128x128px) to modal template in src/components/item-detail-modal.js
-- [ ] T081 [P] [US5] Display item name, short name, total quantity in modal in src/components/item-detail-modal.js
-- [ ] T082 [P] [US5] List all quest sources with quest name + trader in modal in src/components/item-detail-modal.js
-- [ ] T083 [P] [US5] List all hideout sources with module name + level in modal in src/components/item-detail-modal.js
-- [ ] T084 [P] [US5] Add wiki button with wikiLink URL in modal in src/components/item-detail-modal.js
-- [ ] T085 [P] [US5] Style modal with overlay and centered card in styles/item-tracker.css
+- [X] T078 [P] [US5] Create src/components/item-detail-modal.js with ItemDetailModal class
+- [X] T079 [P] [US5] Implement ItemDetailModal.show() method rendering modal HTML in src/components/item-detail-modal.js
+- [X] T080 [P] [US5] Add large item icon (128x128px) to modal template in src/components/item-detail-modal.js
+- [X] T081 [P] [US5] Display item name, short name, total quantity in modal in src/components/item-detail-modal.js
+- [X] T082 [P] [US5] List all quest sources with quest name + trader in modal in src/components/item-detail-modal.js
+- [X] T083 [P] [US5] List all hideout sources with module name + level in modal in src/components/item-detail-modal.js
+- [X] T084 [P] [US5] Add wiki button with wikiLink URL in modal in src/components/item-detail-modal.js
+- [X] T085 [P] [US5] Style modal with overlay and centered card in styles/item-tracker.css
 
 ### Modal Interactions
 
-- [ ] T086 [US5] Add item card click handler opening modal in src/components/item-card.js
-- [ ] T087 [US5] Add Close button click handler in ItemDetailModal in src/components/item-detail-modal.js
-- [ ] T088 [US5] Add Escape key handler closing modal in src/components/item-detail-modal.js
-- [ ] T089 [US5] Add overlay click handler closing modal in src/components/item-detail-modal.js
+- [X] T086 [US5] Add item card click handler opening modal in src/components/item-card.js
+- [X] T087 [US5] Add Close button click handler in ItemDetailModal in src/components/item-detail-modal.js
+- [X] T088 [US5] Add Escape key handler closing modal in src/components/item-detail-modal.js
+- [X] T089 [US5] Add overlay click handler closing modal in src/components/item-detail-modal.js
 
 ---
 
@@ -232,15 +232,15 @@ This document breaks down the Item Tracker feature into atomic, executable tasks
 
 ### Loading States
 
-- [ ] T090 [P] Add loading spinner to ItemTracker during API fetch in src/components/item-tracker.js
-- [ ] T091 [P] Add "Loading items..." text during initialization in src/components/item-tracker.js
-- [ ] T092 [P] Style loading spinner in styles/item-tracker.css
+- [X] T090 [P] Add loading spinner to ItemTracker during API fetch in src/components/item-tracker.js
+- [X] T091 [P] Add "Loading items..." text during initialization in src/components/item-tracker.js
+- [X] T092 [P] Style loading spinner in styles/item-tracker.css
 
 ### Error Handling
 
-- [ ] T093 Add error boundary for ItemTracker.initialize() in src/components/item-tracker.js
-- [ ] T094 Display user-friendly error message on API failure in src/components/item-tracker.js
-- [ ] T095 Add "Retry" button on error state in src/components/item-tracker.js
+- [X] T093 Add error boundary for ItemTracker.initialize() in src/components/item-tracker.js
+- [X] T094 Display user-friendly error message on API failure in src/components/item-tracker.js
+- [X] T095 Add "Retry" button on error state in src/components/item-tracker.js
 
 ### Performance Optimization
 
@@ -249,9 +249,9 @@ This document breaks down the Item Tracker feature into atomic, executable tasks
 
 ### Documentation
 
-- [ ] T098 [P] Add JSDoc comments to all ItemTracker methods in src/components/item-tracker.js
-- [ ] T099 [P] Add JSDoc comments to ItemTrackerManager in src/models/item-tracker-manager.js
-- [ ] T100 [P] Add JSDoc comments to HideoutManager in src/models/hideout-manager.js
+- [X] T098 [P] Add JSDoc comments to all ItemTracker methods in src/components/item-tracker.js
+- [X] T099 [P] Add JSDoc comments to ItemTrackerManager in src/models/item-tracker-manager.js
+- [X] T100 [P] Add JSDoc comments to HideoutManager in src/models/hideout-manager.js
 - [ ] T101 Update README.md with Item Tracker feature description and usage
 
 ### Final Integration
