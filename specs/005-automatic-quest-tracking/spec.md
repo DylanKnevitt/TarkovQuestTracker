@@ -19,11 +19,10 @@ Currently, users must manually mark quests as complete, hideout modules as built
 ## Goals
 
 1. **Automatic Quest Completion Detection**: Detect when quests are completed in-game and automatically mark them complete in the tracker
-2. **Hideout Progress Sync**: Detect hideout module constructions and mark them as built
-3. **Item Collection Tracking**: Track flea market sales and stash changes to update item quantities
-4. **Real-time Web Sync**: Push detected changes to the web application in real-time
-5. **Non-intrusive**: Desktop app runs in system tray, minimal resource usage
-6. **Privacy-focused**: All log parsing happens locally, only syncs to user's own database
+2. **Quest Turn-in Item Tracking**: Automatically decrement item quantities when quests requiring items are completed
+3. **Real-time Web Sync**: Push detected changes to the web application in real-time
+4. **Non-intrusive**: Desktop app runs in system tray, minimal resource usage
+5. **Privacy-focused**: All log parsing happens locally, only syncs to user's own database
 
 ## Non-Goals
 
@@ -46,16 +45,16 @@ Currently, users must manually mark quests as complete, hideout modules as built
 - A subtle notification confirms the quest was detected (optional, user preference)
 - Historical quest completions can be imported from past log files
 
-### US2: Hideout Build Detection
+### US2: Quest Turn-in Item Tracking
 **As a** player  
-**I want** hideout modules to automatically mark as built when I construct them  
-**So that** my hideout progress stays in sync without manual entry
+**I want** items to be automatically decremented when I turn in quests that require items  
+**So that** my item tracker stays accurate without manual updates
 
 **Acceptance Criteria**:
-- When I complete a hideout upgrade, the desktop app detects it
-- The module is marked as built in the web tracker
-- Item priorities automatically recalculate based on new hideout status
-- [NEEDS CLARIFICATION: How to handle cases where logs don't capture hideout builds?]
+- When I complete a quest that requires items, the desktop app looks up item requirements from Tarkov.dev API
+- Item quantities are automatically decremented in the web tracker
+- Only applies to quests with item objectives (not kill/place/find quests)
+- Item priorities automatically recalculate after quantities change
 
 ### US3: Offline Log Parsing
 **As a** player returning after a break  
@@ -80,6 +79,7 @@ Currently, users must manually mark quests as complete, hideout modules as built
 - User logs in with same Supabase credentials as web app
 - Connection status indicator shows when web app is synced
 - Manual log directory selection if auto-detect fails
+- User links their Supabase account to a specific Tarkov profile ID (for multi-account support)
 
 ### US5: System Tray Operation
 **As a** player  
@@ -109,11 +109,12 @@ Currently, users must manually mark quests as complete, hideout modules as built
 - Handle multi-objective quests (mark complete only when all objectives done)
 - Detect quest turn-ins vs objective completions
 
-### FR3: Hideout Detection
-- [NEEDS CLARIFICATION: Are hideout builds logged? If not, how to handle?]
-- Parse hideout construction completion events (if available)
-- Extract station ID and level from logs
-- Map to hideout module keys used in web app
+### FR3: Quest Turn-in Item Tracking
+- When quest completion is detected, query Tarkov.dev API for quest's item requirements
+- Extract item IDs and quantities from quest objectives
+- Decrement item quantities in user's item_collection table
+- Only decrement items that have "needToCollect" or "needToHandIn" objectives
+- Skip quests with no item requirements (kill quests, placement quests, etc.)
 
 ### FR4: Web Application Sync
 - Establish WebSocket connection to Supabase Realtime
@@ -125,7 +126,8 @@ Currently, users must manually mark quests as complete, hideout modules as built
 ### FR5: Settings & Configuration
 - Auto-detect Tarkov installation directory (Steam, EFT launcher locations)
 - Manual log directory path override
-- Enable/disable specific tracking features (quests, hideout, items)
+- Enable/disable specific tracking features (quest completion, quest item turn-ins)
+- Tarkov profile ID configuration (user links their profile to their Supabase account)
 - Notification preferences (sound, visual, none)
 - Auto-start with Windows toggle
 - Wipe date selection for historical import
@@ -133,7 +135,7 @@ Currently, users must manually mark quests as complete, hideout modules as built
 ### FR6: Historical Import
 - Scan log directory for all log files since selected date
 - Parse logs in chronological order
-- Extract all quest completions, hideout builds, item changes
+- Extract all quest completions and calculate item turn-ins retroactively
 - Batch sync to database (progress bar UI)
 - Prevent duplicate imports with import checkpoint tracking
 
@@ -164,9 +166,9 @@ Currently, users must manually mark quests as complete, hideout modules as built
 ### Assumptions
 - Log file format remains relatively stable between game patches
 - Users grant file system read access to log directory
-- Log events contain enough information to uniquely identify quests/hideout
+- Log events contain enough information to uniquely identify quests and profile
 - Users want automatic tracking (opt-in feature, not mandatory)
-- [NEEDS CLARIFICATION: Do logs include hideout construction events?]
+- Tarkov.dev API provides accurate quest item requirements for turn-in calculations
 
 ## Key Entities
 
@@ -211,25 +213,18 @@ Currently, users must manually mark quests as complete, hideout modules as built
 }
 ```
 
-**HideoutBuiltEvent** (if available in logs)
+**QuestTurnInEvent**
 ```typescript
 {
-  eventType: 'hideoutBuilt',
-  stationId: string,
-  level: number,
+  eventType: 'questTurnIn',
+  questId: string,
+  questName: string,
+  itemRequirements: Array<{
+    itemId: string,
+    quantity: number
+  }>,
   timestamp: Date,
   profileId: string
-}
-```
-
-**ItemChangedEvent** (future enhancement)
-```typescript
-{
-  eventType: 'itemChanged',
-  itemId: string,
-  quantityDelta: number,
-  reason: 'flea_sale' | 'quest_turnin' | 'stash_change',
-  timestamp: Date
 }
 ```
 
@@ -258,8 +253,8 @@ Currently, users must manually mark quests as complete, hideout modules as built
 - System tray icon → Right-click → Settings
 - Settings window with tabs:
   - **General**: Log directory, auto-start, notifications
-  - **Account**: Supabase connection, profile selection
-  - **Tracking**: Enable/disable features (quests, hideout, items)
+  - **Account**: Supabase connection, Tarkov profile ID linking
+  - **Tracking**: Enable/disable features (quest completion, quest item turn-ins)
   - **Import**: Historical progress import, wipe date selection
   - **About**: Version, links to GitHub, support
 
@@ -300,9 +295,10 @@ Currently, users must manually mark quests as complete, hideout modules as built
 ### Log File Format Research Needed
 - [ ] Document log file location for Steam vs EFT Launcher installations
 - [ ] Identify log line patterns for quest completions
-- [ ] Verify if hideout construction events are logged
+- [ ] Identify log line patterns for profile ID extraction
 - [ ] Test with multiple game versions for format stability
 - [ ] Create regex patterns for each event type
+- [ ] Verify quest turn-in events are distinguishable from quest objective completions
 
 ### Sync Architecture
 ```
@@ -318,31 +314,37 @@ Web App (Vite)
   └── "Synced via Desktop App" indicator
 ```
 
-## Clarification Questions
+## Clarification Decisions (RESOLVED)
 
-1. **Hideout Logging**: Does the Tarkov game log hideout construction events? TarkovMonitor FAQ says "no log events for hideout stations". If true, should we:
-   - Skip hideout auto-tracking entirely?
-   - Prompt user to manually mark after construction?
-   - Use alternative detection (stash value changes)?
+1. **Hideout Logging**: ✅ **Decision: Skip hideout auto-tracking (Option A)**
+   - TarkovMonitor confirms no log events exist for hideout construction
+   - Hideout tracking remains manual in web app (already works well)
+   - Reduces scope and complexity, focuses on reliable quest tracking
+   - Future: Can revisit if BSG adds hideout logging in future patches
 
-2. **Item Tracking Scope**: For item collection tracking, should we:
-   - Track flea market sales only?
-   - Track all stash changes?
-   - Skip item tracking for v1 (quests only)?
+2. **Item Tracking Scope**: ✅ **Decision: Quest turn-in items only (Option C)**
+   - When quest completes, query Tarkov.dev API for item requirements
+   - Auto-decrement items that were needed for quest turn-in
+   - Reliable because quest completion is logged + requirements are known
+   - Does not track flea sales or general stash changes (unreliable/incomplete logs)
+   - Provides meaningful automation without overreaching
 
-3. **Multi-User Households**: If multiple people use same computer with different Tarkov accounts, how to handle?
-   - Profile selection in app settings?
-   - Auto-detect based on logged-in Windows user?
-   - Separate desktop app instances?
+3. **Multi-User Households**: ✅ **Decision: Single profile with auto-detect (Option A)**
+   - Parse profile ID from log files (already in logs)
+   - User links their Supabase account to specific Tarkov profile ID in settings
+   - Only sync events matching configured profile ID
+   - Simple, handles 95% of use cases (most people play solo on their PC)
+   - Explicit configuration prevents accidental cross-account syncing
 
-## Future Enhancements
+## Future Enhancements (Post-V1)
 
-- **V2: Item Tracking**: Parse flea market sales, quest turn-ins to auto-update item quantities
-- **V3: Map Detection**: Detect which map player loaded into, auto-load map on web app
-- **V4: Raid Timer**: Display raid duration and runthrough timer in overlay
-- **V5: Statistics**: Track map play frequency, survival rate, quest completion rate
-- **V6: Goon Tracking**: Detect Goon sightings, submit to community database
-- **V7: Mobile App**: iOS/Android app for remote progress viewing
+- **V2: Flea Market Item Tracking**: Parse flea market sales to auto-decrement item quantities when sold
+- **V3: Hideout Auto-Tracking**: Monitor for hideout logging in future game patches, implement if available
+- **V4: Map Detection**: Detect which map player loaded into, auto-load map on web app
+- **V5: Raid Timer**: Display raid duration and runthrough timer in overlay
+- **V6: Statistics**: Track map play frequency, survival rate, quest completion rate
+- **V7: Goon Tracking**: Detect Goon sightings, submit to community database
+- **V8: Mobile App**: iOS/Android app for remote progress viewing
 
 ## Related Documentation
 
