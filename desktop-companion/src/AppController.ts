@@ -5,6 +5,8 @@ import {
   updateTrayIcon,
   type LogEvent,
 } from './services/tauri-commands';
+import { supabaseService } from './services/SupabaseService';
+import { QuestEventParser, QuestEventType } from './services/QuestEventParser';
 
 export class AppController {
   private isWatching = false;
@@ -24,6 +26,18 @@ export class AppController {
       return;
     }
 
+    // Initialize Supabase client
+    if (config.supabase_url && config.supabase_key) {
+      const initialized = supabaseService.initialize(config.supabase_url, config.supabase_key);
+      if (initialized) {
+        console.log('Supabase client initialized');
+        this.setConnectionStatus('Connected');
+      } else {
+        console.error('Failed to initialize Supabase client');
+        this.setConnectionStatus('Disconnected');
+      }
+    }
+
     // Listen for log events
     await listen<LogEvent>('log-event', (event) => {
       this.handleLogEvent(event.payload);
@@ -39,6 +53,11 @@ export class AppController {
     await listen<string>('navigate', (event) => {
       this.handleNavigation(event.payload);
     });
+
+    // Request notification permissions
+    if (config.notifications_enabled && Notification.permission === 'default') {
+      await Notification.requestPermission();
+    }
 
     // Auto-start log watching if configured
     if (config.log_directory) {
@@ -73,53 +92,100 @@ export class AppController {
   }
 
   private parseQuestEvents(content: string) {
-    // Look for quest completion patterns from research.md
-    // Pattern: Got notification | ChatMessageReceived with MessageType 10/11/12
-    const lines = content.split('\n');
+    // Parse quest events using QuestEventParser
+    const events = QuestEventParser.parseLogContent(content);
     
-    for (const line of lines) {
-      if (line.includes('Got notification') && line.includes('ChatMessageReceived')) {
-        try {
-          // Extract JSON from log line
-          const jsonMatch = line.match(/\{.*\}/);
-          if (jsonMatch) {
-            const notification = JSON.parse(jsonMatch[0]);
-            
-            // Check MessageType: 10=TaskStarted, 11=TaskFailed, 12=TaskFinished
-            if (notification.MessageType === 10) {
-              console.log('Quest started:', notification.message?.templateId);
-            } else if (notification.MessageType === 11) {
-              console.log('Quest failed:', notification.message?.templateId);
-            } else if (notification.MessageType === 12) {
-              console.log('Quest completed:', notification.message?.templateId);
-              this.handleQuestCompletion(notification.message?.templateId);
-            }
-          }
-        } catch (error) {
-          console.error('Failed to parse notification:', error);
-        }
+    if (events.length === 0) {
+      return;
+    }
+
+    console.log(`Found ${events.length} quest events`);
+
+    // Process each event
+    for (const event of events) {
+      const eventName = QuestEventParser.getEventTypeName(event.eventType);
+      console.log(`Quest ${eventName}:`, event.questId);
+
+      switch (event.eventType) {
+        case QuestEventType.TaskStarted:
+          // Quest started - could show notification
+          break;
+        case QuestEventType.TaskFailed:
+          // Quest failed - sync to database
+          this.handleQuestFailed(event.questId);
+          break;
+        case QuestEventType.TaskFinished:
+          // Quest completed - sync to database
+          this.handleQuestCompletion(event.questId);
+          break;
       }
     }
   }
 
-  private async handleQuestCompletion(templateId: string) {
-    if (!templateId) return;
-
-    // Extract quest ID (templateId format: "questId arg1 arg2 ...")
-    const questId = templateId.split(' ')[0];
+  private async handleQuestCompletion(questId: string) {
+    if (!questId) return;
     
     console.log('Quest completed! ID:', questId);
     
     // Set status to syncing
     this.setConnectionStatus('Syncing');
     
-    // TODO: Phase 5 - Sync to Supabase database
-    // For now, just log it
-    
-    // Reset to connected after a short delay
-    setTimeout(() => {
+    try {
+      // Sync to Supabase database
+      const success = await supabaseService.markQuestCompleted(questId);
+      
+      if (success) {
+        console.log(`Successfully synced quest ${questId} to database`);
+        
+        // Show success notification
+        if (Notification.permission === 'granted') {
+          new Notification('Quest Completed!', {
+            body: `Quest ${questId} has been marked as complete`,
+            icon: '/icons/icon.png',
+          });
+        }
+      } else {
+        console.error(`Failed to sync quest ${questId}`);
+      }
+    } catch (error) {
+      console.error('Error syncing quest completion:', error);
+    } finally {
+      // Reset to connected
       this.setConnectionStatus('Connected');
-    }, 2000);
+    }
+  }
+
+  private async handleQuestFailed(questId: string) {
+    if (!questId) return;
+    
+    console.log('Quest failed! ID:', questId);
+    
+    // Set status to syncing
+    this.setConnectionStatus('Syncing');
+    
+    try {
+      // Sync to Supabase database
+      const success = await supabaseService.markQuestFailed(questId);
+      
+      if (success) {
+        console.log(`Successfully synced quest failure ${questId} to database`);
+        
+        // Show notification
+        if (Notification.permission === 'granted') {
+          new Notification('Quest Failed', {
+            body: `Quest ${questId} has been marked as failed`,
+            icon: '/icons/icon.png',
+          });
+        }
+      } else {
+        console.error(`Failed to sync quest ${questId}`);
+      }
+    } catch (error) {
+      console.error('Error syncing quest failure:', error);
+    } finally {
+      // Reset to connected
+      this.setConnectionStatus('Connected');
+    }
   }
 
   private handleNavigation(route: string) {
