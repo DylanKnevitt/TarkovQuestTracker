@@ -84,15 +84,7 @@
     "shortDescription": "Tarkov Quest Companion - Automatic quest tracking"
   },
   "plugins": {
-    "dialog": {
-      "all": true,
-      "open": true
-    },
-    "store": {},
     "fs": {
-      "all": true,
-      "readDir": true,
-      "readFile": true,
       "scope": [
         "$HOME/**",
         "C:\\**",
