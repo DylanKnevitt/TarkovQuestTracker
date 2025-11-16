@@ -7,10 +7,12 @@ import {
 } from './services/tauri-commands';
 import { supabaseService } from './services/SupabaseService';
 import { QuestEventParser, QuestEventType } from './services/QuestEventParser';
+import { CircularBuffer } from './utils/CircularBuffer';
 
 export class AppController {
   private isWatching = false;
   private connectionStatus: 'Connected' | 'Disconnected' | 'Syncing' = 'Disconnected';
+  private logLineBuffer = new CircularBuffer<string>(1000); // Keep last 1000 log lines
 
   constructor() {
     this.init();
@@ -92,8 +94,17 @@ export class AppController {
   }
 
   private parseQuestEvents(content: string) {
-    // Parse quest events using QuestEventParser
-    const events = QuestEventParser.parseLogContent(content);
+    // Split content into lines and store in circular buffer
+    const lines = content.split('\n');
+    for (const line of lines) {
+      if (line.trim()) {
+        this.logLineBuffer.push(line);
+      }
+    }
+
+    // Parse quest events from recent log lines
+    const recentContent = this.logLineBuffer.getAll().join('\n');
+    const events = QuestEventParser.parseLogContent(recentContent);
     
     if (events.length === 0) {
       return;

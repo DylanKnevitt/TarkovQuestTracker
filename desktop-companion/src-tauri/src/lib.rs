@@ -1,4 +1,5 @@
 mod app_state;
+mod error;
 mod log_watcher;
 mod system_tray;
 mod tarkov_paths;

@@ -44,7 +44,42 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "",
+      "wix": {
+        "language": "en-US",
+        "template": null
+      },
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "headerImage": null,
+        "sidebarImage": null,
+        "installMode": "currentUser",
+        "languages": ["en-US"],
+        "displayLanguageSelector": false,
+        "compression": "lzma"
+      }
+    },
+    "macOS": {
+      "minimumSystemVersion": "10.13",
+      "frameworks": [],
+      "exceptionDomain": ""
+    },
+    "linux": {
+      "deb": {
+        "depends": []
+      },
+      "appimage": {
+        "bundleMediaFramework": false
+      }
+    },
+    "publisher": "TarkovQuest",
+    "homepage": "https://github.com/DylanKnevitt/TarkovQuestTracker",
+    "longDescription": "Automatic quest tracking desktop companion for Escape from Tarkov. Monitors game log files and syncs quest progress to the web tracker in real-time.",
+    "shortDescription": "Tarkov Quest Companion - Automatic quest tracking"
   },
   "plugins": {
     "dialog": {
