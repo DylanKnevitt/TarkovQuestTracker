@@ -89,7 +89,7 @@ class TarkovQuestApp {
             // Initialize hideout and item tracker managers
             this.hideoutManager = new HideoutManager();
             await this.hideoutManager.initialize();
-            
+
             this.itemTrackerManager = new ItemTrackerManager(this.questManager, this.hideoutManager);
             await this.itemTrackerManager.initialize();
 
@@ -98,7 +98,7 @@ class TarkovQuestApp {
             this.questGraph = new QuestGraph('quest-graph', this.questManager);
             this.questOptimizer = new QuestOptimizer(this.questManager);
             this.userComparison = new UserComparison('comparison-view', this.questManager);
-            
+
             // Initialize item tracker component
             this.itemTracker = new ItemTracker(this.questManager, this.hideoutManager, this.itemTrackerManager);
             const itemsTabContent = document.getElementById('items-tab');
@@ -244,7 +244,7 @@ class TarkovQuestApp {
         if (tabName === 'comparison' && this.userComparison) {
             this.userComparison.initialize();
         }
-        
+
         // Refresh item tracker when switching to it
         if (tabName === 'items' && this.itemTracker) {
             this.itemTracker.refresh();

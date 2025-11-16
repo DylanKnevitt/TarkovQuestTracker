@@ -36,7 +36,7 @@ export class ComparisonQuestList {
     setSelectedUsers(userIds, progressMap, userProfiles = null) {
         this.selectedUserIds = userIds;
         this.userProgressMap = progressMap;
-        
+
         // Build user profiles map for easy lookup
         this.userProfilesMap = new Map();
         if (userProfiles) {

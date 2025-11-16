@@ -83,11 +83,33 @@ export class ItemList {
             items = items.filter(item => item.collectedQuantity < item.totalQuantity);
         }
         
-        // Sort by priority (NEEDED_SOON first), then by name
+        // Sort by three-tier priority (NEED_NOW > NEED_SOON > NEED_LATER)
+        // Within each tier, sort by dependency depth (lower = more urgent)
+        // Then alphabetically by name
         items.sort((a, b) => {
-            if (a.priority !== b.priority) {
-                return a.priority === 'NEEDED_SOON' ? -1 : 1;
+            // Define priority order
+            const priorityOrder = {
+                'NEED_NOW': 3,
+                'NEED_SOON': 2,
+                'NEED_LATER': 1
+            };
+            
+            const aPriorityValue = priorityOrder[a.priority] || 0;
+            const bPriorityValue = priorityOrder[b.priority] || 0;
+            
+            // Primary sort: by priority tier
+            if (aPriorityValue !== bPriorityValue) {
+                return bPriorityValue - aPriorityValue; // Higher priority first
             }
+            
+            // Secondary sort: by dependency depth (lower depth = closer to completion)
+            const aDepth = a.priorityDepth ?? Infinity;
+            const bDepth = b.priorityDepth ?? Infinity;
+            if (aDepth !== bDepth) {
+                return aDepth - bDepth; // Lower depth first
+            }
+            
+            // Tertiary sort: alphabetically by name
             return a.item.name.localeCompare(b.item.name);
         });
         

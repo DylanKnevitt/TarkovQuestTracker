@@ -1,13 +1,12 @@
 /**
  * Hideout Manager
- * Feature: 003-item-tracker
+ * Feature: 003-item-tracker + 004-hideout-item-enhancements
  * Manages hideout module completion tracking and buildability checks
  */
 
 import { fetchHideoutStations } from '../api/tarkov-items-api.js';
 import { parseHideoutStations } from './hideout-module.js';
-
-const STORAGE_KEY = 'tarkov-hideout-progress';
+import { HideoutProgressService } from '../services/hideout-progress-service.js';
 
 /**
  * T015-T020: HideoutManager class
@@ -57,26 +56,20 @@ export class HideoutManager {
     }
 
     /**
-     * T017: Load progress from localStorage
+     * T009: Load progress from HideoutProgressService (ENHANCED)
      * @returns {Promise<void>}
      */
     async loadProgress() {
         try {
-            const json = localStorage.getItem(STORAGE_KEY);
-            if (json) {
-                const progress = JSON.parse(json);
-                this.completedModules = new Map(Object.entries(progress));
-                console.log(`Loaded hideout progress: ${this.completedModules.size} modules completed`);
+            this.completedModules = await HideoutProgressService.loadProgress();
+            console.log(`Loaded hideout progress: ${this.completedModules.size} modules completed`);
 
-                // Update completed status on module instances
-                for (const [moduleKey, completed] of this.completedModules) {
-                    const module = this.modulesMap.get(moduleKey);
-                    if (module) {
-                        module.completed = completed;
-                    }
+            // Update completed status on module instances
+            for (const [moduleKey, completed] of this.completedModules) {
+                const module = this.modulesMap.get(moduleKey);
+                if (module) {
+                    module.completed = completed;
                 }
-            } else {
-                console.log('No saved hideout progress found (starting fresh)');
             }
         } catch (error) {
             console.error('Failed to load hideout progress:', error);
@@ -86,45 +79,65 @@ export class HideoutManager {
     }
 
     /**
-     * Save progress to localStorage
+     * T009: Save progress using HideoutProgressService (ENHANCED)
      * @returns {Promise<void>}
      */
     async saveProgress() {
         try {
-            const progressObj = Object.fromEntries(this.completedModules);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(progressObj));
+            await HideoutProgressService.saveProgress(this.completedModules);
         } catch (error) {
             console.error('Failed to save hideout progress:', error);
         }
     }
 
     /**
-     * T018: Toggle module completion status
+     * T009: Toggle module build status using service (NEW)
+     * @param {string} moduleKey - Format: "stationId-level"
+     * @returns {Promise<void>}
+     */
+    async toggleModuleBuild(moduleKey) {
+        const wasCompleted = this.completedModules.get(moduleKey) || false;
+        const newStatus = !wasCompleted;
+
+        // Update local state
+        this.completedModules.set(moduleKey, newStatus);
+
+        // Update module instance
+        const module = this.modulesMap.get(moduleKey);
+        if (module) {
+            module.completed = newStatus;
+        }
+
+        // Save via service (handles database sync)
+        try {
+            await HideoutProgressService.toggleModuleBuild(moduleKey, newStatus);
+        } catch (error) {
+            console.error(`Failed to save hideout build status for ${moduleKey}:`, error);
+            // Rollback local state on error
+            this.completedModules.set(moduleKey, wasCompleted);
+            if (module) {
+                module.completed = wasCompleted;
+            }
+            throw error;
+        }
+
+        // Dispatch event for priority recalculation
+        document.dispatchEvent(new CustomEvent('hideoutProgressUpdated', {
+            detail: { moduleKey, completed: newStatus }
+        }));
+
+        console.log(`${module ? module.getDisplayName() : moduleKey}: ${newStatus ? 'built' : 'not built'}`);
+    }
+
+    /**
+     * T018: Toggle module completion status (LEGACY - kept for backward compatibility)
      * @param {string} stationId
      * @param {number} level
      * @returns {Promise<void>}
      */
     async toggleModuleComplete(stationId, level) {
         const key = `${stationId}-${level}`;
-        const wasCompleted = this.completedModules.get(key) || false;
-        const newStatus = !wasCompleted;
-
-        this.completedModules.set(key, newStatus);
-
-        // Update module instance
-        const module = this.modulesMap.get(key);
-        if (module) {
-            module.completed = newStatus;
-        }
-
-        await this.saveProgress();
-
-        // Dispatch event for ItemTracker to listen
-        document.dispatchEvent(new CustomEvent('hideoutUpdated', {
-            detail: { stationId, level, completed: newStatus }
-        }));
-
-        console.log(`${module ? module.getDisplayName() : key}: ${newStatus ? 'completed' : 'incomplete'}`);
+        await this.toggleModuleBuild(key);
     }
 
     /**
@@ -206,7 +219,7 @@ export class HideoutManager {
      * @returns {Array<HideoutModule>}
      */
     getBuildableModules() {
-        return this.stations.filter(m => 
+        return this.stations.filter(m =>
             !m.completed && this.isModuleBuildable(m.stationId, m.level)
         );
     }

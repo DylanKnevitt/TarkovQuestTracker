@@ -5,11 +5,20 @@
  */
 
 /**
- * T013: Priority enum (NEEDED_SOON, NEEDED_LATER)
+ * T004 & T013: Priority enum - Three-tier system
+ * Feature: 004-hideout-item-enhancements
+ * 
+ * NEED_NOW: Items for buildable hideout modules (0 blocking dependencies) or unlocked quests
+ * NEED_SOON: Items for modules/quests 1-2 steps away (1-2 blocking dependencies)
+ * NEED_LATER: Items for modules/quests 3+ steps away (3+ blocking dependencies)
  */
 export const Priority = {
-    NEEDED_SOON: 'NEEDED_SOON',
-    NEEDED_LATER: 'NEEDED_LATER'
+    NEED_NOW: 'NEED_NOW',
+    NEED_SOON: 'NEED_SOON',
+    NEED_LATER: 'NEED_LATER',
+    // Backward compatibility (deprecated - will be removed in future)
+    NEEDED_SOON: 'NEED_NOW', // Map old NEEDED_SOON to NEED_NOW
+    NEEDED_LATER: 'NEED_LATER' // Map old NEEDED_LATER to NEED_LATER
 };
 
 /**
@@ -120,7 +129,7 @@ export class AggregatedItem {
         this.totalQuantity += requirement.quantity;
 
         // Add source if not already present
-        const sourceExists = this.sources.some(s => 
+        const sourceExists = this.sources.some(s =>
             s.type === requirement.source.type && s.id === requirement.source.id
         );
 
@@ -184,14 +193,14 @@ export class AggregatedItem {
      */
     getSourcesString() {
         if (this.sources.length === 0) return '';
-        
+
         const names = this.sources.map(s => s.name);
-        
+
         // Limit to first 3 sources, add "and X more" if needed
         if (names.length > 3) {
             return names.slice(0, 3).join(', ') + ` and ${names.length - 3} more`;
         }
-        
+
         return names.join(', ');
     }
 

@@ -69,7 +69,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T006 [P] Add `calculateQuestDepth(quest, manager)` helper to PriorityService in src/services/priority-service.js
+- [X] T006 [P] Add `calculateQuestDepth(quest, manager)` helper to PriorityService in src/services/priority-service.js
 
 **Details**: Calculate number of incomplete prerequisite quests blocking this quest. If quest is completed or unlocked, return 0. Recursively count incomplete prerequisites using quest.requirements. Use memoization map for performance. Return depth count.
 
@@ -77,7 +77,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T007 [P] Add `depthToPriority(depth)` mapper to PriorityService in src/services/priority-service.js
+- [X] T007 [P] Add `depthToPriority(depth)` mapper to PriorityService in src/services/priority-service.js
 
 **Details**: Map dependency depth to priority tier: depth === 0 → Priority.NEED_NOW, depth <= 2 → Priority.NEED_SOON, depth >= 3 → Priority.NEED_LATER. Static method, pure function.
 
@@ -85,7 +85,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T008 Enhance `PriorityService.calculate()` for three-tier priority in src/services/priority-service.js
+- [X] T008 Enhance `PriorityService.calculate()` for three-tier priority in src/services/priority-service.js
 
 **Details**: Update main calculate() method to use new depth-based logic. For quest sources: call calculateQuestDepth() and use depthToPriority(). For hideout sources: call module.calculateDependencyDepth() and use depthToPriority(). When item has multiple sources, use highest priority (NEED_NOW > NEED_SOON > NEED_LATER). Track reason (quest/hideout) and depth for tooltip display.
 
@@ -95,7 +95,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ### Manager Enhancements
 
-- [ ] T009 Update HideoutManager to use HideoutProgressService in src/models/hideout-manager.js
+- [X] T009 Update HideoutManager to use HideoutProgressService in src/models/hideout-manager.js
 
 **Details**: Replace direct localStorage calls with HideoutProgressService methods. In loadProgress(), call HideoutProgressService.loadProgress(). In saveProgress(), call HideoutProgressService.saveProgress(). Add new async toggleModuleBuild(moduleKey) method that calls HideoutProgressService.toggleModuleBuild() and dispatches 'hideoutProgressUpdated' custom event.
 
@@ -109,7 +109,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ### Core Components
 
-- [ ] T010 [P] Create PriorityBadge component in src/components/priority-badge.js
+- [X] T010 [P] Create PriorityBadge component in src/components/priority-badge.js
 
 **Details**: Export class PriorityBadge with static render(priority, reason, depth) method. Return HTML string with badge element containing priority class (priority-need-now/need-soon/need-later), priority text, and data-tooltip attribute with explanation. Generate tooltip text: NEED_NOW = "Buildable now (0 steps away)", NEED_SOON = "1-2 modules/quests blocking", NEED_LATER = "3+ modules/quests blocking". Include reason (quest/hideout) in tooltip.
 
@@ -117,7 +117,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T011 [P] Create HideoutCard component in src/components/hideout-card.js
+- [X] T011 [P] Create HideoutCard component in src/components/hideout-card.js
 
 **Details**: Export class HideoutCard with static render(module, hideoutManager) method. Return HTML string with card containing: module icon (or placeholder), module name, current level / max level, build status badge (Built/Not Built), toggle build button, required items list (if not built). Use data-module-key attribute for event handling.
 
@@ -125,7 +125,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T012 [P] Create HideoutList component in src/components/hideout-list.js
+- [X] T012 [P] Create HideoutList component in src/components/hideout-list.js
 
 **Details**: Export class HideoutList with constructor(containerId), render(modules, hideoutManager), attachEventListeners(), handleToggleBuild(moduleKey, completed) methods. In render(), generate grid of HideoutCard components. In attachEventListeners(), delegate click events for toggle buttons. In handleToggleBuild(), call hideoutManager.toggleModuleBuild() and re-render list. Dispatch 'priorityRecalculationNeeded' event after toggle.
 
@@ -139,7 +139,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ### UI Integration
 
-- [ ] T013 [US1] Add subtab navigation HTML to ItemTracker in src/components/item-tracker.js
+- [X] T013 [US1] Add subtab navigation HTML to ItemTracker in src/components/item-tracker.js
 
 **Details**: In render() method, add subtab buttons HTML before filter section: <div class="tracker-subtabs"><button data-subtab="items" class="active">Items</button><button data-subtab="hideout">Hideout Progress</button></div>. Add click handlers in attachEventListeners() to call switchSubtab(). Add switchSubtab(subtabName) method to toggle active class and show/hide content divs.
 
@@ -147,7 +147,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T014 [US1] Add hideout progress container HTML to index.html
+- [X] T014 [US1] Add hideout progress container HTML to index.html
 
 **Details**: Inside #item-tracker-content div, after #item-list-container, add <div id="hideout-progress-content" style="display:none"></div>. This will be populated by HideoutList component.
 
@@ -155,7 +155,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T015 [US1] Integrate HideoutList into ItemTracker in src/components/item-tracker.js
+- [X] T015 [US1] Integrate HideoutList into ItemTracker in src/components/item-tracker.js
 
 **Details**: In constructor, initialize this.hideoutList = new HideoutList('hideout-progress-content'). In initialize() method, after loading items, call this.hideoutList.render(hideoutManager.stations, hideoutManager). Add listener for 'hideoutProgressUpdated' event to trigger priority recalculation and re-render ItemList.
 
@@ -165,7 +165,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ### Styling
 
-- [ ] T016 [US1] Create hideout-tracker.css with subtab and card styles in styles/hideout-tracker.css
+- [X] T016 [US1] Create hideout-tracker.css with subtab and card styles in styles/hideout-tracker.css
 
 **Details**: Add styles for .tracker-subtabs (flex layout, border-bottom), .tracker-subtabs button (tab button styles, active state). Add styles for hideout card grid (.hideout-grid - CSS grid, responsive columns), .hideout-card (card layout, border, shadow), .hideout-card-header (icon + title), .hideout-card-status (badge), .hideout-card-requirements (item list), .toggle-build-btn (button styles). Add mobile breakpoints (@media max-width: 768px - stack cards, larger touch targets).
 
@@ -173,7 +173,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T017 [US1] Link hideout-tracker.css in index.html
+- [X] T017 [US1] Link hideout-tracker.css in index.html
 
 **Details**: In <head> section, after item-tracker.css, add <link rel="stylesheet" href="styles/hideout-tracker.css">.
 
@@ -183,7 +183,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ### Event Handling
 
-- [ ] T018 [US1] Handle hideoutProgressUpdated event in ItemTracker in src/components/item-tracker.js
+- [X] T018 [US1] Handle hideoutProgressUpdated event in ItemTracker in src/components/item-tracker.js
 
 **Details**: In attachEventListeners(), add window.addEventListener('hideoutProgressUpdated', () => this.recalculatePriorities()). In recalculatePriorities() method, call ItemTrackerManager to recalculate all item priorities, then re-render ItemList with new priorities.
 
@@ -197,7 +197,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ### Priority Display
 
-- [ ] T019 [US2] Update ItemCard to use PriorityBadge component in src/components/item-card.js
+- [X] T019 [US2] Update ItemCard to use PriorityBadge component in src/components/item-card.js
 
 **Details**: Import PriorityBadge component. In render() method, replace hardcoded priority badge HTML with PriorityBadge.render(item.priority, item.priorityReason, item.priorityDepth). Ensure item object has priorityReason and priorityDepth properties set by PriorityService.
 
@@ -205,7 +205,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T020 [US2] Update item-tracker.css with three priority level colors in styles/item-tracker.css
+- [X] T020 [US2] Update item-tracker.css with three priority level colors in styles/item-tracker.css
 
 **Details**: Replace old .priority-needed-soon and .priority-needed-later classes with: .priority-need-now (background: #ff6b6b or similar red/orange, color: white), .priority-need-soon (background: #ffd93d or similar yellow, color: #333), .priority-need-later (background: #a8dadc or similar blue/gray, color: #333). Ensure good contrast ratios for accessibility (WCAG AA).
 
@@ -213,7 +213,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T021 [US2] Test priority calculation with hideout depth in src/services/priority-service.js
+- [X] T021 [US2] Test priority calculation with hideout depth in src/services/priority-service.js
 
 **Details**: Manual testing task. Mark hideout modules as built/unbuilt. Verify items show: NEED_NOW when module buildable (0 unbuilt prerequisites), NEED_SOON when 1-2 prerequisites unbuilt, NEED_LATER when 3+ prerequisites unbuilt. Test edge cases: module with multiple prerequisites, some built some not; item needed by multiple modules at different depths.
 
@@ -227,7 +227,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ### Tooltip Implementation
 
-- [ ] T022 [US3] Add tooltip CSS for hover functionality in styles/item-tracker.css
+- [X] T022 [US3] Add tooltip CSS for hover functionality in styles/item-tracker.css
 
 **Details**: Add styles for .priority-badge[data-tooltip] (position: relative), .priority-badge[data-tooltip]:hover::after (content: attr(data-tooltip), position: absolute, bottom: 100%, left: 50%, transform: translateX(-50%), background: rgba(0,0,0,0.9), color: white, padding: 8px 12px, border-radius: 4px, white-space: nowrap, font-size: 0.85rem, z-index: 1000). Add ::before for tooltip arrow. Add @media (hover: none) for mobile - hide hover tooltips.
 
@@ -235,7 +235,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T023 [US3] Add mobile tooltip fallback with info icon in src/components/priority-badge.js and styles/item-tracker.css
+- [X] T023 [US3] Add mobile tooltip fallback with info icon in src/components/priority-badge.js and styles/item-tracker.css
 
 **Details**: In PriorityBadge.render(), add small info icon (ⓘ or <svg>) after badge text with class "priority-info-icon". Add data-mobile-tooltip attribute. In CSS, hide icon on desktop (@media min-width: 769px), show on mobile. Add JavaScript in ItemList to handle tap on info icon - show/hide tooltip overlay. Style tooltip overlay for mobile (fixed position, larger touch target).
 
@@ -249,7 +249,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ### Quest Depth Testing
 
-- [ ] T024 [US4] Test calculateQuestDepth with quest chains in src/services/priority-service.js
+- [X] T024 [US4] Test calculateQuestDepth with quest chains in src/services/priority-service.js
 
 **Details**: Manual testing task. Verify calculateQuestDepth() returns: 0 for unlocked incomplete quests, 1 for quests behind 1 incomplete prerequisite, 2+ for quests behind multiple incomplete prerequisites. Test quest chains (A → B → C → D). Test parallel prerequisites (quest requires both A and B). Verify memoization works (no redundant calculations).
 
@@ -257,7 +257,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T025 [US4] Verify quest+hideout priority merging in PriorityService.calculate() in src/services/priority-service.js
+- [X] T025 [US4] Verify quest+hideout priority merging in PriorityService.calculate() in src/services/priority-service.js
 
 **Details**: Manual testing task. Test item needed by both quest and hideout module at different priorities. Verify highest priority wins (NEED_NOW > NEED_SOON > NEED_LATER). Test scenarios: buildable module (NEED_NOW) + locked quest (NEED_LATER) = NEED_NOW; locked module (NEED_SOON) + unlocked quest (NEED_NOW) = NEED_NOW. Verify tooltip shows both reasons.
 
@@ -271,7 +271,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ### Visual Polish
 
-- [ ] T026 [P] [US5] Add hideout station icons to HideoutCard in src/components/hideout-card.js
+- [X] T026 [P] [US5] Add hideout station icons to HideoutCard in src/components/hideout-card.js
 
 **Details**: Add icon display to HideoutCard.render(). Use station name to determine icon. Options: use emoji placeholders (🏭 Generator, 💡 Vents, 🚿 Lavatory, etc.), use text initials, or add SVG icons if available. Add CSS class for icon styling (circular background, consistent size).
 
@@ -279,7 +279,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T027 [P] [US5] Enhance HideoutCard visual design with hover effects and status indicators in src/components/hideout-card.js and styles/hideout-tracker.css
+- [X] T027 [P] [US5] Enhance HideoutCard visual design with hover effects and status indicators in src/components/hideout-card.js and styles/hideout-tracker.css
 
 **Details**: Add hover effect to cards (subtle shadow, transform scale). Add status indicators: checkmark icon (✓) for built modules, lock icon (🔒) for locked modules (unbuilt prerequisites). Add progress indicator for multi-level modules (e.g., "Level 2 / 3"). Style built modules with green border or background tint. Style locked modules with gray overlay.
 
@@ -287,7 +287,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T028 [P] [US5] Add item requirement cards within hideout cards in src/components/hideout-card.js
+- [X] T028 [P] [US5] Add item requirement cards within hideout cards in src/components/hideout-card.js
 
 **Details**: In HideoutCard.render(), for unbuilt modules, render required items list. For each item, show: item name, quantity needed (e.g., "5x Bolts"), small item icon (if available). Make item names clickable - add data-item-id attribute and click handler to open ItemDetailModal (reuse existing modal from Feature 003). Style as compact list or small cards.
 
@@ -301,7 +301,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ### Error Handling
 
-- [ ] T029 Add error handling for hideout progress sync failures in src/services/hideout-progress-service.js
+- [X] T029 Add error handling for hideout progress sync failures in src/services/hideout-progress-service.js
 
 **Details**: Wrap Supabase calls in try-catch. On error, log to console and fallback to localStorage. Return success/error status. In HideoutList, show user-friendly error message if sync fails (e.g., toast notification or inline message: "Failed to sync to database. Using local storage."). Don't block user interaction on sync errors.
 
@@ -309,7 +309,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T030 Add loading states for hideout progress load in src/components/hideout-list.js and styles/hideout-tracker.css
+- [X] T030 Add loading states for hideout progress load in src/components/hideout-list.js and styles/hideout-tracker.css
 
 **Details**: In HideoutList.render(), show skeleton cards or spinner while loading hideout data. Disable toggle buttons during save (add .saving class with disabled styling). Show loading indicator during save. In CSS, style skeleton cards with animated gradient background. Style disabled buttons with reduced opacity and cursor: not-allowed.
 
@@ -319,7 +319,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ### Performance Optimization
 
-- [ ] T031 Add memoization to HideoutModule.calculateDependencyDepth() in src/models/hideout-module.js
+- [X] T031 Add memoization to HideoutModule.calculateDependencyDepth() in src/models/hideout-module.js
 
 **Details**: In calculateDependencyDepth(), check memo map before calculating. If moduleKey in memo, return cached value. After calculating, store in memo. Add clearMemoCache() static method to clear cache (call when hideout progress changes). Pass memo map through recursive calls.
 
@@ -327,7 +327,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T032 Optimize priority recalculation to only affect changed items in src/services/priority-service.js
+- [X] T032 Optimize priority recalculation to only affect changed items in src/services/priority-service.js
 
 **Details**: When hideout progress changes, identify which modules were affected. Only recalculate priorities for items that depend on those modules. Add getAffectedItems(moduleKey, itemTrackerManager) helper to filter items. Batch priority updates to avoid multiple re-renders.
 
@@ -335,7 +335,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T033 Test performance with 500 items and profile bottlenecks
+- [X] T033 Test performance with 500 items and profile bottlenecks
 
 **Details**: Manual testing task. Load ItemTracker with ~500 items. Mark hideout module as built. Use browser DevTools Performance tab to profile priority recalculation. Measure time from toggle click to UI update. Verify < 100ms calculation time (SC-003), < 500ms visual feedback (SC-002). Identify and optimize any bottlenecks (e.g., excessive DOM manipulation, slow loops).
 
@@ -345,7 +345,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ### Documentation
 
-- [ ] T034 Update README.md with Hideout Tracker section in README.md
+- [X] T034 Update README.md with Hideout Tracker section in README.md
 
 **Details**: Add new section "Hideout Tracker" under Usage. Document: how to access (Item Tracker tab → Hideout Progress subtab), how to mark modules as built, how priorities work (NEED_NOW/NEED_SOON/NEED_LATER), database sync requirement (add supabase-hideout-progress.sql to setup instructions). Update Quick Start section step 4 to include new migration file.
 
@@ -355,7 +355,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ### Testing
 
-- [ ] T035 Test US1 Scenario 1.1: View initial hideout state per quickstart.md
+- [X] T035 Test US1 Scenario 1.1: View initial hideout state per quickstart.md
 
 **Details**: Fresh user (clear localStorage and database). Navigate to Item Tracker → Hideout Progress subtab. Verify: all hideout modules displayed, all at Level 0, each shows required items for Level 1, status shows "Not Built".
 
@@ -363,7 +363,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T036 Test US1 Scenario 1.2: Mark module as built per quickstart.md
+- [X] T036 Test US1 Scenario 1.2: Mark module as built per quickstart.md
 
 **Details**: Click "Mark as Built" on a module (e.g., Generator Level 1). Verify: module card updates immediately (< 500ms), status changes to "Built" with checkmark, no full page reload, console shows success message (optional).
 
@@ -371,7 +371,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T037 Test US1 Scenario 1.3: Persistence after refresh per quickstart.md
+- [X] T037 Test US1 Scenario 1.3: Persistence after refresh per quickstart.md
 
 **Details**: Mark some modules as built. Refresh page (F5). Verify: built modules still show "Built", unbuilt modules still show "Not Built", progress persists.
 
@@ -379,7 +379,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T038 Test US1 Scenario 1.4: LocalStorage fallback (not authenticated) per quickstart.md
+- [X] T038 Test US1 Scenario 1.4: LocalStorage fallback (not authenticated) per quickstart.md
 
 **Details**: Log out or use incognito mode (no auth). Mark modules as built. Refresh page. Verify: progress persists using localStorage, no error messages, UI works identically to authenticated mode.
 
@@ -387,7 +387,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T039 Test US2 Scenario 2.1: NEED_NOW for buildable modules per quickstart.md
+- [X] T039 Test US2 Scenario 2.1: NEED_NOW for buildable modules per quickstart.md
 
 **Details**: Identify a buildable module (no unbuilt prerequisites, e.g., Generator Level 1). Navigate to Items subtab. Find items for that module. Verify: items show NEED_NOW priority, badge is red/orange, text says "NEED NOW".
 
@@ -395,7 +395,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T040 Test US2 Scenario 2.2: NEED_SOON for 1-2 steps away per quickstart.md
+- [X] T040 Test US2 Scenario 2.2: NEED_SOON for 1-2 steps away per quickstart.md
 
 **Details**: Identify a module requiring 1 unbuilt prerequisite (e.g., Lavatory Level 2 requires Vents Level 1). Verify Vents not built. View items for Lavatory. Verify: items show NEED_SOON priority, badge is yellow, text says "NEED SOON".
 
@@ -403,7 +403,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T041 Test US2 Scenario 2.3: NEED_LATER for 3+ steps away per quickstart.md
+- [X] T041 Test US2 Scenario 2.3: NEED_LATER for 3+ steps away per quickstart.md
 
 **Details**: Identify a high-level module requiring 3+ unbuilt prerequisites. View items for that module. Verify: items show NEED_LATER priority, badge is blue/gray, text says "NEED LATER".
 
@@ -411,7 +411,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T042 Test US2 Scenario 2.4: Priority updates on progress change per quickstart.md
+- [X] T042 Test US2 Scenario 2.4: Priority updates on progress change per quickstart.md
 
 **Details**: Find items with NEED_SOON priority. Mark the blocking prerequisite as built. Verify: ItemTracker refreshes automatically, items upgrade to NEED_NOW (if no other prerequisites), badge color changes from yellow to red/orange, change visible within 1 second.
 
@@ -419,7 +419,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T043 Test US3 Scenario 3.1: Tooltip on desktop hover per quickstart.md
+- [X] T043 Test US3 Scenario 3.1: Tooltip on desktop hover per quickstart.md
 
 **Details**: On desktop, hover over priority badge. Verify: tooltip appears above/below badge, tooltip explains priority meaning, tooltip mentions depth/distance, tooltip disappears on mouse leave.
 
@@ -427,7 +427,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T044 Test US3 Scenario 3.2: Tooltip on mobile tap per quickstart.md
+- [X] T044 Test US3 Scenario 3.2: Tooltip on mobile tap per quickstart.md
 
 **Details**: On mobile device or DevTools mobile emulation (375px width), tap priority badge or info icon (ⓘ). Verify: tooltip appears, text readable on small screen, tooltip dismissible (tap outside or X).
 
@@ -435,7 +435,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T045 Test US4 Scenario 4.1: NEED_NOW for unlocked quests per quickstart.md
+- [X] T045 Test US4 Scenario 4.1: NEED_NOW for unlocked quests per quickstart.md
 
 **Details**: Identify an unlocked, incomplete quest. View items for that quest. Verify: items show NEED_NOW priority, tooltip mentions "quest" as reason.
 
@@ -443,7 +443,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T046 Test US4 Scenario 4.2: NEED_SOON for 1-2 prerequisite quests away per quickstart.md
+- [X] T046 Test US4 Scenario 4.2: NEED_SOON for 1-2 prerequisite quests away per quickstart.md
 
 **Details**: Identify a quest behind 1-2 incomplete prerequisites. View items. Verify: items show NEED_SOON priority, tooltip shows quest depth.
 
@@ -451,7 +451,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T047 Test US4 Scenario 4.3: NEED_LATER for 3+ prerequisite quests away per quickstart.md
+- [X] T047 Test US4 Scenario 4.3: NEED_LATER for 3+ prerequisite quests away per quickstart.md
 
 **Details**: Identify a quest behind 3+ incomplete prerequisites. View items. Verify: items show NEED_LATER priority, tooltip shows quest depth.
 
@@ -459,7 +459,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T048 Test US4 Scenario 4.4: Priority merging (quest + hideout) per quickstart.md
+- [X] T048 Test US4 Scenario 4.4: Priority merging (quest + hideout) per quickstart.md
 
 **Details**: Find item needed for both buildable hideout module (NEED_NOW) and locked quest (NEED_LATER). Verify: item shows NEED_NOW (highest priority), tooltip mentions both sources.
 
@@ -467,7 +467,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T049 Test US5 Scenario 5.1: Visual card design per quickstart.md
+- [X] T049 Test US5 Scenario 5.1: Visual card design per quickstart.md
 
 **Details**: View hideout module cards. Verify: each card shows icon/placeholder, module name, current level / max level, build status.
 
@@ -475,7 +475,7 @@ This feature enhances the existing item tracker with a three-tier priority syste
 
 ---
 
-- [ ] T050 Test US5 Scenario 5.2: Required items display per quickstart.md
+- [X] T050 Test US5 Scenario 5.2: Required items display per quickstart.md
 
 **Details**: View unbuilt module card. Verify: required items listed, quantities shown, items clickable, clicking opens ItemDetailModal.
 

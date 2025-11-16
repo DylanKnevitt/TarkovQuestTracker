@@ -1,11 +1,12 @@
 /**
  * Item Tracker Component
- * Feature: 003-item-tracker
+ * Feature: 003-item-tracker + 004-hideout-item-enhancements
  * Main controller for item tracker view
  */
 
 import { ItemList } from './item-list.js';
 import { ItemDetailModal } from './item-detail-modal.js';
+import { HideoutList } from './hideout-list.js'; // T013: Import HideoutList
 
 /**
  * T031-T038: ItemTracker component
@@ -21,15 +22,17 @@ export class ItemTracker {
         this.questManager = questManager;
         this.hideoutManager = hideoutManager;
         this.itemTrackerManager = itemTrackerManager;
-        
+
         this.container = null;
         this.itemList = null;
+        this.hideoutList = null; // T013: HideoutList component
         this.itemDetailModal = null;
         this.isInitialized = false;
-        
+
         this.currentFilter = 'all';
         this.hideCollected = false;
-        
+        this.currentSubtab = 'items'; // T013: Track active subtab
+
         // T057: Storage key for filter persistence
         this.STORAGE_KEY = 'item-tracker-filters';
     }
@@ -41,41 +44,47 @@ export class ItemTracker {
      */
     async initialize(container) {
         this.container = container;
-        
+
         console.log('Initializing ItemTracker...');
-        
+
         // T090-T091: Show loading state
         this.showLoading();
-        
+
         try {
             // T058: Load saved filter state
             this.loadFilters();
-            
+
             // T035: Load items from API
             await this.loadItems();
-            
+
             // T036: Render initial UI
             await this.render();
-            
+
+            // T015: Initialize HideoutList component
+            this.hideoutList = new HideoutList('hideout-progress-content');
+
             // Initialize item detail modal
             this.itemDetailModal = new ItemDetailModal();
-            
+
             // T037: Add quest update listener
             window.addEventListener('questUpdated', () => this.handleQuestUpdate());
-            
+
             // T038: Add hideout update listener
             window.addEventListener('hideoutUpdated', () => this.handleHideoutUpdate());
-            
+
+            // T015: Add hideout progress update listener for priority recalculation
+            window.addEventListener('hideoutProgressUpdated', () => this.handleHideoutProgressUpdate());
+
             // Add item collection update listener
             window.addEventListener('itemCollectionUpdated', () => this.handleCollectionUpdate());
-            
+
             // T086: Add item detail modal open listener
             window.addEventListener('openItemDetail', (e) => {
                 if (this.itemDetailModal && e.detail?.item) {
                     this.itemDetailModal.show(e.detail.item);
                 }
             });
-            
+
             this.isInitialized = true;
             console.log('ItemTracker initialized successfully');
         } catch (error) {
@@ -90,10 +99,10 @@ export class ItemTracker {
      */
     async loadItems() {
         console.log('Loading items...');
-        
+
         // ItemTrackerManager will fetch items and aggregate requirements
         await this.itemTrackerManager.initialize();
-        
+
         console.log('Items loaded successfully');
     }
 
@@ -102,28 +111,28 @@ export class ItemTracker {
      */
     async render() {
         if (!this.container) return;
-        
+
         this.container.innerHTML = this.getTemplate();
-        
+
         // Restore saved filter state to UI
         this.restoreFilterState();
-        
+
         // Render item list
         const itemListContainer = this.container.querySelector('#item-list-container');
         if (itemListContainer) {
             this.itemList = new ItemList(this.itemTrackerManager);
             await this.itemList.render(itemListContainer);
         }
-        
+
         // Attach event listeners
         this.attachEventListeners();
-        
+
         // Apply saved filters
         this.applyFilters();
     }
 
     /**
-     * Get HTML template for item tracker
+     * T013: Get HTML template for item tracker (ENHANCED with subtabs)
      * @returns {string}
      */
     getTemplate() {
@@ -132,6 +141,11 @@ export class ItemTracker {
                 <div class="item-tracker-header">
                     <h2>Quest & Hideout Item Tracker</h2>
                     <div class="item-tracker-stats" id="item-stats"></div>
+                </div>
+                
+                <div class="tracker-subtabs">
+                    <button class="subtab-btn active" data-subtab="items">Items</button>
+                    <button class="subtab-btn" data-subtab="hideout">Hideout Progress</button>
                 </div>
                 
                 <div class="item-tracker-filters">
@@ -150,15 +164,27 @@ export class ItemTracker {
                     </div>
                 </div>
                 
-                <div id="item-list-container"></div>
+                <div id="item-tracker-content">
+                    <div id="item-list-container"></div>
+                    <div id="hideout-progress-content" style="display:none;"></div>
+                </div>
             </div>
         `;
     }
 
     /**
-     * Attach event listeners to UI elements
+     * T013: Attach event listeners to UI elements (ENHANCED with subtabs)
      */
     attachEventListeners() {
+        // Subtab buttons
+        const subtabButtons = this.container.querySelectorAll('.subtab-btn');
+        subtabButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const subtab = e.target.dataset.subtab;
+                this.switchSubtab(subtab);
+            });
+        });
+
         // Filter buttons
         const filterButtons = this.container.querySelectorAll('.filter-btn');
         filterButtons.forEach(btn => {
@@ -167,7 +193,7 @@ export class ItemTracker {
                 this.handleFilterChange(filter);
             });
         });
-        
+
         // Hide collected checkbox
         const hideCollectedCheckbox = this.container.querySelector('#hide-collected-checkbox');
         if (hideCollectedCheckbox) {
@@ -179,18 +205,54 @@ export class ItemTracker {
     }
 
     /**
+     * T013: Switch between Items and Hideout Progress subtabs
+     * @param {string} subtabName - 'items' or 'hideout'
+     */
+    switchSubtab(subtabName) {
+        this.currentSubtab = subtabName;
+
+        // Update active button
+        const subtabButtons = this.container.querySelectorAll('.subtab-btn');
+        subtabButtons.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.subtab === subtabName);
+        });
+
+        // Toggle content visibility
+        const itemListContainer = this.container.querySelector('#item-list-container');
+        const hideoutProgressContainer = this.container.querySelector('#hideout-progress-content');
+        const filterSection = this.container.querySelector('.item-tracker-filters');
+
+        if (subtabName === 'items') {
+            itemListContainer.style.display = '';
+            hideoutProgressContainer.style.display = 'none';
+            filterSection.style.display = '';
+        } else if (subtabName === 'hideout') {
+            itemListContainer.style.display = 'none';
+            hideoutProgressContainer.style.display = '';
+            filterSection.style.display = 'none'; // Hide filters on hideout tab
+
+            // Render hideout list if not already rendered
+            if (this.hideoutList && this.hideoutManager) {
+                this.hideoutList.render(this.hideoutManager.stations, this.hideoutManager);
+            }
+        }
+
+        console.log(`[ItemTracker] Switched to ${subtabName} subtab`);
+    }
+
+    /**
      * Handle filter button click
      * @param {string} filter
      */
     handleFilterChange(filter) {
         this.currentFilter = filter;
-        
+
         // Update active button
         const filterButtons = this.container.querySelectorAll('.filter-btn');
         filterButtons.forEach(btn => {
             btn.classList.toggle('active', btn.dataset.filter === filter);
         });
-        
+
         this.applyFilters();
         this.saveFilters(); // T057: Persist filter state
     }
@@ -202,7 +264,7 @@ export class ItemTracker {
         if (this.itemList) {
             this.itemList.applyFilters(this.currentFilter, this.hideCollected);
         }
-        
+
         this.updateStats();
         this.saveFilters(); // T057: Persist filter state
     }
@@ -213,9 +275,9 @@ export class ItemTracker {
     updateStats() {
         const statsContainer = this.container.querySelector('#item-stats');
         if (!statsContainer) return;
-        
+
         const stats = this.itemTrackerManager.getStats();
-        
+
         statsContainer.innerHTML = `
             <span>${stats.total} items needed</span>
             <span>${stats.questItems} quest items</span>
@@ -239,6 +301,16 @@ export class ItemTracker {
      */
     handleHideoutUpdate() {
         console.log('Hideout updated, refreshing item tracker...');
+        this.itemTrackerManager.refresh();
+        // Fire and forget refresh (will await internally)
+        this.refresh().catch(err => console.error('Failed to refresh:', err));
+    }
+
+    /**
+     * T015: Handle hideout progress update event (priority recalculation)
+     */
+    handleHideoutProgressUpdate() {
+        console.log('Hideout progress updated, recalculating priorities...');
         this.itemTrackerManager.refresh();
         // Fire and forget refresh (will await internally)
         this.refresh().catch(err => console.error('Failed to refresh:', err));
@@ -269,7 +341,7 @@ export class ItemTracker {
      */
     renderError(error) {
         if (!this.container) return;
-        
+
         this.container.innerHTML = `
             <div class="item-tracker-error">
                 <h3>Failed to load item tracker</h3>
@@ -277,7 +349,7 @@ export class ItemTracker {
                 <button class="btn-retry">Retry</button>
             </div>
         `;
-        
+
         const retryBtn = this.container.querySelector('.btn-retry');
         if (retryBtn) {
             retryBtn.addEventListener('click', () => {
@@ -291,7 +363,7 @@ export class ItemTracker {
      */
     showLoading() {
         if (!this.container) return;
-        
+
         this.container.innerHTML = `
             <div class="item-tracker-loading">
                 <div class="spinner"></div>
@@ -326,7 +398,7 @@ export class ItemTracker {
         filterButtons.forEach(btn => {
             btn.classList.toggle('active', btn.dataset.filter === this.currentFilter);
         });
-        
+
         // Set hide collected checkbox
         const hideCollectedCheckbox = this.container.querySelector('#hide-collected-checkbox');
         if (hideCollectedCheckbox) {
