@@ -5,6 +5,7 @@
  */
 
 import { ItemList } from './item-list.js';
+import { ItemDetailModal } from './item-detail-modal.js';
 
 /**
  * T031-T038: ItemTracker component
@@ -23,6 +24,7 @@ export class ItemTracker {
         
         this.container = null;
         this.itemList = null;
+        this.itemDetailModal = null;
         this.isInitialized = false;
         
         this.currentFilter = 'all';
@@ -42,6 +44,9 @@ export class ItemTracker {
         
         console.log('Initializing ItemTracker...');
         
+        // T090-T091: Show loading state
+        this.showLoading();
+        
         try {
             // T058: Load saved filter state
             this.loadFilters();
@@ -52,6 +57,9 @@ export class ItemTracker {
             // T036: Render initial UI
             this.render();
             
+            // Initialize item detail modal
+            this.itemDetailModal = new ItemDetailModal();
+            
             // T037: Add quest update listener
             window.addEventListener('questUpdated', () => this.handleQuestUpdate());
             
@@ -60,6 +68,13 @@ export class ItemTracker {
             
             // Add item collection update listener
             window.addEventListener('itemCollectionUpdated', () => this.handleCollectionUpdate());
+            
+            // T086: Add item detail modal open listener
+            window.addEventListener('openItemDetail', (e) => {
+                if (this.itemDetailModal && e.detail?.item) {
+                    this.itemDetailModal.show(e.detail.item);
+                }
+            });
             
             this.isInitialized = true;
             console.log('ItemTracker initialized successfully');
