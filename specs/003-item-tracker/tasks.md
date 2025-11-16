@@ -244,8 +244,8 @@ This document breaks down the Item Tracker feature into atomic, executable tasks
 
 ### Performance Optimization
 
-- [ ] T096 [P] Implement virtual scrolling for 100+ items in src/components/item-list.js (optional)
-- [ ] T097 [P] Debounce filter changes (100ms) in src/components/item-tracker.js
+- [-] T096 [P] Implement virtual scrolling for 100+ items in src/components/item-list.js (optional - skipped, not needed for current item count)
+- [-] T097 [P] Debounce filter changes (100ms) in src/components/item-tracker.js (skipped, filters already perform well under 100ms)
 
 ### Documentation
 
@@ -256,12 +256,12 @@ This document breaks down the Item Tracker feature into atomic, executable tasks
 
 ### Final Integration
 
-- [ ] T102 Test item tracker with 0 quests completed (should show many items)
-- [ ] T103 Test item tracker with all quests completed (should show empty state)
-- [ ] T104 Test filter performance with 100+ items (< 100ms per SC-003)
-- [ ] T105 Test initial load performance (< 3s per SC-001)
-- [ ] T106 Run all quickstart.md test scenarios (Scenarios 1-10)
-- [ ] T107 Fix any bugs found during manual testing
+- [X] T102 Test item tracker with 0 quests completed (should show many items)
+- [X] T103 Test item tracker with all quests completed (should show empty state)
+- [X] T104 Test filter performance with 100+ items (< 100ms per SC-003)
+- [X] T105 Test initial load performance (< 3s per SC-001)
+- [X] T106 Run all quickstart.md test scenarios (Scenarios 1-10)
+- [X] T107 Fix any bugs found during manual testing
 
 ---
 
