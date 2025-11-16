@@ -214,14 +214,14 @@
 }
 
 .quantity-btn {
-    width: 24px;
-    height: 24px;
+    min-width: 28px;
+    min-height: 28px;
     padding: 0;
     background: var(--accent-color, #4fc3f7);
     border: none;
-    border-radius: 3px;
+    border-radius: 4px;
     color: white;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
     cursor: pointer;
     display: flex;
@@ -229,6 +229,7 @@
     justify-content: center;
     transition: background-color 0.2s, transform 0.1s;
     line-height: 1;
+    flex-shrink: 0;
 }
 
 .quantity-btn:hover {
@@ -246,12 +247,30 @@
     opacity: 0.5;
 }
 
-.quantity-display {
-    min-width: 20px;
+.quantity-input {
+    width: 36px;
+    padding: 2px 4px;
     text-align: center;
+    background: var(--surface-bg, #1e1e1e);
+    border: 1px solid var(--border-color, #444);
+    border-radius: 3px;
     color: var(--text-primary, #e0e0e0);
     font-weight: 600;
     font-size: 14px;
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.quantity-input:focus {
+    outline: none;
+    border-color: var(--accent-color, #4fc3f7);
+    background: var(--bg-secondary, #252525);
 }
 
 .quantity-separator {
@@ -266,6 +285,21 @@
     font-weight: 500;
     min-width: 20px;
     text-align: center;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .quantity-btn {
+        min-width: 32px;
+        min-height: 32px;
+        font-size: 22px;
+    }
+    
+    .quantity-input {
+        width: 40px;
+        font-size: 15px;
+        padding: 4px;
+    }
 }
 
 .item-info {

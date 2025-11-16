@@ -122,6 +122,23 @@ export class ItemList {
      * Attach event listeners to item cards
      */
     attachCardEventListeners() {
+        // Collection quantity input fields
+        const quantityInputs = this.container.querySelectorAll('.quantity-input');
+        quantityInputs.forEach(input => {
+            // Handle direct input changes
+            input.addEventListener('change', async (e) => {
+                e.stopPropagation();
+                const itemId = input.dataset.itemId;
+                const quantity = parseInt(input.value, 10) || 0;
+                await this.handleQuantityChange(itemId, quantity);
+            });
+            
+            // Prevent modal from opening when clicking input
+            input.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        });
+        
         // Collection quantity buttons
         const minusButtons = this.container.querySelectorAll('.quantity-minus');
         const plusButtons = this.container.querySelectorAll('.quantity-plus');
@@ -134,10 +151,10 @@ export class ItemList {
                 const item = this.itemTrackerManager.getItem(itemId);
                 if (!item) return;
                 
-                // Read current quantity from DOM display
+                // Read current quantity from input field
                 const card = this.container.querySelector(`.item-card[data-item-id="${itemId}"]`);
-                const quantityDisplay = card?.querySelector('.quantity-display');
-                const currentQuantity = quantityDisplay ? parseInt(quantityDisplay.textContent, 10) : item.collectedQuantity;
+                const quantityInput = card?.querySelector('.quantity-input');
+                const currentQuantity = quantityInput ? parseInt(quantityInput.value, 10) : item.collectedQuantity;
                 
                 if (currentQuantity > 0) {
                     await this.handleQuantityChange(itemId, currentQuantity - 1);
@@ -153,10 +170,10 @@ export class ItemList {
                 const item = this.itemTrackerManager.getItem(itemId);
                 if (!item) return;
                 
-                // Read current quantity from DOM display
+                // Read current quantity from input field
                 const card = this.container.querySelector(`.item-card[data-item-id="${itemId}"]`);
-                const quantityDisplay = card?.querySelector('.quantity-display');
-                const currentQuantity = quantityDisplay ? parseInt(quantityDisplay.textContent, 10) : item.collectedQuantity;
+                const quantityInput = card?.querySelector('.quantity-input');
+                const currentQuantity = quantityInput ? parseInt(quantityInput.value, 10) : item.collectedQuantity;
                 
                 if (currentQuantity < item.totalQuantity) {
                     await this.handleQuantityChange(itemId, currentQuantity + 1);
@@ -208,9 +225,9 @@ export class ItemList {
         // Update the display for this specific card
         const card = this.container.querySelector(`.item-card[data-item-id="${itemId}"]`);
         if (card) {
-            const quantityDisplay = card.querySelector('.quantity-display');
-            if (quantityDisplay) {
-                quantityDisplay.textContent = clampedQuantity;
+            const quantityInput = card.querySelector('.quantity-input');
+            if (quantityInput) {
+                quantityInput.value = clampedQuantity;
             }
             
             // Update collected class

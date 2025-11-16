@@ -35,7 +35,13 @@ export class ItemCard {
                                 aria-label="Decrease quantity">
                             −
                         </button>
-                        <span class="quantity-display">${item.collectedQuantity || 0}</span>
+                        <input type="number" 
+                               class="quantity-input"
+                               data-item-id="${item.item.id}"
+                               value="${item.collectedQuantity || 0}"
+                               min="0"
+                               max="${item.totalQuantity}"
+                               aria-label="Quantity collected">
                         <span class="quantity-separator">/</span>
                         <span class="quantity-max">${item.totalQuantity}</span>
                         <button class="quantity-btn quantity-plus" 
