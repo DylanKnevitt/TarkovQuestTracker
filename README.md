@@ -54,9 +54,10 @@ If you configured Supabase credentials in step 3, you need to run the SQL migrat
 # 2. Create a new query and run the contents of:
 #    - supabase-setup.sql (quest_progress table and RLS policies)
 #    - supabase-user-profiles-function.sql (user comparison support)
+#    - supabase-item-collection.sql (item collection tracking with database sync)
 ```
 
-These files are in the repository root. Copy and paste their contents into Supabase SQL Editor and run them.
+These files are in the repository root. Copy and paste their contents into Supabase SQL Editor and run them **in order**.
 
 5. **Start the development server:**
 ```bash
@@ -121,6 +122,38 @@ Compare quest progress with other users to coordinate squad play:
 - Squad planning: Identify common objectives for group raids
 - Progress tracking: See which squadmate needs help with specific quests
 
+### Quest & Hideout Item Tracker
+Track all items needed for incomplete quests and hideout upgrades:
+
+**Features**:
+- **View All Items**: Aggregated list of items from quests and hideout modules
+- **Smart Filtering**: 
+  - All Items / Quest Items / Hideout Items / Keys
+  - Hide Collected toggle
+  - Filter persistence across sessions
+- **Priority Indicators**:
+  - ⚠️ **NEEDED SOON** (red/orange): Items for unlocked quests or buildable hideout modules
+  - 🕐 **NEEDED LATER** (blue/gray): Items for locked quests or non-buildable modules
+- **Collection Tracking**: Track collected quantities with number inputs (syncs to database if logged in)
+- **Item Details**: Click any item for detailed info, sources, and wiki link
+- **Cloud Sync**: Item collection quantities sync across devices when logged in with Supabase
+- **FiR Indicators**: 🔍 badge shows when Found in Raid required
+- **Real-time Updates**: Automatically refreshes when you complete quests or hideout modules
+
+**How to Use**:
+1. Complete quests and hideout tracking in other tabs
+2. Switch to Item Tracker tab to see aggregated items needed
+3. Use filters to focus on specific categories (Quest/Hideout/Keys)
+4. Enter collected quantities using number inputs (0 to max needed)
+5. Priority indicators show which items are urgently needed
+6. Click any item card for detailed breakdown of requirements
+7. Collection data syncs to database when logged in (or localStorage if not logged in)
+
+**Performance**:
+- < 3 second initial load with 400-500 items
+- < 100ms filter response time
+- 24-hour API cache with offline fallback
+
 ## Data Source
 
 Quest data is fetched from the [Tarkov.dev GraphQL API](https://api.tarkov.dev/):
@@ -139,16 +172,29 @@ TarkovQuest/
 ├── src/
 │   ├── index.js           # Main application entry
 │   ├── api/
-│   │   └── tarkov-api.js  # API client & caching
+│   │   ├── tarkov-api.js  # Quest API client & caching
+│   │   └── tarkov-items-api.js  # Items & hideout API client
 │   ├── models/
-│   │   └── quest.js       # Quest data model
+│   │   ├── quest.js       # Quest data model
+│   │   ├── item.js        # Item data models (Item, AggregatedItem)
+│   │   ├── hideout-module.js  # Hideout module model
+│   │   ├── hideout-manager.js  # Hideout tracking manager
+│   │   └── item-tracker-manager.js  # Item aggregation engine
+│   ├── services/
+│   │   ├── priority-service.js  # Priority calculation
+│   │   └── item-storage-service.js  # Collection persistence
 │   └── components/
 │       ├── quest-list.js  # Quest list UI
-│       └── quest-graph.js # Graph visualization
+│       ├── quest-graph.js # Graph visualization
+│       ├── item-tracker.js  # Item tracker controller
+│       ├── item-list.js   # Item grid renderer
+│       ├── item-card.js   # Item card component
+│       └── item-detail-modal.js  # Item detail modal
 ├── styles/
 │   ├── main.css           # Base styles
 │   ├── quest-list.css     # List view styles
-│   └── quest-graph.css    # Graph view styles
+│   ├── quest-graph.css    # Graph view styles
+│   └── item-tracker.css   # Item tracker styles
 ├── scripts/
 │   └── fetch-quest-data.js # Data fetching script
 └── data/

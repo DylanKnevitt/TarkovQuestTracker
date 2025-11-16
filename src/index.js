@@ -12,13 +12,19 @@ import { AuthUI } from './components/auth-ui.js';
 import { SyncIndicator } from './components/sync-indicator.js';
 import { getComparisonService } from './services/comparison-service.js';
 import { UserComparison } from './components/user-comparison.js';
+import { ItemTracker } from './components/item-tracker.js';
+import { HideoutManager } from './models/hideout-manager.js';
+import { ItemTrackerManager } from './models/item-tracker-manager.js';
 
 class TarkovQuestApp {
     constructor() {
         this.questManager = new QuestManager();
+        this.hideoutManager = null;
+        this.itemTrackerManager = null;
         this.questList = null;
         this.questGraph = null;
         this.questOptimizer = null;
+        this.itemTracker = null;
         this.authUI = null;
         this.syncIndicator = null;
         this.comparisonService = null;
@@ -80,11 +86,25 @@ class TarkovQuestApp {
             this.questManager.setQuests(questData);
             await this.questManager.initialize();
 
+            // Initialize hideout and item tracker managers
+            this.hideoutManager = new HideoutManager();
+            await this.hideoutManager.initialize();
+            
+            this.itemTrackerManager = new ItemTrackerManager(this.questManager, this.hideoutManager);
+            await this.itemTrackerManager.initialize();
+
             // Initialize components
             this.questList = new QuestList('quest-list', this.questManager);
             this.questGraph = new QuestGraph('quest-graph', this.questManager);
             this.questOptimizer = new QuestOptimizer(this.questManager);
             this.userComparison = new UserComparison('comparison-view', this.questManager);
+            
+            // Initialize item tracker component
+            this.itemTracker = new ItemTracker(this.questManager, this.hideoutManager, this.itemTrackerManager);
+            const itemsTabContent = document.getElementById('items-tab');
+            if (itemsTabContent) {
+                await this.itemTracker.initialize(itemsTabContent);
+            }
 
             // Set up graph click handler
             this.questGraph.onNodeClick = (questId) => {
@@ -223,6 +243,11 @@ class TarkovQuestApp {
         // Initialize comparison view when switching to it
         if (tabName === 'comparison' && this.userComparison) {
             this.userComparison.initialize();
+        }
+        
+        // Refresh item tracker when switching to it
+        if (tabName === 'items' && this.itemTracker) {
+            this.itemTracker.refresh();
         }
     }
 
