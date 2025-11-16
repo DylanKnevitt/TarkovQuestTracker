@@ -69,13 +69,21 @@ export class SettingsComponent {
 
     private async loadUserInfo() {
         try {
-            const { supabaseService } = await import('../services/SupabaseService');
-            const user = await supabaseService.getCurrentUser();
+            // Initialize Supabase client first
+            if (this.config?.supabase_url && this.config?.supabase_key) {
+                const { supabaseService } = await import('../services/SupabaseService');
+                supabaseService.initialize(this.config.supabase_url, this.config.supabase_key);
 
-            if (user) {
-                this.elements.userEmail.textContent = `Signed in as: ${user.email || 'Unknown'}`;
+                const user = await supabaseService.getCurrentUser();
+
+                if (user) {
+                    this.elements.userEmail.textContent = `Signed in as: ${user.email || 'Unknown'}`;
+                } else {
+                    this.elements.userEmail.textContent = 'Not signed in';
+                    this.elements.signoutBtn.disabled = true;
+                }
             } else {
-                this.elements.userEmail.textContent = 'Not signed in';
+                this.elements.userEmail.textContent = 'Supabase not configured';
                 this.elements.signoutBtn.disabled = true;
             }
         } catch (error) {

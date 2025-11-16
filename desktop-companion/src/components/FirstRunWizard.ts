@@ -66,6 +66,7 @@ export class FirstRunWizard {
                 break;
             case 'auth':
                 this.renderAuth();
+                this.initializeSupabaseForAuth();
                 break;
             case 'complete':
                 this.renderComplete();
@@ -510,6 +511,19 @@ export class FirstRunWizard {
             alert('Failed to save configuration. Please try again.');
             btn.disabled = false;
             btn.innerHTML = '<span class="btn-icon">🚀</span> Start Monitoring';
+        }
+    }
+
+    private async initializeSupabaseForAuth() {
+        // Initialize Supabase client before auth step
+        if (this.config.supabase_url && this.config.supabase_key) {
+            try {
+                const { supabaseService } = await import('../services/SupabaseService');
+                supabaseService.initialize(this.config.supabase_url, this.config.supabase_key);
+                console.log('Supabase client initialized for authentication');
+            } catch (error) {
+                console.error('Failed to initialize Supabase:', error);
+            }
         }
     }
 
