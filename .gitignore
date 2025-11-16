@@ -12,3 +12,14 @@ build/
 *.swp
 Thumbs.db
 coverage/
+
+# Rust/Cargo
+desktop-companion/src-tauri/target/
+desktop-companion/src-tauri/Cargo.lock
+*.rs.bk
+*.prof
+*.rlib
+
+# Tauri installer artifacts
+desktop-companion/src-tauri/tauri.conf.json.bak
+rustup-init.exe
