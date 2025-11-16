@@ -20,6 +20,7 @@ export class ItemList {
         this.container = null;
         this.currentFilter = 'all';
         this.hideCollected = false;
+        this.collectionLoaded = false;
     }
 
     /**
@@ -29,9 +30,12 @@ export class ItemList {
     async render(container) {
         this.container = container;
         
-        // Apply collection status to items
-        const items = this.itemTrackerManager.getAllItems();
-        await ItemCollectionService.applyCollectionStatus(items);
+        // Only load collection status once at initialization
+        if (!this.collectionLoaded) {
+            const items = this.itemTrackerManager.getAllItems();
+            await ItemCollectionService.applyCollectionStatus(items);
+            this.collectionLoaded = true;
+        }
         
         // Get filtered items
         const filteredItems = this.getFilteredItems();
