@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="styles/quest-graph.css">
     <link rel="stylesheet" href="styles/auth.css">
     <link rel="stylesheet" href="styles/user-comparison.css">
+    <link rel="stylesheet" href="styles/item-tracker.css">
 </head>
 
 <body>
@@ -83,6 +84,7 @@
                     <button class="tab-btn" data-tab="graph">Dependency Graph</button>
                     <button class="tab-btn" data-tab="path">Path Finder</button>
                     <button class="tab-btn" data-tab="comparison">User Comparison</button>
+                    <button class="tab-btn" data-tab="items">Item Tracker</button>
                 </div>
 
                 <!-- Tab Content: Quest List -->
@@ -166,6 +168,13 @@
                 <div id="comparison-tab" class="tab-content">
                     <div id="comparison-view" class="comparison-view">
                         <!-- User Comparison component will be mounted here -->
+                    </div>
+                </div>
+
+                <!-- Tab Content: Item Tracker -->
+                <div id="items-tab" class="tab-content">
+                    <div id="item-tracker-view" class="item-tracker-view">
+                        <!-- Item Tracker component will be mounted here -->
                     </div>
                 </div>
             </div>
