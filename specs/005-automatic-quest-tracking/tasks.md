@@ -54,44 +54,44 @@ Tasks are organized by **user story** to enable independent implementation and t
 
 ---
 
-## Phase 2: Foundational Infrastructure (Blocking Prerequisites)
+## Phase 2: Foundational Infrastructure (Blocking Prerequisites) ✅ COMPLETE
 
 **Goal**: Build core infrastructure that all user stories depend on
 
 ### Rust Backend Foundation
 
-- [ ] T011 Implement AppState struct in src-tauri/src/main.rs with config, watcher status
-- [ ] T012 Create log_watcher.rs module with file watcher using notify crate
-- [ ] T013 Implement watch_logs() function with RecommendedWatcher and async channels
-- [ ] T014 Add IPC command: start_log_watcher(logDirectory: string) → Result<String>
-- [ ] T015 Add IPC command: stop_log_watcher() → Result<bool>
-- [ ] T016 Implement log file change event emission to JavaScript layer
+- [X] T011 Implement AppState struct in src-tauri/src/main.rs with config, watcher status
+- [X] T012 Create log_watcher.rs module with file watcher using notify crate
+- [X] T013 Implement watch_logs() function with RecommendedWatcher and async channels
+- [X] T014 Add IPC command: start_log_watcher(logDirectory: string) → Result<String>
+- [X] T015 Add IPC command: stop_log_watcher() → Result<bool>
+- [X] T016 Implement log file change event emission to JavaScript layer
 
 ### System Tray
 
-- [ ] T017 Create system_tray.rs module with SystemTray and SystemTrayMenu
-- [ ] T018 Add tray icon assets: icons/tray-connected.png, tray-disconnected.png, tray-syncing.png
-- [ ] T019 Implement tray menu items: Open Settings, Import Progress, Quit
-- [ ] T020 Add tray event handler for menu item clicks
-- [ ] T021 [P] Implement dynamic tray icon updates based on connection status
+- [X] T017 Create system_tray.rs module with SystemTray and SystemTrayMenu
+- [X] T018 Add tray icon assets: icons/tray-connected.png, tray-disconnected.png, tray-syncing.png
+- [X] T019 Implement tray menu items: Open Settings, Import Progress, Quit
+- [X] T020 Add tray event handler for menu item clicks
+- [X] T021 [P] Implement dynamic tray icon updates based on connection status
 
 ### Configuration Management
 
-- [ ] T022 Create settings-manager.js service for AppConfig persistence
-- [ ] T023 Implement saveConfig() and loadConfig() using Tauri store API
-- [ ] T024 Add config validation: directory exists, URL format, required fields
-- [ ] T025 Add IPC command: get_app_config() → AppConfig
-- [ ] T026 Add IPC command: save_app_config(config: AppConfig) → Result<bool>
-- [ ] T027 Create default config object with sensible defaults
+- [X] T022 Create settings-manager.js service for AppConfig persistence
+- [X] T023 Implement saveConfig() and loadConfig() using Tauri store API
+- [X] T024 Add config validation: directory exists, URL format, required fields
+- [X] T025 Add IPC command: get_app_config() → AppConfig
+- [X] T026 Add IPC command: save_app_config(config: AppConfig) → Result<bool>
+- [X] T027 Create default config object with sensible defaults
 
 ### Tarkov Path Detection
 
-- [ ] T028 Create tarkov-paths.js utility for auto-detecting Tarkov installation
-- [ ] T029 Implement Windows registry detection for EFT Launcher path
-- [ ] T030 Implement Steam library folder parsing for Tarkov installation
-- [ ] T031 Add common path fallback checks (C:\Battlestate Games\, D:\Games\, etc.)
-- [ ] T032 Add IPC command: auto_detect_log_directory() → Result<string>
-- [ ] T033 Add IPC command: validate_log_directory(path: string) → Result<bool>
+- [X] T028 Create tarkov-paths.js utility for auto-detecting Tarkov installation
+- [X] T029 Implement Windows registry detection for EFT Launcher path
+- [X] T030 Implement Steam library folder parsing for Tarkov installation
+- [X] T031 Add common path fallback checks (C:\Battlestate Games\, D:\Games\, etc.)
+- [X] T032 Add IPC command: auto_detect_log_directory() → Result<string>
+- [X] T033 Add IPC command: validate_log_directory(path: string) → Result<bool>
 
 ---
 

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - Tarkov Quest Companion</title>
+  <link rel="stylesheet" href="/src/styles/settings.css">
+</head>
+<body>
+  <div class="settings-container">
+    <header class="settings-header">
+      <h1>Settings</h1>
+      <p>Configure your Tarkov Quest Companion</p>
+    </header>
+
+    <main class="settings-content">
+      <!-- Log Directory Section -->
+      <section class="settings-section">
+        <h2>Tarkov Installation</h2>
+        <p class="section-description">
+          Point to your Escape from Tarkov installation directory so we can monitor quest progress.
+        </p>
+
+        <div class="form-group">
+          <label for="log-directory">Log Directory</label>
+          <div class="input-group">
+            <input 
+              type="text" 
+              id="log-directory" 
+              placeholder="C:\Battlestate Games\EscapeFromTarkov\Logs"
+              class="text-input"
+            />
+            <button id="browse-btn" class="btn btn-secondary">Browse</button>
+          </div>
+          <div class="button-row">
+            <button id="auto-detect-btn" class="btn btn-primary">Auto-detect</button>
+            <button id="validate-btn" class="btn btn-secondary">Validate</button>
+          </div>
+          <div id="validation-status" class="status-message"></div>
+        </div>
+      </section>
+
+      <!-- Supabase Connection Section -->
+      <section class="settings-section">
+        <h2>Database Connection</h2>
+        <p class="section-description">
+          Connect to your Supabase database to sync quest progress with the web app.
+        </p>
+
+        <div class="form-group">
+          <label for="supabase-url">Supabase URL</label>
+          <input 
+            type="text" 
+            id="supabase-url" 
+            placeholder="https://your-project.supabase.co"
+            class="text-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="supabase-key">Supabase Anon Key</label>
+          <input 
+            type="password" 
+            id="supabase-key" 
+            placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            class="text-input"
+          />
+          <p class="help-text">
+            Find these credentials in your Supabase project settings under API.
+          </p>
+        </div>
+
+        <button id="test-connection-btn" class="btn btn-primary">Test Connection</button>
+        <div id="connection-status" class="status-message"></div>
+      </section>
+
+      <!-- General Settings Section -->
+      <section class="settings-section">
+        <h2>General</h2>
+        
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="auto-start" />
+            <span>Start automatically with Windows</span>
+          </label>
+          <p class="help-text">Launch the companion app when you log in to Windows.</p>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="notifications" />
+            <span>Enable desktop notifications</span>
+          </label>
+          <p class="help-text">Show notifications when quests are completed or failed.</p>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="sync-enabled" />
+            <span>Enable automatic sync</span>
+          </label>
+          <p class="help-text">Automatically sync quest progress to the web app.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="settings-footer">
+      <button id="cancel-btn" class="btn btn-secondary">Cancel</button>
+      <button id="save-btn" class="btn btn-primary">Save Settings</button>
+    </footer>
+  </div>
+
+  <script type="module" src="/src/settings.ts"></script>
+</body>
+</html>

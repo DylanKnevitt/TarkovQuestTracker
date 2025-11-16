@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup Wizard - Tarkov Quest Companion</title>
+  <link rel="stylesheet" href="/src/styles/wizard.css">
+</head>
+<body>
+  <div id="wizard-container" class="wizard-container">
+    <div id="step-indicator" class="step-indicator"></div>
+    
+    <main id="content-area" class="content-area">
+      <!-- Step content will be rendered here dynamically -->
+    </main>
+    
+    <footer class="wizard-footer">
+      <button id="skip-btn" class="btn btn-text">Skip Setup</button>
+      <div class="footer-buttons">
+        <button id="prev-btn" class="btn btn-secondary">← Previous</button>
+        <button id="next-btn" class="btn btn-primary">Let's Go!</button>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module" src="/src/wizard.ts"></script>
+</body>
+</html>
