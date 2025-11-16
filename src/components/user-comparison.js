@@ -54,6 +54,9 @@ export class UserComparison {
         // Fetch user profiles
         await this.loadUserProfiles();
 
+        // Load selection from URL if present (T050-T051)
+        await this.loadFromUrl();
+
         // Render initial view
         this.render();
     }
@@ -140,6 +143,15 @@ export class UserComparison {
         const actions = document.createElement('div');
         actions.className = 'comparison-actions';
 
+        // Share Comparison button
+        const shareBtn = document.createElement('button');
+        shareBtn.className = 'share-comparison-btn';
+        shareBtn.textContent = '🔗 Share';
+        shareBtn.title = 'Copy shareable link to clipboard';
+        shareBtn.style.display = this.selectedUserIds.length > 0 ? 'inline-block' : 'none';
+        shareBtn.addEventListener('click', () => this.handleShareComparison());
+        actions.appendChild(shareBtn);
+
         // Clear Selection button
         const clearBtn = document.createElement('button');
         clearBtn.className = 'clear-selection-btn';
@@ -195,8 +207,8 @@ export class UserComparison {
             }
         }
 
-        // Update Clear Selection button visibility
-        this.updateClearButtonVisibility();
+        // Update button visibility
+        this.updateActionButtonsVisibility();
 
         // Update quest list
         await this.updateQuestList();
@@ -288,8 +300,11 @@ export class UserComparison {
             this.userList.clearSelection();
         }
 
-        // Update Clear Selection button visibility
-        this.updateClearButtonVisibility();
+        // Clear URL parameters
+        this.clearUrlParams();
+
+        // Update button visibility
+        this.updateActionButtonsVisibility();
 
         // Update quest list to show empty state
         this.updateQuestList();
@@ -388,12 +403,129 @@ export class UserComparison {
     }
 
     /**
-     * Update Clear Selection button visibility
+     * Update action button visibility (Clear and Share)
      */
-    updateClearButtonVisibility() {
+    updateActionButtonsVisibility() {
         const clearBtn = this.container.querySelector('.clear-selection-btn');
+        const shareBtn = this.container.querySelector('.share-comparison-btn');
+        const hasSelection = this.selectedUserIds.length > 0;
+        
         if (clearBtn) {
-            clearBtn.style.display = this.selectedUserIds.length > 0 ? 'inline-block' : 'none';
+            clearBtn.style.display = hasSelection ? 'inline-block' : 'none';
         }
+        if (shareBtn) {
+            shareBtn.style.display = hasSelection ? 'inline-block' : 'none';
+        }
+    }
+
+    /**
+     * Generate shareable URL with selected user IDs (T048)
+     * @returns {string} Shareable URL
+     */
+    generateShareUrl() {
+        if (this.selectedUserIds.length === 0) {
+            return window.location.href.split('?')[0];
+        }
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('users', this.selectedUserIds.join(','));
+        return url.toString();
+    }
+
+    /**
+     * Handle share comparison button click (T049, T052)
+     * Copy shareable URL to clipboard and show toast notification
+     */
+    async handleShareComparison() {
+        const shareUrl = this.generateShareUrl();
+
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            this.showToast('✅ Link copied to clipboard!');
+        } catch (error) {
+            console.error('Failed to copy to clipboard:', error);
+            // Fallback: show URL in prompt
+            prompt('Copy this link:', shareUrl);
+        }
+    }
+
+    /**
+     * Load selection from URL parameters (T050-T051, T054)
+     * Parse URL params and pre-select users on page load
+     */
+    async loadFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const usersParam = urlParams.get('users');
+
+        if (!usersParam) return;
+
+        // Parse user IDs from URL
+        const userIds = usersParam.split(',').filter(id => id.trim());
+
+        if (userIds.length === 0) return;
+
+        // Filter out invalid/deleted user IDs (T054)
+        const validUserIds = userIds.filter(userId => 
+            this.users.some(user => user.id === userId)
+        );
+
+        if (validUserIds.length === 0) {
+            console.warn('No valid user IDs found in URL');
+            return;
+        }
+
+        // Pre-select users
+        for (const userId of validUserIds) {
+            if (this.selectedUserIds.length >= UserComparison.MAX_SELECTED_USERS) {
+                break;
+            }
+            this.selectedUserIds.push(userId);
+
+            // Fetch user progress
+            const { data, error } = await this.comparisonService.fetchUserProgress(userId);
+            if (data && !error) {
+                this.userProgressMap.set(userId, data);
+            }
+        }
+
+        // Update UserList visual selection
+        if (this.userList && this.selectedUserIds.length > 0) {
+            this.userList.selectedUserIds = new Set(this.selectedUserIds);
+        }
+    }
+
+    /**
+     * Show toast notification (T052)
+     * @param {string} message - Message to display
+     */
+    showToast(message) {
+        // Create or reuse toast element
+        let toast = document.querySelector('.comparison-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'comparison-toast';
+            document.body.appendChild(toast);
+        }
+
+        toast.textContent = message;
+        toast.style.display = 'block';
+        toast.classList.add('show');
+
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 300);
+        }, 3000);
+    }
+
+    /**
+     * Clear URL parameters
+     */
+    clearUrlParams() {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('users');
+        window.history.replaceState({}, '', url.toString());
     }
 }

@@ -151,14 +151,14 @@ description: "Task list for User Quest Progress Comparison feature"
 
 ### Implementation for User Story 5
 
-- [ ] T047 [P] [US5] Add "Share Comparison" button to UserComparison header (next to Clear Selection)
-- [ ] T048 [US5] Implement UserComparison.generateShareUrl() - encode selected user IDs in URL query params
-- [ ] T049 [US5] Add copy-to-clipboard functionality on Share button click
-- [ ] T050 [US5] Implement UserComparison.loadFromUrl() - parse URL params and pre-select users on page load
-- [ ] T051 [US5] Call loadFromUrl() in UserComparison initialization if URL params exist
-- [ ] T052 [US5] Add toast notification "Link copied to clipboard!" on successful copy
-- [ ] T053 [US5] Style Share button in styles/user-comparison.css (icon, hover effect)
-- [ ] T054 [US5] Handle edge case: shared URL with invalid/deleted user IDs (filter them out silently)
+- [X] T047 [P] [US5] Add "Share Comparison" button to UserComparison header (next to Clear Selection)
+- [X] T048 [US5] Implement UserComparison.generateShareUrl() - encode selected user IDs in URL query params
+- [X] T049 [US5] Add copy-to-clipboard functionality on Share button click
+- [X] T050 [US5] Implement UserComparison.loadFromUrl() - parse URL params and pre-select users on page load
+- [X] T051 [US5] Call loadFromUrl() in UserComparison initialization if URL params exist
+- [X] T052 [US5] Add toast notification "Link copied to clipboard!" on successful copy
+- [X] T053 [US5] Style Share button in styles/user-comparison.css (icon, hover effect)
+- [X] T054 [US5] Handle edge case: shared URL with invalid/deleted user IDs (filter them out silently)
 
 **Checkpoint**: Share URL generates, clipboard copy works, URL loading restores selections
 

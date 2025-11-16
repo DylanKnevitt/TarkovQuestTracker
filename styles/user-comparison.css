@@ -50,12 +50,42 @@
     cursor: not-allowed;
 }
 
+.share-comparison-btn {
+    background: var(--success-color, #4caf50) !important;
+}
+
+.share-comparison-btn:hover {
+    background: var(--success-hover, #45a049) !important;
+}
+
 .clear-selection-btn {
     background: var(--warning-color, #ff6b6b) !important;
 }
 
 .clear-selection-btn:hover {
     background: var(--warning-hover, #ee5a52) !important;
+}
+
+/* Toast Notification */
+.comparison-toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface-dark, #1e1e1e);
+    color: var(--text-primary, #ffffff);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-size: 0.9rem;
+    z-index: 1000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.comparison-toast.show {
+    opacity: 1;
 }
 
 /* Max Selection Warning */
