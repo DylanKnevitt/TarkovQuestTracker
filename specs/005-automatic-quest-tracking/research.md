@@ -7,14 +7,18 @@
 
 ## Executive Summary
 
-Tauri provides a robust framework for building lightweight desktop applications with Rust backend and web frontend. For log file monitoring applications, the recommended architecture uses:
+⚠️ **CRITICAL FINDING**: Initial research suggests Escape from Tarkov may **NOT** log quest completion events to accessible log files. This requires verification with actual game testing before proceeding with implementation.
+
+**If quest events ARE logged**: Tauri provides a robust framework for building lightweight desktop applications with Rust backend and web frontend. For log file monitoring applications, the recommended architecture uses:
 - **Rust** for file watching (via `notify` crate) and system operations  
 - **JavaScript** for UI and business logic  
 - **Tauri IPC** for seamless communication between Rust and JavaScript  
 - **System tray** for background operation  
-- **Tauri''s state management** for configuration persistence  
+- **Tauri's state management** for configuration persistence  
 
 This approach ensures minimal resource usage (<50MB RAM, <1% CPU idle) while maintaining responsiveness.
+
+**If quest events are NOT logged**: Alternative approaches must be considered (see section 10 below).
 
 ---
 ## 1. Tauri Architecture - Recommended Component Separation
@@ -191,9 +195,78 @@ npm run tauri build    # Production build
 
 ---
 
-## Conclusion
+## 10. CRITICAL: Log File Verification Required
 
-Tauri provides an excellent foundation for lightweight log monitoring. The architecture leverages:
+### Research Gap
+
+The specification assumes quest completion events are logged based on reference to TarkovMonitor. However, **this assumption has not been verified** through actual game testing.
+
+**REQUIRED BEFORE IMPLEMENTATION:**
+1. Install Escape from Tarkov
+2. Locate log directory (`C:\Battlestate Games\EFT\Logs\` or Steam equivalent)
+3. Complete a test quest in-game
+4. Examine log files for quest completion entries
+5. Document exact log format and patterns if found
+
+### If Quest Events ARE Logged
+
+✅ Proceed with implementation as planned:
+- Use Tauri + Rust file watching
+- Parse log entries with regex patterns
+- Sync detected events to Supabase
+- Estimated effort: ~80 hours
+
+### If Quest Events are NOT Logged
+
+❌ Current approach is **not viable**. Consider alternatives:
+
+**Option A: Memory Reading** (⚠️ EULA Risk)
+- Scan game process memory for quest state
+- **Risks**: Account bans, EULA violations, legal issues
+- **Not recommended** without legal clearance
+
+**Option B: Browser Extension**
+- Parse quest data from EFT Wiki while user browses
+- Auto-import from community tracker sites
+- No game modification, EULA-compliant
+- **Estimated effort**: ~40 hours
+
+**Option C: Enhanced Manual Tracking**
+- Improve existing web app UX
+- Add keyboard shortcuts for quick quest completion
+- Bulk import tools, templates for wipe progress
+- **Estimated effort**: ~16 hours
+
+**Option D: Screenshot OCR**
+- User captures quest completion screenshots
+- OCR extracts quest name and completion time
+- Requires user action but no EULA concerns
+- **Estimated effort**: ~50 hours
+
+**Option E: Official API** (Long-term)
+- Wait for Battlestate Games to release official API
+- Monitor community announcements
+- **Timeline**: Unknown, may never happen
+
+### Decision Tree
+
+```
+Does Tarkov log quest completions?
+├─ YES → Proceed with Tauri desktop app (Phase 1)
+└─ NO → Choose alternative approach:
+    ├─ Browser extension (B)
+    ├─ Enhanced manual UX (C)  ← Safest, fastest
+    ├─ Screenshot OCR (D)
+    └─ Wait for official API (E)
+```
+
+---
+
+## 11. Conclusion
+
+**Conditional on Log File Verification:**
+
+**IF** quest events are logged, Tauri provides an excellent foundation for lightweight log monitoring. The architecture leverages:
 - Rust for file watching and system integration (notify crate + system tray API)
 - JavaScript for business logic, API integration, and UI  
 - Tauri IPC for seamless communication
@@ -201,4 +274,15 @@ Tauri provides an excellent foundation for lightweight log monitoring. The archi
 
 This approach meets all performance goals while maintaining code reusability with the web application.
 
-**Next Steps**: Implement Phase 0 research tasks, then proceed to Phase 1 design (data-model.md, contracts/, quickstart.md).
+**IF** quest events are not logged, pivot to browser extension or enhanced manual tracking to avoid EULA violations and wasted development effort.
+
+---
+
+## Next Steps
+
+1. **CRITICAL**: Verify quest event logging through game testing
+2. **IF VERIFIED**: Proceed to Phase 1 design (data-model.md, contracts/, quickstart.md)
+3. **IF NOT VERIFIED**: Present alternatives to stakeholders for decision
+4. Document findings in updated plan.md
+
+**Status**: Research complete, pending log file verification before implementation phase.
