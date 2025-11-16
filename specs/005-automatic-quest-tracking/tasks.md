@@ -95,7 +95,7 @@ Tasks are organized by **user story** to enable independent implementation and t
 
 ---
 
-## Phase 3: US4 - Desktop App Setup
+## Phase 3: US4 - Desktop App Setup ✅ COMPLETE
 
 **User Story**: As a new user, I want easy setup for the desktop companion, so that I can start using automatic tracking quickly.
 
@@ -107,25 +107,25 @@ Tasks are organized by **user story** to enable independent implementation and t
 
 ### Settings UI
 
-- [ ] T034 [US4] Create index.html with settings window structure
-- [ ] T035 [US4] Create main.css with layout styles for settings tabs
-- [ ] T036 [US4] Create components/settings.js with Settings component
-- [ ] T037 [US4] Implement General tab: log directory picker, auto-start toggle, notifications
-- [ ] T038 [US4] Implement Account tab: Supabase URL/key inputs, profile ID input
-- [ ] T039 [US4] Add "Test Connection" button with Supabase connection validation
-- [ ] T040 [US4] Add connection status indicator (connected/disconnected)
-- [ ] T041 [US4] Implement save/cancel buttons with config persistence
-- [ ] T042 [US4] Add form validation with error messages for invalid inputs
+- [X] T034 [US4] Create index.html with settings window structure
+- [X] T035 [US4] Create main.css with layout styles for settings tabs
+- [X] T036 [US4] Create components/settings.js with Settings component
+- [X] T037 [US4] Implement General tab: log directory picker, auto-start toggle, notifications
+- [X] T038 [US4] Implement Account tab: Supabase URL/key inputs, profile ID input
+- [X] T039 [US4] Add "Test Connection" button with Supabase connection validation
+- [X] T040 [US4] Add connection status indicator (connected/disconnected)
+- [X] T041 [US4] Implement save/cancel buttons with config persistence
+- [X] T042 [US4] Add form validation with error messages for invalid inputs
 
 ### Initialization Flow
 
-- [ ] T043 [US4] Create main.js app initialization logic
-- [ ] T044 [US4] Implement first-run detection (no config exists)
-- [ ] T045 [US4] Show setup wizard on first run with step-by-step flow
-- [ ] T046 [US4] Auto-detect log directory and pre-fill in settings
-- [ ] T047 [US4] Load saved config on subsequent app starts
-- [ ] T048 [US4] Initialize Supabase client with user credentials
-- [ ] T049 [US4] Add IPC command: test_supabase_connection(url, key) → Result<bool>
+- [X] T043 [US4] Create main.js app initialization logic
+- [X] T044 [US4] Implement first-run detection (no config exists)
+- [X] T045 [US4] Show setup wizard on first run with step-by-step flow
+- [X] T046 [US4] Auto-detect log directory and pre-fill in settings
+- [X] T047 [US4] Load saved config on subsequent app starts
+- [X] T048 [X] Initialize Supabase client with user credentials
+- [X] T049 [US4] Add IPC command: test_supabase_connection(url, key) → Result<bool>
 
 ---
 
