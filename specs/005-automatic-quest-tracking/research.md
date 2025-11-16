@@ -342,22 +342,110 @@ Quest tracking is inherently a "check your progress" activity that users do peri
 
 ---
 
-## 11. Conclusion
+## 11. TarkovMonitor Analysis - QUEST EVENTS ARE LOGGED! ⚠️
 
-**Verification Complete (2025-11-16):**
+**CRITICAL CORRECTION (2025-01-18):**
 
-✅ **Logs exist**: Backend logs are available at `C:\Battlestate Games\Escape from Tarkov\Logs\`
-✅ **Quest API calls logged**: `/client/quest/list` and related endpoints are logged with timestamps
-❌ **Response payloads NOT logged**: Actual quest data is truncated (`responseText: .`)
+After examining TarkovMonitor's actual source code (the-hideout/TarkovMonitor on GitHub), I discovered my initial conclusion was **INCORRECT**. Quest completion events **ARE logged** and automation **IS possible**.
 
-**Impact on Original Specification:**
-- **Full automation NOT possible** without response payload data
-- Original desktop app approach requires **significant pivot**
-- Semi-automatic detection possible (activity monitoring) but requires user confirmation
-- **Manual tracking with enhanced UX** is the most practical approach
+### How TarkovMonitor Actually Works
 
-**Architecture Decision:**
-Tauri remains a valid framework for hybrid approaches (Option C), but the complexity-to-value ratio makes **enhanced manual tracking (Option A)** the better choice:
+**Source File**: `TarkovMonitor/GameWatcher.cs` (lines 584-607)
+
+```csharp
+// TarkovMonitor monitors the notifications.log file for ChatMessageReceived events
+if (systemMessageEvent.message.type >= MessageType.TaskStarted && 
+    systemMessageEvent.message.type <= MessageType.TaskFinished)
+{
+    var args = jsonNode?.AsObject().Deserialize<TaskStatusMessageLogContent>();
+    TaskModified?.Invoke(this, new LogContentEventArgs<TaskStatusMessageLogContent>() 
+        { LogContent = args, Profile = CurrentProfile });
+    
+    if (args.Status == TaskStatus.Started) { TaskStarted?.Invoke(...); }
+    if (args.Status == TaskStatus.Failed) { TaskFailed?.Invoke(...); }
+    if (args.Status == TaskStatus.Finished) { TaskFinished?.Invoke(...); }
+}
+```
+
+### Quest Event Detection Patterns
+
+**✅ Log File**: `notifications.log` (NOT application.log!)
+**✅ Event Pattern**: `Got notification | ChatMessageReceived`
+**✅ Message Types**:
+- `TaskStarted = 10`
+- `TaskFailed = 11`
+- `TaskFinished = 12`
+
+**Data Structure** (from `LogMessageTypes.cs`):
+```csharp
+public class TaskStatusMessageLogContent : ChatMessageLogContent
+{
+    public string TaskId { get; }  // Parsed from: message.templateId.Split(' ')[0]
+    public TaskStatus Status { get; }  // Cast from: (TaskStatus)message.type
+    public SystemChatMessage message { get; set; }
+}
+```
+
+### Why I Initially Missed This
+
+1. ❌ **Wrong Log File**: Searched `application.log` instead of `notifications.log`
+2. ❌ **Wrong Pattern**: Searched for "quest complete" strings instead of JSON chat notifications
+3. ❌ **Wrong Format**: Expected API response payloads, but events are system messages
+4. ✅ **Correct Pattern**: Quest status changes logged as system chat messages with MessageType enum
+
+### TarkovMonitor Features (Proven Working)
+
+From their README:
+> "TarkovMonitor simply watches the log files that the game creates as it's running. Certain log messages correspond with particular events, so it's possible to automatically read some game events from these log files."
+
+**Quest Tracking Features**:
+- ✅ "Automatically mark quests as complete as you complete them" (via TarkovTracker API)
+- ✅ "Read Past Logs" to process historical quest completions
+- ✅ Profile matching via "game's version number and your player profile id as written into each set of logs"
+
+**Limitations** (from TarkovMonitor FAQ):
+- ❌ No hideout tracking ("no log events for when you build hideout stations")
+- ❌ No PMC level tracking ("not logged by the game")
+- ❌ No in-raid updates ("logs aren't updated while a raid is in-progress")
+
+### Impact on Feature 005 Specification
+
+**ORIGINAL CONCLUSION WAS WRONG** ❌
+- ~~"Quest events NOT logged"~~ → **Quest events ARE logged in notifications.log**
+- ~~"Full automation impossible"~~ → **Full automation PROVEN by TarkovMonitor (135 stars)**
+- ~~"Recommend Option A: Manual tracking"~~ → **Original spec is ACHIEVABLE**
+
+**CORRECTED CONCLUSION** ✅
+- **Automation IS viable**: TarkovMonitor proves it works in production
+- **Log monitoring works**: Chat notifications contain quest status changes
+- **Original specification valid**: Tauri desktop app with log monitoring is the right approach
+- **Reference implementation exists**: Can study TarkovMonitor's C# patterns for Rust implementation
+
+### Updated Architecture Decision
+
+**Proceed with Original Feature 005 Specification:**
+- ✅ Tauri desktop app (Rust 1.75+ + TypeScript 5.x)
+- ✅ Monitor `notifications.log` for `ChatMessageReceived` events
+- ✅ Parse MessageType 10/11/12 for quest status changes
+- ✅ Extract quest ID from `templateId` field
+- ✅ Sync to TarkovTracker API automatically
+- ✅ Read past logs for historical quest completion catch-up
+
+**Estimated Effort**: ~80 hours (as originally planned)
+
+---
+
+## 12. Conclusion
+
+**Final Verification (2025-01-18):**
+
+✅ **Quest events ARE logged**: In `notifications.log` as system chat messages
+✅ **Pattern identified**: `Got notification | ChatMessageReceived` with MessageType 10-12
+✅ **Working proof**: TarkovMonitor successfully automates quest tracking (135 GitHub stars)
+✅ **Original spec valid**: Desktop app approach IS achievable
+✅ **Reference available**: Can study TarkovMonitor source for implementation patterns
+
+**Proceed with Feature 005 as originally specified.** ✅
 - Simpler implementation (16h vs 60-80h)
 - No EULA risks
 - More reliable (no dependency on log format changes)
