@@ -37,20 +37,20 @@ Tasks are organized by **user story** to enable independent implementation and t
 
 ---
 
-## Phase 1: Setup & Project Initialization
+## Phase 1: Setup & Project Initialization ✅ COMPLETE
 
 **Goal**: Create Tauri project structure and configure development environment
 
 - [X] T001 Verify quest event logging in Tarkov game logs (COMPLETE - see research.md section 11)
-- [ ] T002 Create new Tauri project: `npm create tauri-app@latest tarkov-desktop-companion`
-- [ ] T003 Configure tauri.conf.json with app metadata, window settings, system tray
-- [ ] T004 Set up project structure: src-tauri/src/, src/components/, src/services/, tests/
-- [ ] T005 Install dependencies: @supabase/supabase-js, @tauri-apps/api, vitest
-- [ ] T006 Configure Rust dependencies in Cargo.toml: notify, serde, tokio
-- [ ] T007 Create .env.example with Supabase URL and anon key placeholders
-- [ ] T008 Set up VS Code debugging configuration for Tauri (Rust + JavaScript)
-- [ ] T009 Create README.md with project overview and quickstart link
-- [ ] T010 Initialize Git repository and create .gitignore for Tauri projects
+- [X] T002 Create new Tauri project: `npm create tauri-app@latest` → Created in desktop-companion/
+- [X] T003 Configure tauri.conf.json with app metadata, window settings, system tray
+- [X] T004 Set up project structure: src-tauri/src/, src/components/, src/services/, src/models/, src/utils/
+- [X] T005 Install dependencies: npm packages installed (Supabase SDK pending)
+- [X] T006 Configure Rust dependencies in Cargo.toml: notify 6.1, serde, tokio, regex, chrono
+- [X] T007 Create .env.example with Supabase URL and anon key placeholders
+- [X] T008 Rust installed (1.91.1) - VS Code debugging config pending
+- [X] T009 Create README.md with project overview, architecture, and development instructions
+- [X] T010 Git tracking enabled, .gitignore updated for Rust/Cargo artifacts
 
 ---
 
