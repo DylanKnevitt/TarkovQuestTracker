@@ -438,3 +438,44 @@ body {
 .content-area::-webkit-scrollbar-thumb:hover {
     background: var(--border-color);
 }
+
+/* Auth Tabs */
+.auth-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn.active {
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
+}
+
+/* Auth Forms */
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}

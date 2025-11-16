@@ -24,6 +24,10 @@ export class SettingsComponent {
         testConnectionBtn: document.getElementById('test-connection-btn') as HTMLButtonElement,
         connectionStatus: document.getElementById('connection-status') as HTMLDivElement,
 
+        userEmail: document.getElementById('user-email') as HTMLParagraphElement,
+        signoutBtn: document.getElementById('signout-btn') as HTMLButtonElement,
+        signoutStatus: document.getElementById('signout-status') as HTMLDivElement,
+
         autoStartCheckbox: document.getElementById('auto-start') as HTMLInputElement,
         notificationsCheckbox: document.getElementById('notifications') as HTMLInputElement,
         syncEnabledCheckbox: document.getElementById('sync-enabled') as HTMLInputElement,
@@ -38,6 +42,7 @@ export class SettingsComponent {
 
     private async init() {
         await this.loadConfig();
+        await this.loadUserInfo();
         this.attachEventListeners();
     }
 
@@ -62,11 +67,29 @@ export class SettingsComponent {
         this.elements.syncEnabledCheckbox.checked = this.config.sync_enabled;
     }
 
+    private async loadUserInfo() {
+        try {
+            const { supabaseService } = await import('../services/SupabaseService');
+            const user = await supabaseService.getCurrentUser();
+
+            if (user) {
+                this.elements.userEmail.textContent = `Signed in as: ${user.email || 'Unknown'}`;
+            } else {
+                this.elements.userEmail.textContent = 'Not signed in';
+                this.elements.signoutBtn.disabled = true;
+            }
+        } catch (error) {
+            console.error('Failed to load user info:', error);
+            this.elements.userEmail.textContent = 'Error loading user';
+        }
+    }
+
     private attachEventListeners() {
         this.elements.autoDetectBtn.addEventListener('click', () => this.handleAutoDetect());
         this.elements.browseBtn.addEventListener('click', () => this.handleBrowse());
         this.elements.validateBtn.addEventListener('click', () => this.handleValidate());
         this.elements.testConnectionBtn.addEventListener('click', () => this.handleTestConnection());
+        this.elements.signoutBtn.addEventListener('click', () => this.handleSignOut());
         this.elements.saveBtn.addEventListener('click', () => this.handleSave());
         this.elements.cancelBtn.addEventListener('click', () => this.handleCancel());
     }
@@ -222,6 +245,39 @@ export class SettingsComponent {
         } finally {
             this.elements.saveBtn.disabled = false;
             this.elements.saveBtn.textContent = 'Save';
+        }
+    }
+
+    private async handleSignOut() {
+        try {
+            this.elements.signoutBtn.disabled = true;
+            this.elements.signoutBtn.textContent = 'Signing out...';
+            this.elements.signoutStatus.textContent = '';
+            this.elements.signoutStatus.className = 'status-message';
+
+            const { supabaseService } = await import('../services/SupabaseService');
+            const result = await supabaseService.signOut();
+
+            if (result.success) {
+                this.elements.signoutStatus.textContent = '✓ Signed out successfully';
+                this.elements.signoutStatus.className = 'status-message success';
+                
+                // Redirect to wizard after signout
+                setTimeout(() => {
+                    window.location.href = '/wizard.html';
+                }, 1500);
+            } else {
+                this.elements.signoutStatus.textContent = `✗ ${result.error || 'Sign out failed'}`;
+                this.elements.signoutStatus.className = 'status-message error';
+                this.elements.signoutBtn.disabled = false;
+                this.elements.signoutBtn.textContent = 'Sign Out';
+            }
+        } catch (error: any) {
+            console.error('Sign out failed:', error);
+            this.elements.signoutStatus.textContent = `✗ ${error.message || 'Sign out failed'}`;
+            this.elements.signoutStatus.className = 'status-message error';
+            this.elements.signoutBtn.disabled = false;
+            this.elements.signoutBtn.textContent = 'Sign Out';
         }
     }
 

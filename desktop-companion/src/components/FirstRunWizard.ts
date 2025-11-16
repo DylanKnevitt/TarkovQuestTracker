@@ -8,7 +8,7 @@ import {
     type AppConfig,
 } from '../services/tauri-commands';
 
-type WizardStep = 'welcome' | 'detect-tarkov' | 'configure-database' | 'complete';
+type WizardStep = 'welcome' | 'detect-tarkov' | 'configure-database' | 'auth' | 'complete';
 
 export class FirstRunWizard {
     private currentStep: WizardStep = 'welcome';
@@ -63,6 +63,9 @@ export class FirstRunWizard {
                 break;
             case 'configure-database':
                 this.renderConfigureDatabase();
+                break;
+            case 'auth':
+                this.renderAuth();
                 break;
             case 'complete':
                 this.renderComplete();
@@ -214,6 +217,98 @@ export class FirstRunWizard {
 
         // Attach event listeners for this step
         document.getElementById('test-connection-wizard')?.addEventListener('click', () => this.handleTestConnectionWizard());
+    }
+
+    private renderAuth() {
+        this.elements.contentArea.innerHTML = `
+      <div class="wizard-step">
+        <h1>Sign In to Your Account</h1>
+        <p class="lead">
+          Sign in to sync your quest progress across devices.
+        </p>
+        
+        <div class="form-container">
+          <div class="auth-tabs">
+            <button id="signin-tab" class="tab-btn active">Sign In</button>
+            <button id="signup-tab" class="tab-btn">Sign Up</button>
+          </div>
+
+          <div id="signin-form" class="auth-form active">
+            <div class="form-group">
+              <label for="email-signin">Email</label>
+              <input 
+                type="email" 
+                id="email-signin" 
+                placeholder="your@email.com"
+                class="text-input"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="password-signin">Password</label>
+              <input 
+                type="password" 
+                id="password-signin" 
+                placeholder="••••••••"
+                class="text-input"
+              />
+            </div>
+            
+            <button id="signin-btn" class="btn btn-primary">Sign In</button>
+          </div>
+
+          <div id="signup-form" class="auth-form">
+            <div class="form-group">
+              <label for="email-signup">Email</label>
+              <input 
+                type="email" 
+                id="email-signup" 
+                placeholder="your@email.com"
+                class="text-input"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="password-signup">Password</label>
+              <input 
+                type="password" 
+                id="password-signup" 
+                placeholder="••••••••"
+                class="text-input"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="password-confirm">Confirm Password</label>
+              <input 
+                type="password" 
+                id="password-confirm" 
+                placeholder="••••••••"
+                class="text-input"
+              />
+            </div>
+            
+            <button id="signup-btn" class="btn btn-primary">Sign Up</button>
+          </div>
+
+          <div id="auth-status" class="status-message"></div>
+        </div>
+        
+        <div class="help-box">
+          <strong>Why do I need an account?</strong>
+          <p>
+            Your account allows you to sync quest progress between the desktop app and web app.
+            All your data is securely stored in your Supabase database.
+          </p>
+        </div>
+      </div>
+    `;
+
+        // Attach event listeners for tabs
+        document.getElementById('signin-tab')?.addEventListener('click', () => this.switchAuthTab('signin'));
+        document.getElementById('signup-tab')?.addEventListener('click', () => this.switchAuthTab('signup'));
+        document.getElementById('signin-btn')?.addEventListener('click', () => this.handleSignIn());
+        document.getElementById('signup-btn')?.addEventListener('click', () => this.handleSignUp());
     }
 
     private renderComplete() {
@@ -418,8 +513,127 @@ export class FirstRunWizard {
         }
     }
 
+    private switchAuthTab(tab: 'signin' | 'signup') {
+        const signinTab = document.getElementById('signin-tab');
+        const signupTab = document.getElementById('signup-tab');
+        const signinForm = document.getElementById('signin-form');
+        const signupForm = document.getElementById('signup-form');
+
+        if (tab === 'signin') {
+            signinTab?.classList.add('active');
+            signupTab?.classList.remove('active');
+            signinForm?.classList.add('active');
+            signupForm?.classList.remove('active');
+        } else {
+            signinTab?.classList.remove('active');
+            signupTab?.classList.add('active');
+            signinForm?.classList.remove('active');
+            signupForm?.classList.add('active');
+        }
+    }
+
+    private async handleSignIn() {
+        const emailInput = document.getElementById('email-signin') as HTMLInputElement;
+        const passwordInput = document.getElementById('password-signin') as HTMLInputElement;
+        const btn = document.getElementById('signin-btn') as HTMLButtonElement;
+        const status = document.getElementById('auth-status') as HTMLDivElement;
+
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!email || !password) {
+            status.textContent = 'Please enter email and password';
+            status.className = 'status-message error';
+            return;
+        }
+
+        try {
+            btn.disabled = true;
+            btn.textContent = 'Signing in...';
+            status.textContent = 'Authenticating...';
+            status.className = 'status-message info';
+
+            const { supabaseService } = await import('../services/SupabaseService');
+            const result = await supabaseService.signIn(email, password);
+
+            if (result.success) {
+                status.textContent = '✓ Signed in successfully!';
+                status.className = 'status-message success';
+                this.elements.nextBtn.disabled = false;
+            } else {
+                status.textContent = `✗ ${result.error || 'Sign in failed'}`;
+                status.className = 'status-message error';
+            }
+        } catch (error: any) {
+            console.error('Sign in failed:', error);
+            status.textContent = `✗ ${error.message || 'Sign in failed'}`;
+            status.className = 'status-message error';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Sign In';
+        }
+    }
+
+    private async handleSignUp() {
+        const emailInput = document.getElementById('email-signup') as HTMLInputElement;
+        const passwordInput = document.getElementById('password-signup') as HTMLInputElement;
+        const confirmInput = document.getElementById('password-confirm') as HTMLInputElement;
+        const btn = document.getElementById('signup-btn') as HTMLButtonElement;
+        const status = document.getElementById('auth-status') as HTMLDivElement;
+
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        const confirm = confirmInput.value;
+
+        if (!email || !password || !confirm) {
+            status.textContent = 'Please fill in all fields';
+            status.className = 'status-message error';
+            return;
+        }
+
+        if (password !== confirm) {
+            status.textContent = 'Passwords do not match';
+            status.className = 'status-message error';
+            return;
+        }
+
+        if (password.length < 6) {
+            status.textContent = 'Password must be at least 6 characters';
+            status.className = 'status-message error';
+            return;
+        }
+
+        try {
+            btn.disabled = true;
+            btn.textContent = 'Creating account...';
+            status.textContent = 'Creating your account...';
+            status.className = 'status-message info';
+
+            const { supabaseService } = await import('../services/SupabaseService');
+            const result = await supabaseService.signUp(email, password);
+
+            if (result.success) {
+                status.textContent = '✓ Account created! Check your email to verify.';
+                status.className = 'status-message success';
+                // Switch to sign in tab
+                this.switchAuthTab('signin');
+                emailInput.value = email;
+            } else {
+                status.textContent = `✗ ${result.error || 'Sign up failed'}`;
+                status.className = 'status-message error';
+            }
+        } catch (error: any) {
+            console.error('Sign up failed:', error);
+            status.textContent = `✗ ${error.message || 'Sign up failed'}`;
+            status.className = 'status-message error';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Sign Up';
+        }
+    }
+
     private handlePrev() {
-        const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'complete'];
+        const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'auth', 'complete'];
         const currentIndex = steps.indexOf(this.currentStep);
         if (currentIndex > 0) {
             this.currentStep = steps[currentIndex - 1];
@@ -428,7 +642,7 @@ export class FirstRunWizard {
     }
 
     private handleNext() {
-        const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'complete'];
+        const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'auth', 'complete'];
         const currentIndex = steps.indexOf(this.currentStep);
 
         // Validate before proceeding
@@ -453,7 +667,7 @@ export class FirstRunWizard {
     }
 
     private updateStepIndicator() {
-        const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'complete'];
+        const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'auth', 'complete'];
         const currentIndex = steps.indexOf(this.currentStep);
 
         this.elements.stepIndicator.innerHTML = steps.map((_, index) => `
@@ -462,7 +676,7 @@ export class FirstRunWizard {
     }
 
     private updateButtons() {
-        const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'complete'];
+        const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'auth', 'complete'];
         const currentIndex = steps.indexOf(this.currentStep);
 
         // Previous button

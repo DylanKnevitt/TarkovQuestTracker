@@ -221,16 +221,101 @@ export class SupabaseService {
     }
 
     /**
-     * Sign in anonymously (for testing)
+     * Sign in with email and password
      */
-    async signInAnonymously(): Promise<boolean> {
+    async signIn(email: string, password: string): Promise<{ success: boolean; error?: string }> {
+        if (!this.isReady()) {
+            return { success: false, error: 'Supabase client not initialized' };
+        }
+
+        try {
+            const { data, error } = await this.client!.auth.signInWithPassword({
+                email,
+                password,
+            });
+
+            if (error) {
+                console.error('Sign in error:', error);
+                return { success: false, error: error.message };
+            }
+
+            if (!data.user) {
+                return { success: false, error: 'No user data returned' };
+            }
+
+            console.log('Successfully signed in:', data.user.email);
+            return { success: true };
+        } catch (error) {
+            console.error('Sign in exception:', error);
+            return { success: false, error: String(error) };
+        }
+    }
+
+    /**
+     * Sign up new user with email and password
+     */
+    async signUp(email: string, password: string): Promise<{ success: boolean; error?: string }> {
+        if (!this.isReady()) {
+            return { success: false, error: 'Supabase client not initialized' };
+        }
+
+        try {
+            const { data, error } = await this.client!.auth.signUp({
+                email,
+                password,
+            });
+
+            if (error) {
+                console.error('Sign up error:', error);
+                return { success: false, error: error.message };
+            }
+
+            if (!data.user) {
+                return { success: false, error: 'No user data returned' };
+            }
+
+            console.log('Successfully signed up:', data.user.email);
+            return { success: true };
+        } catch (error) {
+            console.error('Sign up exception:', error);
+            return { success: false, error: String(error) };
+        }
+    }
+
+    /**
+     * Sign out current user
+     */
+    async signOut(): Promise<{ success: boolean; error?: string }> {
+        if (!this.isReady()) {
+            return { success: false, error: 'Supabase client not initialized' };
+        }
+
+        try {
+            const { error } = await this.client!.auth.signOut();
+
+            if (error) {
+                console.error('Sign out error:', error);
+                return { success: false, error: error.message };
+            }
+
+            console.log('Successfully signed out');
+            return { success: true };
+        } catch (error) {
+            console.error('Sign out exception:', error);
+            return { success: false, error: String(error) };
+        }
+    }
+
+    /**
+     * Check if user is currently authenticated
+     */
+    async isAuthenticated(): Promise<boolean> {
         if (!this.isReady()) return false;
 
         try {
-            const { error } = await this.client!.auth.signInAnonymously();
-            return !error;
+            const { data: { user } } = await this.client!.auth.getUser();
+            return !!user;
         } catch (error) {
-            console.error('Anonymous sign-in failed:', error);
             return false;
         }
     }
