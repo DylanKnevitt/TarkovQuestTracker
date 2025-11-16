@@ -30,14 +30,19 @@ export class ItemCard {
                     <img src="${item.item.iconLink}" alt="${item.item.name}" class="item-icon" onerror="this.src='https://via.placeholder.com/64x64?text=No+Image'">
                     
                     <div class="item-card-quantity-input">
-                        <input type="number" 
-                               class="item-quantity-input" 
-                               data-item-id="${item.item.id}"
-                               min="0"
-                               max="${item.totalQuantity}"
-                               value="${item.collectedQuantity || 0}"
-                               placeholder="0">
-                        <span class="quantity-max">/ ${item.totalQuantity}</span>
+                        <button class="quantity-btn quantity-minus" 
+                                data-item-id="${item.item.id}"
+                                aria-label="Decrease quantity">
+                            −
+                        </button>
+                        <span class="quantity-display">${item.collectedQuantity || 0}</span>
+                        <span class="quantity-separator">/</span>
+                        <span class="quantity-max">${item.totalQuantity}</span>
+                        <button class="quantity-btn quantity-plus" 
+                                data-item-id="${item.item.id}"
+                                aria-label="Increase quantity">
+                            +
+                        </button>
                     </div>
                 </div>
                 

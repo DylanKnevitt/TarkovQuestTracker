@@ -118,18 +118,29 @@ export class ItemList {
      * Attach event listeners to item cards
      */
     attachCardEventListeners() {
-        // Collection quantity inputs
-        const quantityInputs = this.container.querySelectorAll('.item-quantity-input');
-        quantityInputs.forEach(input => {
-            input.addEventListener('change', (e) => {
-                const itemId = e.target.dataset.itemId;
-                const quantity = parseInt(e.target.value, 10) || 0;
-                this.handleQuantityChange(itemId, quantity);
-            });
-            
-            // Prevent click from opening detail modal
-            input.addEventListener('click', (e) => {
+        // Collection quantity buttons
+        const minusButtons = this.container.querySelectorAll('.quantity-minus');
+        const plusButtons = this.container.querySelectorAll('.quantity-plus');
+        
+        minusButtons.forEach(button => {
+            button.addEventListener('click', async (e) => {
                 e.stopPropagation();
+                const itemId = e.target.dataset.itemId;
+                const item = this.itemTrackerManager.getItem(itemId);
+                if (item && item.collectedQuantity > 0) {
+                    await this.handleQuantityChange(itemId, item.collectedQuantity - 1);
+                }
+            });
+        });
+        
+        plusButtons.forEach(button => {
+            button.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const itemId = e.target.dataset.itemId;
+                const item = this.itemTrackerManager.getItem(itemId);
+                if (item && item.collectedQuantity < item.totalQuantity) {
+                    await this.handleQuantityChange(itemId, item.collectedQuantity + 1);
+                }
             });
         });
         
