@@ -88,9 +88,7 @@
       "all": true,
       "open": true
     },
-    "store": {
-      "all": true
-    },
+    "store": {},
     "fs": {
       "all": true,
       "readDir": true,
