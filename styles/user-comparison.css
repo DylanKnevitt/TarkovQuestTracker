@@ -337,6 +337,30 @@
     }
 }
 
+/* Quest List Loading Overlay */
+.quest-list-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 26, 26, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    backdrop-filter: blur(2px);
+}
+
+.quest-list-loading-overlay .spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--border-color, #444);
+    border-top-color: var(--primary-color, #4a9eff);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
 .empty-state {
     display: flex;
     flex-direction: column;

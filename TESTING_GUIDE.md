@@ -58,6 +58,28 @@
 - [ ] Dependent quests unlock automatically
 - [ ] Graph updates when quests completed
 
+### ✅ User Comparison (Cloud Sync Required)
+- [ ] User Comparison tab is visible
+- [ ] Tab switches to comparison view
+- [ ] User list loads with completion stats
+- [ ] User cards show email and completion %
+- [ ] Clicking user selects them (visual highlight)
+- [ ] Quest list updates to show incomplete quests
+- [ ] Multi-select works (select 2+ users)
+- [ ] Quest list shows intersection (common incomplete quests)
+- [ ] Completion indicators show per-user status
+- [ ] Max selection limit (10 users) enforced with warning
+- [ ] Clear Selection button appears when users selected
+- [ ] Clear Selection button clears all selections
+- [ ] Share button copies URL to clipboard
+- [ ] Toast notification shows "Link copied"
+- [ ] Shared URL loads with pre-selected users
+- [ ] Refresh button reloads user list
+- [ ] Keyboard shortcuts work (Escape, Ctrl+R)
+- [ ] Invalid user IDs in URL filtered out silently
+- [ ] Empty states show correct messages
+- [ ] Loading states display during data fetch
+
 ---
 
 ## Test Scenarios
@@ -324,6 +346,53 @@ Open browser console and run:
 // After app loads
 console.log(window.app.questManager.quests);
 ```
+
+---
+
+### Scenario 11: User Comparison - Squad Coordination
+**Goal:** Verify multi-user quest comparison for squad play
+
+**Prerequisites:** 
+- Supabase configured (see README.md setup step 3-4)
+- Multiple user accounts with quest progress
+- SQL migrations run (quest_progress table + user_profiles function)
+
+**Test Steps:**
+1. Navigate to "User Comparison" tab
+2. Verify user list appears with completion stats
+3. Click on first user card
+   - Verify card gets highlighted/selected
+   - Verify quest list updates to show that user's incomplete quests
+   - Verify count shows "X quests incomplete for selected user"
+4. Click on second user card
+   - Verify both cards are highlighted
+   - Verify quest list shows only common incomplete quests
+   - Verify count shows "X quests incomplete for all 2 selected users"
+   - Verify completion indicators appear (checkmarks/circles)
+5. Hover over completion indicators
+   - Verify tooltip shows user email and status
+6. Click "Share" button
+   - Verify toast notification "Link copied to clipboard!"
+   - Open new tab and paste URL
+   - Verify same users are pre-selected
+7. Click "Clear Selection" button
+   - Verify all selections cleared
+   - Verify quest list shows empty state
+8. Test keyboard shortcuts:
+   - Select users, press `Escape` → selections cleared
+   - Press `Ctrl+R` → user list refreshes
+9. Try selecting 10+ users
+   - Verify warning message appears
+   - Verify 11th user is not selected
+
+**Expected:** 
+- User list loads < 2s
+- Selection updates immediately
+- Quest intersection calculates correctly
+- Visual indicators show per-user status
+- URL sharing works across sessions
+- Max selection limit enforced
+- Keyboard shortcuts responsive
 
 ---
 

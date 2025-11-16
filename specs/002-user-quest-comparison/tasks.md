@@ -168,15 +168,15 @@ description: "Task list for User Quest Progress Comparison feature"
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T055 [P] Add refresh button to UserComparison header to reload user profiles
-- [ ] T056 [P] Implement UserComparison.handleRefresh() - clear cache, re-fetch data, re-render
-- [ ] T057 Add loading states for quest list updates (spinner while calculating intersection)
-- [ ] T058 Add error handling for Supabase query failures (show error message in UI)
-- [ ] T059 Optimize ComparisonService.fetchUserProgress() to batch-fetch multiple users at once
-- [ ] T060 Add keyboard shortcuts: Escape to clear selection, Ctrl+R to refresh
-- [ ] T061 Add responsive styles in styles/user-comparison.css for mobile screens (< 768px)
-- [ ] T062 [P] Update README.md with comparison feature documentation
-- [ ] T063 [P] Add comparison feature section to TESTING_GUIDE.md
+- [X] T055 [P] Add refresh button to UserComparison header to reload user profiles
+- [X] T056 [P] Implement UserComparison.handleRefresh() - clear cache, re-fetch data, re-render
+- [X] T057 Add loading states for quest list updates (spinner while calculating intersection)
+- [X] T058 Add error handling for Supabase query failures (show error message in UI)
+- [X] T059 Optimize ComparisonService.fetchUserProgress() to batch-fetch multiple users at once
+- [X] T060 Add keyboard shortcuts: Escape to clear selection, Ctrl+R to refresh
+- [X] T061 Add responsive styles in styles/user-comparison.css for mobile screens (< 768px)
+- [X] T062 [P] Update README.md with comparison feature documentation
+- [X] T063 [P] Add comparison feature section to TESTING_GUIDE.md
 - [ ] T064 Run quickstart.md validation - follow 5-minute prototype test scenarios
 - [ ] T065 Test with 100+ users to verify performance (< 2s load time)
 - [ ] T066 Test with 10 selected users to verify intersection performance (< 2s)

@@ -101,6 +101,26 @@ Use the sidebar buttons to quickly find paths to:
 - Get step-by-step optimal path
 - Highlights prerequisites in order
 
+### User Comparison (Cloud Sync Required)
+Compare quest progress with other users to coordinate squad play:
+- **View All Users**: See all registered users with completion statistics
+- **Select Users**: Click one or more users to compare (up to 10)
+- **Find Common Quests**: Shows quests incomplete for ALL selected users
+- **Visual Indicators**: See per-user completion status with checkmarks/circles
+- **Share Links**: Generate shareable URLs to coordinate with squadmates
+- **Keyboard Shortcuts**: 
+  - `Escape` to clear selection
+  - `Ctrl+R` to refresh user list
+
+**Requirements**: 
+- Supabase configuration required (see Setup step 3-4)
+- Users must be authenticated and have quest progress synced
+
+**Use Cases**:
+- Duo/trio coordination: Find quests you both need to complete
+- Squad planning: Identify common objectives for group raids
+- Progress tracking: See which squadmate needs help with specific quests
+
 ## Data Source
 
 Quest data is fetched from the [Tarkov.dev GraphQL API](https://api.tarkov.dev/):

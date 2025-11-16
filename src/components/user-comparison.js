@@ -30,7 +30,11 @@ export class UserComparison {
         this.userProgressMap = new Map(); // userId -> UserQuestProgress
 
         this.isLoading = false;
+        this.isUpdatingQuests = false;
         this.error = null;
+
+        // Bind keyboard shortcuts (T060)
+        this.handleKeyboardShortcuts = this.handleKeyboardShortcuts.bind(this);
     }
 
     /**
@@ -47,6 +51,9 @@ export class UserComparison {
             this.renderUnavailable();
             return;
         }
+
+        // Add keyboard shortcuts (T060)
+        document.addEventListener('keydown', this.handleKeyboardShortcuts);
 
         // Render loading state
         this.renderLoading();
@@ -229,22 +236,30 @@ export class UserComparison {
             return;
         }
 
-        // Get all quests from QuestManager
-        const allQuests = this.questManager.quests;
-        if (!allQuests || allQuests.length === 0) {
+        // Show loading state (T057)
+        this.isUpdatingQuests = true;
+        this.showQuestListLoading();
+
+        try {
+            // Get all quests from QuestManager
+            const allQuests = this.questManager.quests;
+            if (!allQuests || allQuests.length === 0) {
+                this.questList.setSelectedUsers(this.selectedUserIds, this.userProgressMap, this.users);
+                this.questList.setFilteredQuests([]);
+                this.questList.render();
+                return;
+            }
+
+            // Calculate intersection of incomplete quests
+            const incompleteQuests = this.calculateQuestIntersection(allQuests);
+
+            // Update quest list component
             this.questList.setSelectedUsers(this.selectedUserIds, this.userProgressMap, this.users);
-            this.questList.setFilteredQuests([]);
+            this.questList.setFilteredQuests(incompleteQuests);
             this.questList.render();
-            return;
+        } finally {
+            this.isUpdatingQuests = false;
         }
-
-        // Calculate intersection of incomplete quests
-        const incompleteQuests = this.calculateQuestIntersection(allQuests);
-
-        // Update quest list component
-        this.questList.setSelectedUsers(this.selectedUserIds, this.userProgressMap, this.users);
-        this.questList.setFilteredQuests(incompleteQuests);
-        this.questList.render();
     }
 
     /**
@@ -527,5 +542,61 @@ export class UserComparison {
         const url = new URL(window.location.href);
         url.searchParams.delete('users');
         window.history.replaceState({}, '', url.toString());
+    }
+
+    /**
+     * Handle keyboard shortcuts (T060)
+     * - Escape: Clear selection
+     * - Ctrl+R: Refresh (prevent default browser refresh)
+     * @param {KeyboardEvent} event
+     */
+    handleKeyboardShortcuts(event) {
+        // Only handle if comparison tab is active
+        const comparisonTab = document.getElementById('comparison-tab');
+        if (!comparisonTab || comparisonTab.style.display === 'none') {
+            return;
+        }
+
+        // Escape: Clear selection
+        if (event.key === 'Escape' && this.selectedUserIds.length > 0) {
+            event.preventDefault();
+            this.handleClearSelection();
+        }
+
+        // Ctrl+R: Refresh
+        if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+            event.preventDefault();
+            this.handleRefresh();
+        }
+    }
+
+    /**
+     * Show loading spinner in quest list section (T057)
+     */
+    showQuestListLoading() {
+        const questListSection = this.container.querySelector('.quest-list-section');
+        if (!questListSection || !this.isUpdatingQuests) return;
+
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.className = 'quest-list-loading-overlay';
+        loadingIndicator.innerHTML = '<div class="spinner"></div>';
+        questListSection.style.position = 'relative';
+        questListSection.appendChild(loadingIndicator);
+
+        // Remove after short delay (will be removed when render completes)
+        setTimeout(() => {
+            const overlay = questListSection.querySelector('.quest-list-loading-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }, 500);
+    }
+
+    /**
+     * Cleanup when component is destroyed
+     */
+    destroy() {
+        // Remove keyboard event listener (T060)
+        document.removeEventListener('keydown', this.handleKeyboardShortcuts);
     }
 }
