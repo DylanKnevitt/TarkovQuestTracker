@@ -181,6 +181,9 @@ export class ItemList {
         // Update the item's collected quantity immediately for UI
         item.setCollectionStatus(clampedQuantity >= item.totalQuantity, clampedQuantity);
         
+        // Update collection status (syncs to database) - AWAIT to prevent race condition
+        await ItemCollectionService.setQuantity(itemId, clampedQuantity);
+        
         // Update the display for this specific card
         const card = this.container.querySelector(`.item-card[data-item-id="${itemId}"]`);
         if (card) {
@@ -196,11 +199,6 @@ export class ItemList {
                 card.classList.remove('collected');
             }
         }
-        
-        // Update collection status (syncs to database in background)
-        ItemCollectionService.setQuantity(itemId, clampedQuantity).catch(err => {
-            console.error('Failed to sync quantity:', err);
-        });
     }
 
     /**
