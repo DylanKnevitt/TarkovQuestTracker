@@ -20,8 +20,14 @@ Automatic quest tracking desktop companion for Escape from Tarkov that monitors 
 - Historical import wizard
 - System tray integration
 
-🚧 **Phase 6**: Quest item tracking (not implemented)
-🚧 **Phase 8**: Testing and optimization (ongoing)
+✅ **Phase 8 (Partial)**: Polish and optimization
+- Performance: Event batching, circular buffer for memory management
+- Error handling: Comprehensive error structure with retry logic
+- Documentation: User guide, troubleshooting, IPC reference
+- Build: GitHub Actions workflow, installer configuration
+
+⏭️ **Phase 6**: Quest item tracking (optional, not implemented)
+⏭️ **Remaining**: Code signing, VM testing, optional unit tests
 
 ## Quick Start
 
