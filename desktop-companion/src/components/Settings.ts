@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/core';
+// import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import {
   getAppConfig,
@@ -11,7 +11,6 @@ import {
 export class SettingsComponent {
   private config: AppConfig | null = null;
   private isValidated = false;
-  private isTesting = false;
 
   private elements = {
     logDirectoryInput: document.getElementById('log-directory') as HTMLInputElement,
@@ -162,7 +161,6 @@ export class SettingsComponent {
     }
 
     try {
-      this.isTesting = true;
       this.elements.testConnectionBtn.disabled = true;
       this.elements.testConnectionBtn.textContent = 'Testing...';
       this.showConnectionInfo('Testing connection...');
@@ -183,7 +181,6 @@ export class SettingsComponent {
       console.error('Connection test failed:', error);
       this.showConnectionError(`✗ Connection failed: ${error.message || 'Unknown error'}`);
     } finally {
-      this.isTesting = false;
       this.elements.testConnectionBtn.disabled = false;
       this.elements.testConnectionBtn.textContent = 'Test Connection';
     }

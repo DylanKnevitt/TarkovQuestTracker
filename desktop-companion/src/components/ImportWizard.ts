@@ -1,7 +1,7 @@
-import { invoke } from '@tauri-apps/api/core';
+// import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import { supabaseService } from '../services/SupabaseService';
-import { QuestEventParser, QuestEventType } from '../services/QuestEventParser';
+import { QuestEventParser } from '../services/QuestEventParser';
 
 export class ImportWizard {
   private logDirectory: string = '';

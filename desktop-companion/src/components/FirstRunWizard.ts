@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/core';
+// import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import {
   getAppConfig,
@@ -458,7 +458,7 @@ export class FirstRunWizard {
     const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'complete'];
     const currentIndex = steps.indexOf(this.currentStep);
     
-    this.elements.stepIndicator.innerHTML = steps.map((step, index) => `
+    this.elements.stepIndicator.innerHTML = steps.map((_, index) => `
       <div class="step-dot ${index <= currentIndex ? 'active' : ''}"></div>
     `).join('');
   }

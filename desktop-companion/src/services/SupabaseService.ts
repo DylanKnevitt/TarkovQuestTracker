@@ -201,7 +201,7 @@ export class SupabaseService {
         updated_at: now,
       }));
 
-      const { data, error } = await this.client!
+      const { error } = await this.client!
         .from('quest_progress')
         .upsert(records, {
           onConflict: 'user_id,quest_id'
