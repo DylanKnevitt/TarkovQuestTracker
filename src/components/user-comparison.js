@@ -424,7 +424,7 @@ export class UserComparison {
         const clearBtn = this.container.querySelector('.clear-selection-btn');
         const shareBtn = this.container.querySelector('.share-comparison-btn');
         const hasSelection = this.selectedUserIds.length > 0;
-        
+
         if (clearBtn) {
             clearBtn.style.display = hasSelection ? 'inline-block' : 'none';
         }
@@ -480,7 +480,7 @@ export class UserComparison {
         if (userIds.length === 0) return;
 
         // Filter out invalid/deleted user IDs (T054)
-        const validUserIds = userIds.filter(userId => 
+        const validUserIds = userIds.filter(userId =>
             this.users.some(user => user.id === userId)
         );
 

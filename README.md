@@ -55,6 +55,7 @@ If you configured Supabase credentials in step 3, you need to run the SQL migrat
 #    - supabase-setup.sql (quest_progress table and RLS policies)
 #    - supabase-user-profiles-function.sql (user comparison support)
 #    - supabase-item-collection.sql (item collection tracking with database sync)
+#    - supabase-hideout-progress.sql (hideout build tracking with database sync)
 ```
 
 These files are in the repository root. Copy and paste their contents into Supabase SQL Editor and run them **in order**.
@@ -153,6 +154,49 @@ Track all items needed for incomplete quests and hideout upgrades:
 - < 3 second initial load with 400-500 items
 - < 100ms filter response time
 - 24-hour API cache with offline fallback
+
+### Hideout Progress Tracker
+Track hideout module buildability and see smart item priorities based on what you can build now:
+
+**Features**:
+- **Hideout Progress Tab**: Access via Item Tracker → Hideout Progress subtab
+- **Build Status Tracking**: Mark hideout modules as built/unbuilt
+- **Three-Tier Priority System**:
+  - 🔴 **NEED NOW** (red/orange): Items for modules you can build right now (0 blocking prerequisites)
+  - 🟡 **NEED SOON** (yellow): Items for modules 1-2 steps away (1-2 unbuilt prerequisites)
+  - 🔵 **NEED LATER** (blue/gray): Items for modules 3+ steps away (3+ unbuilt prerequisites)
+- **Smart Dependency Tracking**: Automatically calculates how many modules are blocking you from building each upgrade
+- **Interactive Cards**: Each hideout module shows:
+  - Build status (Built ✓ / Buildable ⚙ / Locked 🔒)
+  - Required items with quantities
+  - Prerequisites (other hideout modules needed first)
+  - Toggle button to mark as built/unbuilt
+- **Real-time Priority Updates**: Item priorities automatically recalculate when you mark modules as built
+- **Database Sync**: Hideout progress syncs to Supabase when logged in (localStorage fallback when offline)
+- **Priority Tooltips**: Hover over any priority badge to see why an item has that priority
+
+**How to Use**:
+1. Navigate to **Item Tracker** tab → **Hideout Progress** subtab
+2. View all hideout modules organized by station and level
+3. Mark modules you've already built by clicking **"Mark as Built"**
+4. Built modules automatically update item priorities on the Items tab
+5. See which items are NEED NOW (buildable immediately) vs NEED LATER
+6. Plan your hideout upgrades based on what's buildable next
+7. Progress syncs to database when logged in, or saves to localStorage
+
+**Database Setup** (for cloud sync):
+```sql
+-- Run this in Supabase SQL Editor after the initial setup
+-- File: supabase-hideout-progress.sql (in repository root)
+```
+
+This migration creates the `hideout_progress` table with Row Level Security policies for multi-user support.
+
+**Priority Calculation Logic**:
+- Depth 0 (unlocked quests or buildable modules) → **NEED NOW**
+- Depth 1-2 (1-2 steps away) → **NEED SOON**  
+- Depth 3+ (far away) → **NEED LATER**
+- When an item is needed by multiple sources, the highest priority wins
 
 ## Data Source
 

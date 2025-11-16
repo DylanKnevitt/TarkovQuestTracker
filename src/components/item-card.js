@@ -1,11 +1,13 @@
 /**
  * Item Card Component
- * Feature: 003-item-tracker
+ * Feature: 003-item-tracker + 004-hideout-item-enhancements
  * Renders individual item card in grid
  */
 
+import { PriorityBadge } from './priority-badge.js';
+
 /**
- * T033, T042-T045: ItemCard component
+ * T033, T042-T045, T019: ItemCard component
  * Displays item with icon, name, quantity, priority, sources, FiR badge
  */
 export class ItemCard {
@@ -23,7 +25,7 @@ export class ItemCard {
     render() {
         const item = this.item;
         const collectedClass = item.collectedQuantity >= item.totalQuantity ? 'collected' : '';
-        
+
         return `
             <div class="item-card ${collectedClass}" data-item-id="${item.item.id}">
                 <div class="item-card-header">
@@ -69,36 +71,57 @@ export class ItemCard {
     }
 
     /**
-     * T043: Render priority badge
+     * T019: Render priority badge using PriorityBadge component (ENHANCED)
      * @returns {string}
      */
     renderPriorityBadge() {
-        const priorityClass = this.item.getPriorityCssClass();
-        const priorityText = this.item.getPriorityDisplay();
-        
-        const icon = this.item.priority === 'NEEDED_SOON' ? '⚠️' : '🕐';
-        
-        return `
-            <div class="priority-badge ${priorityClass}">
-                <span class="priority-icon">${icon}</span>
-                <span class="priority-text">${priorityText}</span>
-            </div>
-        `;
+        // Use PriorityBadge component with priority metadata
+        const priority = this.item.priority;
+        const reason = this.item.priorityReason || 'unknown';
+        const depth = this.item.priorityDepth || 0;
+
+        return PriorityBadge.render(priority, reason, depth);
     }
 
     /**
-     * T044: Render source subtitle
+     * T044: Render source subtitle with detailed breakdown
      * @returns {string}
      */
     renderSources() {
-        const sourcesText = this.item.getSourcesString();
-        
-        return `
-            <div class="item-sources">
-                <span class="sources-label">Needed for:</span>
-                <span class="sources-text">${sourcesText}</span>
-            </div>
-        `;
+        if (this.item.sources.length === 0) {
+            return '';
+        }
+
+        // Group sources by type for better organization
+        const questSources = this.item.sources.filter(s => s.type === 'quest');
+        const hideoutSources = this.item.sources.filter(s => s.type === 'hideout');
+
+        let sourcesHtml = '<div class="item-sources-detailed">';
+
+        // Show quest sources
+        if (questSources.length > 0) {
+            sourcesHtml += '<div class="source-group">';
+            sourcesHtml += '<span class="source-type-label">Quests:</span>';
+            sourcesHtml += '<ul class="source-list">';
+            for (const source of questSources) {
+                sourcesHtml += `<li class="source-item">${source.name} (${source.quantity}x)</li>`;
+            }
+            sourcesHtml += '</ul></div>';
+        }
+
+        // Show hideout sources (each level separately)
+        if (hideoutSources.length > 0) {
+            sourcesHtml += '<div class="source-group">';
+            sourcesHtml += '<span class="source-type-label">Hideout:</span>';
+            sourcesHtml += '<ul class="source-list">';
+            for (const source of hideoutSources) {
+                sourcesHtml += `<li class="source-item">${source.name} (${source.quantity}x)</li>`;
+            }
+            sourcesHtml += '</ul></div>';
+        }
+
+        sourcesHtml += '</div>';
+        return sourcesHtml;
     }
 
     /**
@@ -109,7 +132,7 @@ export class ItemCard {
         if (!this.item.isFiR) {
             return '';
         }
-        
+
         return `
             <span class="fir-badge" title="Found in Raid required">🔍 FiR</span>
         `;

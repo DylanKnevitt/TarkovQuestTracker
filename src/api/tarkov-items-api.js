@@ -9,11 +9,11 @@ const API_ENDPOINT = 'https://api.tarkov.dev/graphql';
 // Cache durations
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-// Cache keys
-const ITEMS_CACHE_KEY = 'tarkov-items-cache';
-const ITEMS_CACHE_TIME_KEY = 'tarkov-items-cache-time';
-const HIDEOUT_CACHE_KEY = 'tarkov-hideout-cache';
-const HIDEOUT_CACHE_TIME_KEY = 'tarkov-hideout-cache-time';
+// Cache keys (v2 to invalidate old cache without item names)
+const ITEMS_CACHE_KEY = 'tarkov-items-cache-v2';
+const ITEMS_CACHE_TIME_KEY = 'tarkov-items-cache-time-v2';
+const HIDEOUT_CACHE_KEY = 'tarkov-hideout-cache-v2';
+const HIDEOUT_CACHE_TIME_KEY = 'tarkov-hideout-cache-time-v2';
 
 /**
  * T005: Fetch items from Tarkov.dev API with minimal query
@@ -116,12 +116,15 @@ export async function fetchHideoutStations() {
                 itemRequirements {
                     item {
                         id
+                        name
+                        shortName
                     }
                     count
                 }
                 stationLevelRequirements {
                     station {
                         id
+                        name
                     }
                     level
                 }

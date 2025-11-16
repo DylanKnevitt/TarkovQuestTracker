@@ -74,7 +74,7 @@ export class HideoutModule {
      * @returns {boolean}
      */
     requiresStationLevel(stationId, level) {
-        return this.stationLevelRequirements.some(req => 
+        return this.stationLevelRequirements.some(req =>
             req.stationId === stationId && req.level === level
         );
     }
@@ -91,6 +91,102 @@ export class HideoutModule {
             stationLevelRequirements: this.stationLevelRequirements,
             completed: this.completed
         };
+    }
+
+    /**
+     * T002: Calculate dependency depth for this module
+     * Feature: 004-hideout-item-enhancements
+     * 
+     * Recursively calculates how many unbuilt prerequisite modules are blocking this one.
+     * Uses DFS with memoization for performance.
+     * 
+     * @param {HideoutManager} manager - For checking built status of prerequisites
+     * @param {Map<string, number>} memo - Memoization cache (optional)
+     * @returns {number} - 0 if buildable now, 1+ for steps away
+     */
+    calculateDependencyDepth(manager, memo = new Map()) {
+        const moduleKey = this.getModuleKey();
+
+        // If already calculated, return cached result
+        if (memo.has(moduleKey)) {
+            return memo.get(moduleKey);
+        }
+
+        // If this module is already built, depth is 0
+        if (this.completed || manager.completedModules.has(moduleKey)) {
+            memo.set(moduleKey, 0);
+            return 0;
+        }
+
+        // If no prerequisites, module is buildable now (depth 0)
+        if (this.stationLevelRequirements.length === 0) {
+            memo.set(moduleKey, 0);
+            return 0;
+        }
+
+        // Calculate depth based on unbuilt prerequisites
+        let maxDepth = 0;
+        for (const prereq of this.stationLevelRequirements) {
+            const prereqKey = `${prereq.stationId}-${prereq.level}`;
+
+            // Check if prerequisite is built
+            if (manager.completedModules.has(prereqKey)) {
+                // This prerequisite is built, skip it
+                continue;
+            }
+
+            // Get prerequisite module and recursively calculate its depth
+            const prereqModule = manager.modulesMap.get(prereqKey);
+            if (prereqModule) {
+                const prereqDepth = prereqModule.calculateDependencyDepth(manager, memo);
+                maxDepth = Math.max(maxDepth, prereqDepth + 1);
+            } else {
+                // Prerequisite module not found - shouldn't happen with valid API data
+                console.warn(`Prerequisite module not found: ${prereqKey} for ${moduleKey}`);
+                // Treat as depth 1 (one unbuilt prerequisite)
+                maxDepth = Math.max(maxDepth, 1);
+            }
+        }
+
+        memo.set(moduleKey, maxDepth);
+        return maxDepth;
+    }
+
+    /**
+     * T003: Get all unbuilt prerequisite modules
+     * Feature: 004-hideout-item-enhancements
+     * 
+     * Recursively traverses prerequisite tree and returns all unbuilt modules blocking this one.
+     * 
+     * @param {HideoutManager} manager - For checking built status and getting module instances
+     * @returns {Array<HideoutModule>} - List of unbuilt prerequisite modules
+     */
+    getUnbuiltPrerequisites(manager) {
+        const unbuilt = [];
+        const visited = new Set(); // Prevent infinite loops
+
+        const traverse = (module) => {
+            for (const prereq of module.stationLevelRequirements) {
+                const prereqKey = `${prereq.stationId}-${prereq.level}`;
+
+                // Skip if already visited or built
+                if (visited.has(prereqKey) || manager.completedModules.has(prereqKey)) {
+                    continue;
+                }
+
+                visited.add(prereqKey);
+                const prereqModule = manager.modulesMap.get(prereqKey);
+
+                if (prereqModule) {
+                    unbuilt.push(prereqModule);
+                    // Recursively get prerequisites of this prerequisite
+                    traverse(prereqModule);
+                }
+            }
+        };
+
+        traverse(this);
+        return unbuilt;
     }
 }
 
@@ -110,10 +206,12 @@ export function parseHideoutStations(stationsData) {
                 level: levelData.level,
                 itemRequirements: levelData.itemRequirements.map(req => ({
                     itemId: req.item.id,
+                    itemName: req.item.name || req.item.shortName || 'Unknown Item',
                     quantity: req.count
                 })),
                 stationLevelRequirements: levelData.stationLevelRequirements.map(req => ({
                     stationId: req.station.id,
+                    stationName: req.station.name || `Station ${req.station.id}`,
                     level: req.level
                 })),
                 completed: false // Will be loaded from storage separately
