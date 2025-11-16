@@ -2,7 +2,6 @@ use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 use std::path::Path;
 use tauri::{AppHandle, Emitter};
 use tokio::sync::mpsc;
-use tokio::task;
 use tokio::time::Duration;
 
 /// Log event data sent to frontend
@@ -41,13 +40,15 @@ pub fn start_log_watcher(
         .map_err(|e| format!("Failed to watch directory: {}", e))?;
 
     // Spawn async task to handle file events with batching
-    task::spawn(async move {
+    tauri::async_runtime::spawn(async move {
         // Keep watcher alive
         let _watcher = watcher;
         
         let mut last_content: Option<String> = None;
         let mut last_path: Option<String> = None;
+        // Create interval inside async context
         let mut batch_timer = tokio::time::interval(Duration::from_millis(100));
+        batch_timer.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
         
         loop {
             tokio::select! {
