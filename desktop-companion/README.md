@@ -4,12 +4,24 @@ Automatic quest tracking desktop companion for Escape from Tarkov that monitors 
 
 ## Features
 
-- 🎯 **Automatic Quest Detection** - Monitors `notifications.log` for quest completions
-- 🔄 **Real-time Sync** - Pushes quest progress to web app via Supabase
-- 📦 **Item Tracking** - Auto-decrements quest item quantities
-- 📜 **Historical Import** - Process past log files to catch up progress
-- 🖥️ **System Tray** - Runs quietly in background
-- ⚡ **Lightweight** - <50MB RAM, <1% CPU idle
+- 🎯 **Automatic Quest Detection** - Monitors `notifications.log` for quest completions in real-time
+- 🔄 **Real-time Sync** - Syncs quest progress to existing web app database via Supabase
+- 📜 **Historical Import** - Batch import past completions from old log files
+- 🖥️ **System Tray** - Runs quietly in background, minimize to tray
+- 🔔 **Desktop Notifications** - Get notified when quests complete or fail
+- 🧙 **Setup Wizard** - Easy first-run configuration with auto-detection
+- ⚡ **Lightweight** - <50MB RAM, minimal CPU usage
+
+## Current Status
+
+✅ **Phase 1-5, 7**: Fully implemented and functional
+- Project setup, Rust backend, UI components
+- Real-time quest tracking and database sync
+- Historical import wizard
+- System tray integration
+
+🚧 **Phase 6**: Quest item tracking (not implemented)
+🚧 **Phase 8**: Testing and optimization (ongoing)
 
 ## Quick Start
 
@@ -36,11 +48,14 @@ npm run tauri build
 
 ## How It Works
 
-1. **Log Monitoring**: Uses Rust `notify` crate to watch `notifications.log`
-2. **Event Detection**: Parses chat messages with MessageType 10-12 (TaskStarted/Failed/Finished)
-3. **Quest Mapping**: Extracts quest ID from `templateId` field
-4. **Web Sync**: Updates Supabase database via same credentials as web app
-5. **Item Updates**: Queries Tarkov.dev API for quest item requirements and decrements quantities
+1. **Log Monitoring**: Uses Rust `notify` crate to watch `notifications.log` for file changes
+2. **Event Detection**: Parses ChatMessageReceived events with MessageType 10-12:
+   - **10**: TaskStarted - Quest accepted
+   - **11**: TaskFailed - Quest failed
+   - **12**: TaskFinished - Quest completed ✓
+3. **Quest ID Extraction**: Parses `templateId` field (format: "questId arg1 arg2...")
+4. **Database Sync**: Upserts to existing `quest_progress` table (same as web app)
+5. **Notifications**: Shows desktop notifications for quest events (if enabled)
 
 ## Architecture
 
