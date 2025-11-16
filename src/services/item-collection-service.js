@@ -25,6 +25,7 @@ export class ItemCollectionService {
                 const { data: { user } } = await supabase.auth.getUser();
                 
                 if (user) {
+                    console.log('Loading collection from Supabase for user:', user.id);
                     // Load from Supabase
                     const { data, error } = await supabase
                         .from('item_collection')
@@ -32,6 +33,8 @@ export class ItemCollectionService {
                         .eq('user_id', user.id);
                     
                     if (error) throw error;
+                    
+                    console.log('Loaded', data?.length || 0, 'items from Supabase');
                     
                     const collection = new Map();
                     for (const item of data || []) {
@@ -45,14 +48,20 @@ export class ItemCollectionService {
                     this.saveToLocalStorage(collection);
                     
                     return collection;
+                } else {
+                    console.log('No authenticated user, using localStorage');
                 }
             } catch (error) {
                 console.error('Failed to load collection from Supabase:', error);
             }
+        } else {
+            console.log('Supabase not configured, using localStorage');
         }
         
         // Fallback to localStorage
-        return this.loadFromLocalStorage();
+        const localCollection = this.loadFromLocalStorage();
+        console.log('Loaded', localCollection.size, 'items from localStorage');
+        return localCollection;
     }
 
     /**
