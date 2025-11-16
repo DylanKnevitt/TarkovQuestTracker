@@ -245,6 +245,16 @@ This means we **CANNOT parse quest completion status from the response bodies**.
    
    **Conclusion**: Quest state changes are NOT logged to any accessible client log file. The game likely only stores quest state in memory and syncs via encrypted API calls.
 
+6. **TarkovTracker Repository Analysis**:
+   - Checked both `TarkovTracker/TarkovTracker` (142 stars) and `tarkovtracker-org/TarkovTracker` (14 stars)
+   - **Architecture**: Vue.js web app + Firebase backend + local storage
+   - **Tracking Method**: **Fully manual** - users mark tasks complete via UI
+   - **No log monitoring**: Zero references to log file parsing, automatic detection, or desktop companions
+   - **Quote from README**: "The web app can work normally using local storage without user authentication"
+   - **Conclusion**: TarkovTracker is a manual web-based tracker, NOT an automatic log monitoring tool
+   
+   This confirms that **NO popular Tarkov tracking tools use log monitoring** because quest events are not logged.
+
 ### Updated Implementation Approach
 
 ### Revised Implementation Strategy
