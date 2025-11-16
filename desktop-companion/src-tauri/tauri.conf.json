@@ -53,6 +53,12 @@
     },
     "store": {
       "all": true
+    },
+    "fs": {
+      "all": true,
+      "readDir": true,
+      "readFile": true,
+      "scope": ["$HOME/**", "C:\\**", "D:\\**", "E:\\**"]
     }
   }
 }
