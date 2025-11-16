@@ -24,10 +24,10 @@ This document breaks down the Item Tracker feature into atomic, executable tasks
 
 **Goal**: Initialize project structure and dependencies
 
-- [ ] T001 Add Item Tracker tab button to index.html navigation bar
-- [ ] T002 Add Item Tracker tab content container div to index.html
-- [ ] T003 Create styles/item-tracker.css with base layout styles
-- [ ] T004 Import item-tracker.css in index.html stylesheet section
+- [X] T001 Add Item Tracker tab button to index.html navigation bar
+- [X] T002 Add Item Tracker tab content container div to index.html
+- [X] T003 Create styles/item-tracker.css with base layout styles
+- [X] T004 Import item-tracker.css in index.html stylesheet section
 
 ---
 
@@ -37,41 +37,41 @@ This document breaks down the Item Tracker feature into atomic, executable tasks
 
 ### API Layer (Parallel Group 1)
 
-- [ ] T005 [P] Create src/api/tarkov-items-api.js with fetchItems() function per contracts/tarkov-items-api.md
-- [ ] T006 [P] Implement fetchHideoutStations() in src/api/tarkov-items-api.js per contracts/tarkov-hideout-api.md
-- [ ] T007 [P] Add 24-hour cache logic for items API in src/api/tarkov-items-api.js
-- [ ] T008 [P] Add 24-hour cache logic for hideout API in src/api/tarkov-items-api.js
-- [ ] T009 Add error handling with stale cache fallback in src/api/tarkov-items-api.js
+- [X] T005 [P] Create src/api/tarkov-items-api.js with fetchItems() function per contracts/tarkov-items-api.md
+- [X] T006 [P] Implement fetchHideoutStations() in src/api/tarkov-items-api.js per contracts/tarkov-hideout-api.md
+- [X] T007 [P] Add 24-hour cache logic for items API in src/api/tarkov-items-api.js
+- [X] T008 [P] Add 24-hour cache logic for hideout API in src/api/tarkov-items-api.js
+- [X] T009 Add error handling with stale cache fallback in src/api/tarkov-items-api.js
 
 ### Data Models (Parallel Group 2)
 
-- [ ] T010 [P] Create src/models/item.js with Item class per data-model.md
-- [ ] T011 [P] Add ItemRequirement class to src/models/item.js
-- [ ] T012 [P] Add AggregatedItem class to src/models/item.js
-- [ ] T013 [P] Add Priority enum (NEEDED_SOON, NEEDED_LATER) to src/models/item.js
-- [ ] T014 [P] Create src/models/hideout-module.js with HideoutModule class per data-model.md
+- [X] T010 [P] Create src/models/item.js with Item class per data-model.md
+- [X] T011 [P] Add ItemRequirement class to src/models/item.js
+- [X] T012 [P] Add AggregatedItem class to src/models/item.js
+- [X] T013 [P] Add Priority enum (NEEDED_SOON, NEEDED_LATER) to src/models/item.js
+- [X] T014 [P] Create src/models/hideout-module.js with HideoutModule class per data-model.md
 
 ### Manager Classes (Sequential - Dependencies Exist)
 
-- [ ] T015 Create src/models/hideout-manager.js with HideoutManager class skeleton
-- [ ] T016 Implement loadStations() method in src/models/hideout-manager.js
-- [ ] T017 Implement loadProgress() method reading tarkov-hideout-progress from localStorage
-- [ ] T018 Implement toggleModuleComplete() method in src/models/hideout-manager.js
-- [ ] T019 Implement isModuleCompleted() method in src/models/hideout-manager.js
-- [ ] T020 Implement isModuleBuildable() method checking prerequisites in src/models/hideout-manager.js
-- [ ] T021 Create src/models/item-tracker-manager.js with ItemTrackerManager class skeleton
-- [ ] T022 Implement aggregateRequirements() method in src/models/item-tracker-manager.js
-- [ ] T023 Implement extractQuestRequirements() method in src/models/item-tracker-manager.js
-- [ ] T024 Implement extractHideoutRequirements() method in src/models/item-tracker-manager.js
-- [ ] T025 Implement detectFiR() helper function in src/models/item-tracker-manager.js
+- [X] T015 Create src/models/hideout-manager.js with HideoutManager class skeleton
+- [X] T016 Implement loadStations() method in src/models/hideout-manager.js
+- [X] T017 Implement loadProgress() method reading tarkov-hideout-progress from localStorage
+- [X] T018 Implement toggleModuleComplete() method in src/models/hideout-manager.js
+- [X] T019 Implement isModuleCompleted() method in src/models/hideout-manager.js
+- [X] T020 Implement isModuleBuildable() method checking prerequisites in src/models/hideout-manager.js
+- [X] T021 Create src/models/item-tracker-manager.js with ItemTrackerManager class skeleton
+- [X] T022 Implement aggregateRequirements() method in src/models/item-tracker-manager.js
+- [X] T023 Implement extractQuestRequirements() method in src/models/item-tracker-manager.js
+- [X] T024 Implement extractHideoutRequirements() method in src/models/item-tracker-manager.js
+- [X] T025 Implement detectFiR() helper function in src/models/item-tracker-manager.js
 
 ### Services (Parallel Group 3)
 
-- [ ] T026 [P] Create src/services/priority-service.js with PriorityService.calculate() method per data-model.md
-- [ ] T027 [P] Create src/services/item-storage-service.js with ItemStorageService class
-- [ ] T028 [P] Implement loadCollection() method in src/services/item-storage-service.js
-- [ ] T029 [P] Implement saveCollection() method in src/services/item-storage-service.js
-- [ ] T030 [P] Implement toggleCollected() method in src/services/item-storage-service.js
+- [X] T026 [P] Create src/services/priority-service.js with PriorityService.calculate() method per data-model.md
+- [X] T027 [P] Create src/services/item-storage-service.js with ItemStorageService class
+- [X] T028 [P] Implement loadCollection() method in src/services/item-storage-service.js
+- [X] T029 [P] Implement saveCollection() method in src/services/item-storage-service.js
+- [X] T030 [P] Implement toggleCollected() method in src/services/item-storage-service.js
 
 ---
 
