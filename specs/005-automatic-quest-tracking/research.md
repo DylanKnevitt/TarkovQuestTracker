@@ -195,94 +195,162 @@ npm run tauri build    # Production build
 
 ---
 
-## 10. CRITICAL: Log File Verification Required
+## 10. ✅ VERIFIED: Log File Analysis Complete
 
-### Research Gap
+### Verification Results (2025-11-16)
 
-The specification assumes quest completion events are logged based on reference to TarkovMonitor. However, **this assumption has not been verified** through actual game testing.
+**Log Directory Verified**: `C:\Battlestate Games\Escape from Tarkov\Logs\`
 
-**REQUIRED BEFORE IMPLEMENTATION:**
-1. Install Escape from Tarkov
-2. Locate log directory (`C:\Battlestate Games\EFT\Logs\` or Steam equivalent)
-3. Complete a test quest in-game
-4. Examine log files for quest completion entries
-5. Document exact log format and patterns if found
+**Finding**: ✅ **Quest data IS available in backend API logs**
 
-### If Quest Events ARE Logged
+**Evidence from actual logs:**
 
-✅ Proceed with implementation as planned:
-- Use Tauri + Rust file watching
-- Parse log entries with regex patterns
-- Sync detected events to Supabase
-- Estimated effort: ~80 hours
+1. **Backend Log Location**: Each game session creates a subdirectory with backend logs
+   - Recent format: `log_YYYY.MM.DD_HH-MM-SS_VERSION\YYYY.MM.DD_HH-MM-SS_VERSION backend_000.log`
+   - Older format: `log_YYYY.MM.DD_HH-MM-SS_VERSION\YYYY.MM.DD_HH-MM-SS_VERSION_backend.log`
 
-### If Quest Events are NOT Logged
+2. **Quest API Endpoints Found**:
+   ```
+   https://prod.escapefromtarkov.com/client/quest/list
+   https://prod.escapefromtarkov.com/client/quest/getMainQuestsList  
+   https://prod.escapefromtarkov.com/client/quest/getMainQuestNotesList
+   https://prod.escapefromtarkov.com/client/repeatalbeQuests/activityPeriods
+   ```
 
-❌ Current approach is **not viable**. Consider alternatives:
+3. **Log Entry Format**:
+   ```
+   2025-11-16 11:25:25.778 +02:00|1.0.0.0.41760|Info|backend|---> Request HTTPS, id [39]: URL: https://prod.escapefromtarkov.com/client/quest/list, crc: .
+   2025-11-16 11:25:27.051 +02:00|1.0.0.0.41760|Info|backend|<--- Response HTTPS, id [39]: URL: https://prod.escapefromtarkov.com/client/quest/list, crc: , responseText: .
+   ```
 
-**Option A: Memory Reading** (⚠️ EULA Risk)
-- Scan game process memory for quest state
-- **Risks**: Account bans, EULA violations, legal issues
-- **Not recommended** without legal clearance
+4. **Key Observations**:
+   - `/client/quest/list` is called frequently (every time quest menu is opened)
+   - Response contains `responseText: .` (actual JSON is truncated in logs)
+   - API calls are logged with timestamps, request/response pairs, and unique IDs
+   - Pattern: `---> Request` followed by `<--- Response`
+
+**CRITICAL LIMITATION DISCOVERED**:
+⚠️ The backend log **DOES NOT include the actual response payload** (responseText is truncated to `.`)
+This means we **CANNOT parse quest completion status from the response bodies**.
+
+### Updated Implementation Approach
+
+### Revised Implementation Strategy
+
+❌ **Original Approach Not Viable**: Response payloads are truncated in logs
+
+✅ **New Approach - Frequency-Based Detection**:
+
+Since response bodies are not logged but API calls ARE logged with timestamps:
+
+**Detection Method**:
+1. Monitor `/client/quest/list` API calls in backend log
+2. **Assumption**: When quest is completed, the game will call `/client/quest/list` shortly after
+3. Parse timestamps to detect "burst" patterns (multiple calls within short timeframe)
+4. When burst detected, trigger a manual check in the web app (notification to user)
+5. User confirms quest completion → sync to Supabase
+
+**Pros**:
+- Logs ARE available and contain timestamps
+- Can detect quest-related activity (menu opens, status checks)
+- EULA-compliant (reading own log files)
+- Simple regex parsing
+
+**Cons**:
+- Cannot determine WHICH quest was completed from logs alone
+- Requires user confirmation (semi-automatic)
+- False positives possible (user just browsing quests)
+
+**Alternative Approaches (Recommended)**:
+
+**Option A: Enhanced Manual Tracking** ⭐ **RECOMMENDED**
+- Keep current web app approach (fully manual)
+- Add quality-of-life improvements:
+  * Keyboard shortcuts (Space to complete, Q to open quests)
+  * Bulk import from popular tracking sites
+  * Quest completion templates for wipe progress
+  * Recent quest history (last 5 completed)
+- **Estimated effort**: ~16 hours
+- **Pros**: Simple, reliable, no EULA concerns
+- **Cons**: Still requires manual input
 
 **Option B: Browser Extension**
-- Parse quest data from EFT Wiki while user browses
-- Auto-import from community tracker sites
-- No game modification, EULA-compliant
+- Parse quest data from Tarkov.dev or EFT Wiki while browsing
+- Auto-import when user views quest pages
+- Detect pattern: "User viewing quest X details" → Suggest marking as in-progress
 - **Estimated effort**: ~40 hours
+- **Pros**: Semi-automatic, EULA-compliant, no game modification
+- **Cons**: Only works when user browses wiki
 
-**Option C: Enhanced Manual Tracking**
-- Improve existing web app UX
-- Add keyboard shortcuts for quick quest completion
-- Bulk import tools, templates for wipe progress
-- **Estimated effort**: ~16 hours
+**Option C: Hybrid Approach**
+- Desktop app monitors log for `/client/quest/list` activity bursts
+- Shows system tray notification: "Quest activity detected - update tracker?"
+- User clicks notification → opens web app → marks quest complete
+- **Estimated effort**: ~60 hours (original Tauri app minus parsing complexity)
+- **Pros**: Best of both worlds, some automation
+- **Cons**: Still requires user action, complex setup
 
-**Option D: Screenshot OCR**
-- User captures quest completion screenshots
-- OCR extracts quest name and completion time
-- Requires user action but no EULA concerns
-- **Estimated effort**: ~50 hours
-
-**Option E: Official API** (Long-term)
-- Wait for Battlestate Games to release official API
-- Monitor community announcements
-- **Timeline**: Unknown, may never happen
+**Option D: Memory Reading** (⚠️ **NOT RECOMMENDED**)
+- Scan game process memory for quest state
+- **Risks**: Account bans, EULA violations, legal issues
+- TarkovMonitor may use this approach (hence rare, risky)
 
 ### Decision Tree
 
 ```
-Does Tarkov log quest completions?
-├─ YES → Proceed with Tauri desktop app (Phase 1)
-└─ NO → Choose alternative approach:
-    ├─ Browser extension (B)
-    ├─ Enhanced manual UX (C)  ← Safest, fastest
-    ├─ Screenshot OCR (D)
-    └─ Wait for official API (E)
+Verified: Backend logs contain API calls but NOT response payloads
+├─ Option A: Enhanced Manual UX (safest, fastest) ⭐
+├─ Option B: Browser Extension (semi-auto, EULA-safe)
+├─ Option C: Hybrid (log monitoring + manual confirm)
+└─ Option D: Memory Reading (DANGEROUS - not recommended)
 ```
+
+### Recommendation
+
+**Go with Option A: Enhanced Manual Tracking**
+
+Rationale:
+1. **Safest**: No EULA violations, no risk of bans
+2. **Fastest**: 16 hours vs 40-80 hours for alternatives
+3. **Reliable**: No dependency on log formats, game updates, or memory offsets
+4. **Better UX**: Keyboard shortcuts and bulk import provide 80% of automation benefits
+5. **Maintainable**: Simple code, no complex parsing or system integration
+
+Quest tracking is inherently a "check your progress" activity that users do periodically, not real-time. Manual input with excellent UX is often better than fragile automation.
 
 ---
 
 ## 11. Conclusion
 
-**Conditional on Log File Verification:**
+**Verification Complete (2025-11-16):**
 
-**IF** quest events are logged, Tauri provides an excellent foundation for lightweight log monitoring. The architecture leverages:
-- Rust for file watching and system integration (notify crate + system tray API)
-- JavaScript for business logic, API integration, and UI  
-- Tauri IPC for seamless communication
-- Minimal resource usage through async operations
+✅ **Logs exist**: Backend logs are available at `C:\Battlestate Games\Escape from Tarkov\Logs\`
+✅ **Quest API calls logged**: `/client/quest/list` and related endpoints are logged with timestamps
+❌ **Response payloads NOT logged**: Actual quest data is truncated (`responseText: .`)
 
-This approach meets all performance goals while maintaining code reusability with the web application.
+**Impact on Original Specification:**
+- **Full automation NOT possible** without response payload data
+- Original desktop app approach requires **significant pivot**
+- Semi-automatic detection possible (activity monitoring) but requires user confirmation
+- **Manual tracking with enhanced UX** is the most practical approach
 
-**IF** quest events are not logged, pivot to browser extension or enhanced manual tracking to avoid EULA violations and wasted development effort.
+**Architecture Decision:**
+Tauri remains a valid framework for hybrid approaches (Option C), but the complexity-to-value ratio makes **enhanced manual tracking (Option A)** the better choice:
+- Simpler implementation (16h vs 60-80h)
+- No EULA risks
+- More reliable (no dependency on log format changes)
+- Better user experience (keyboard shortcuts > fragile automation)
 
 ---
 
 ## Next Steps
 
-1. **CRITICAL**: Verify quest event logging through game testing
-2. **IF VERIFIED**: Proceed to Phase 1 design (data-model.md, contracts/, quickstart.md)
-3. **IF NOT VERIFIED**: Present alternatives to stakeholders for decision
-4. Document findings in updated plan.md
+1. ✅ **T001 VERIFICATION COMPLETE** - Log analysis done
+2. **DECISION REQUIRED**: Choose implementation approach
+   - **Recommended**: Option A (Enhanced Manual UX) - 16 hours
+   - Alternative: Option B (Browser Extension) - 40 hours
+   - Alternative: Option C (Hybrid Log Monitor) - 60 hours
+3. **IF Option A chosen**: Update spec.md to focus on UX improvements instead of automation
+4. **IF Option B/C chosen**: Continue with original plan.md but adjust expectations (semi-automatic)
 
-**Status**: Research complete, pending log file verification before implementation phase.
+**Status**: T001 verification complete. Ready for stakeholder decision on implementation approach.
