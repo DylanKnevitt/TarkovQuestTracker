@@ -54,9 +54,10 @@ If you configured Supabase credentials in step 3, you need to run the SQL migrat
 # 2. Create a new query and run the contents of:
 #    - supabase-setup.sql (quest_progress table and RLS policies)
 #    - supabase-user-profiles-function.sql (user comparison support)
+#    - supabase-item-collection.sql (item collection tracking with database sync)
 ```
 
-These files are in the repository root. Copy and paste their contents into Supabase SQL Editor and run them.
+These files are in the repository root. Copy and paste their contents into Supabase SQL Editor and run them **in order**.
 
 5. **Start the development server:**
 ```bash
@@ -133,8 +134,9 @@ Track all items needed for incomplete quests and hideout upgrades:
 - **Priority Indicators**:
   - ⚠️ **NEEDED SOON** (red/orange): Items for unlocked quests or buildable hideout modules
   - 🕐 **NEEDED LATER** (blue/gray): Items for locked quests or non-buildable modules
-- **Collection Tracking**: Mark items as collected with checkboxes
+- **Collection Tracking**: Track collected quantities with number inputs (syncs to database if logged in)
 - **Item Details**: Click any item for detailed info, sources, and wiki link
+- **Cloud Sync**: Item collection quantities sync across devices when logged in with Supabase
 - **FiR Indicators**: 🔍 badge shows when Found in Raid required
 - **Real-time Updates**: Automatically refreshes when you complete quests or hideout modules
 
@@ -142,9 +144,10 @@ Track all items needed for incomplete quests and hideout upgrades:
 1. Complete quests and hideout tracking in other tabs
 2. Switch to Item Tracker tab to see aggregated items needed
 3. Use filters to focus on specific categories (Quest/Hideout/Keys)
-4. Mark items as collected when you find them
+4. Enter collected quantities using number inputs (0 to max needed)
 5. Priority indicators show which items are urgently needed
 6. Click any item card for detailed breakdown of requirements
+7. Collection data syncs to database when logged in (or localStorage if not logged in)
 
 **Performance**:
 - < 3 second initial load with 400-500 items

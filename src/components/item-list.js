@@ -5,7 +5,7 @@
  */
 
 import { ItemCard } from './item-card.js';
-import { ItemStorageService } from '../services/item-storage-service.js';
+import { ItemCollectionService } from '../services/item-collection-service.js';
 
 /**
  * T032, T039-T041: ItemList component
@@ -26,12 +26,12 @@ export class ItemList {
      * T039: Render item list grid
      * @param {HTMLElement} container
      */
-    render(container) {
+    async render(container) {
         this.container = container;
         
         // Apply collection status to items
         const items = this.itemTrackerManager.getAllItems();
-        ItemStorageService.applyCollectionStatus(items);
+        await ItemCollectionService.applyCollectionStatus(items);
         
         // Get filtered items
         const filteredItems = this.getFilteredItems();
@@ -63,7 +63,8 @@ export class ItemList {
     applyFilters(filter, hideCollected) {
         this.currentFilter = filter;
         this.hideCollected = hideCollected;
-        this.refresh();
+        // Fire and forget refresh (will await internally)
+        this.refresh().catch(err => console.error('Failed to refresh:', err));
     }
 
     /**
@@ -107,9 +108,9 @@ export class ItemList {
     /**
      * Refresh item list display
      */
-    refresh() {
+    async refresh() {
         if (this.container) {
-            this.render(this.container);
+            await this.render(this.container);
         }
     }
 
@@ -152,18 +153,18 @@ export class ItemList {
      * @param {string} itemId
      * @param {number} quantity
      */
-    handleQuantityChange(itemId, quantity) {
+    async handleQuantityChange(itemId, quantity) {
         const item = this.itemTrackerManager.getItem(itemId);
         if (!item) return;
         
         // Clamp quantity to valid range
         const clampedQuantity = Math.max(0, Math.min(quantity, item.totalQuantity));
         
-        // Update collection status
-        ItemStorageService.setQuantity(itemId, clampedQuantity);
+        // Update collection status (syncs to database)
+        await ItemCollectionService.setQuantity(itemId, clampedQuantity);
         
         // Update display
-        this.refresh();
+        await this.refresh();
     }
 
     /**

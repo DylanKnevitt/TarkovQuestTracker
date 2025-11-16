@@ -55,7 +55,7 @@ export class ItemTracker {
             await this.loadItems();
             
             // T036: Render initial UI
-            this.render();
+            await this.render();
             
             // Initialize item detail modal
             this.itemDetailModal = new ItemDetailModal();
@@ -100,7 +100,7 @@ export class ItemTracker {
     /**
      * T036: Render item tracker UI
      */
-    render() {
+    async render() {
         if (!this.container) return;
         
         this.container.innerHTML = this.getTemplate();
@@ -112,7 +112,7 @@ export class ItemTracker {
         const itemListContainer = this.container.querySelector('#item-list-container');
         if (itemListContainer) {
             this.itemList = new ItemList(this.itemTrackerManager);
-            this.itemList.render(itemListContainer);
+            await this.itemList.render(itemListContainer);
         }
         
         // Attach event listeners
@@ -230,7 +230,8 @@ export class ItemTracker {
     handleQuestUpdate() {
         console.log('Quest updated, refreshing item tracker...');
         this.itemTrackerManager.refresh();
-        this.refresh();
+        // Fire and forget refresh (will await internally)
+        this.refresh().catch(err => console.error('Failed to refresh:', err));
     }
 
     /**
@@ -239,7 +240,8 @@ export class ItemTracker {
     handleHideoutUpdate() {
         console.log('Hideout updated, refreshing item tracker...');
         this.itemTrackerManager.refresh();
-        this.refresh();
+        // Fire and forget refresh (will await internally)
+        this.refresh().catch(err => console.error('Failed to refresh:', err));
     }
 
     /**
@@ -247,15 +249,16 @@ export class ItemTracker {
      */
     handleCollectionUpdate() {
         console.log('Item collection updated, refreshing display...');
-        this.refresh();
+        // Fire and forget refresh (will await internally)
+        this.refresh().catch(err => console.error('Failed to refresh:', err));
     }
 
     /**
      * Refresh item list display
      */
-    refresh() {
+    async refresh() {
         if (this.itemList) {
-            this.itemList.refresh();
+            await this.itemList.refresh();
         }
         this.updateStats();
     }
