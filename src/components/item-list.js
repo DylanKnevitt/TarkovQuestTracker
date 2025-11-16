@@ -197,7 +197,10 @@ export class ItemList {
         console.log(`Updating ${item.item.name} quantity to ${clampedQuantity}`);
         
         // Update the item's collected quantity immediately for UI
-        item.setCollectionStatus(clampedQuantity >= item.totalQuantity, clampedQuantity);
+        item.setCollectionStatus({
+            collected: clampedQuantity >= item.totalQuantity,
+            quantity: clampedQuantity
+        });
         
         // Update collection status (syncs to database) - AWAIT to prevent race condition
         await ItemCollectionService.setQuantity(itemId, clampedQuantity);

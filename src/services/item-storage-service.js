@@ -183,7 +183,7 @@ export class ItemStorageService {
 
         for (const item of items) {
             const status = collection.get(item.item.id) || { collected: false, quantity: 0 };
-            item.setCollectionStatus(status.collected, status.quantity);
+            item.setCollectionStatus(status);
         }
     }
 
