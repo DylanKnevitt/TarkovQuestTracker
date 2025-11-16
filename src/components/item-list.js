@@ -125,7 +125,8 @@ export class ItemList {
         minusButtons.forEach(button => {
             button.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                const itemId = e.target.dataset.itemId;
+                e.preventDefault();
+                const itemId = button.dataset.itemId;
                 const item = this.itemTrackerManager.getItem(itemId);
                 if (item && item.collectedQuantity > 0) {
                     await this.handleQuantityChange(itemId, item.collectedQuantity - 1);
@@ -136,7 +137,8 @@ export class ItemList {
         plusButtons.forEach(button => {
             button.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                const itemId = e.target.dataset.itemId;
+                e.preventDefault();
+                const itemId = button.dataset.itemId;
                 const item = this.itemTrackerManager.getItem(itemId);
                 if (item && item.collectedQuantity < item.totalQuantity) {
                     await this.handleQuantityChange(itemId, item.collectedQuantity + 1);
@@ -166,16 +168,39 @@ export class ItemList {
      */
     async handleQuantityChange(itemId, quantity) {
         const item = this.itemTrackerManager.getItem(itemId);
-        if (!item) return;
+        if (!item) {
+            console.error('Item not found:', itemId);
+            return;
+        }
         
         // Clamp quantity to valid range
         const clampedQuantity = Math.max(0, Math.min(quantity, item.totalQuantity));
         
-        // Update collection status (syncs to database)
-        await ItemCollectionService.setQuantity(itemId, clampedQuantity);
+        console.log(`Updating ${item.item.name} quantity to ${clampedQuantity}`);
         
-        // Update display
-        await this.refresh();
+        // Update the item's collected quantity immediately for UI
+        item.setCollectionStatus(clampedQuantity >= item.totalQuantity, clampedQuantity);
+        
+        // Update the display for this specific card
+        const card = this.container.querySelector(`.item-card[data-item-id="${itemId}"]`);
+        if (card) {
+            const quantityDisplay = card.querySelector('.quantity-display');
+            if (quantityDisplay) {
+                quantityDisplay.textContent = clampedQuantity;
+            }
+            
+            // Update collected class
+            if (clampedQuantity >= item.totalQuantity) {
+                card.classList.add('collected');
+            } else {
+                card.classList.remove('collected');
+            }
+        }
+        
+        // Update collection status (syncs to database in background)
+        ItemCollectionService.setQuantity(itemId, clampedQuantity).catch(err => {
+            console.error('Failed to sync quantity:', err);
+        });
     }
 
     /**
