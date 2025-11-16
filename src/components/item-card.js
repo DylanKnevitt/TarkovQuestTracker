@@ -22,18 +22,22 @@ export class ItemCard {
      */
     render() {
         const item = this.item;
-        const collectedClass = item.collected ? 'collected' : '';
+        const collectedClass = item.collectedQuantity >= item.totalQuantity ? 'collected' : '';
         
         return `
             <div class="item-card ${collectedClass}" data-item-id="${item.item.id}">
                 <div class="item-card-header">
                     <img src="${item.item.iconLink}" alt="${item.item.name}" class="item-icon" onerror="this.src='https://via.placeholder.com/64x64?text=No+Image'">
                     
-                    <div class="item-card-checkbox">
-                        <input type="checkbox" 
-                               class="item-collection-checkbox" 
+                    <div class="item-card-quantity-input">
+                        <input type="number" 
+                               class="item-quantity-input" 
                                data-item-id="${item.item.id}"
-                               ${item.collected ? 'checked' : ''}>
+                               min="0"
+                               max="${item.totalQuantity}"
+                               value="${item.collectedQuantity || 0}"
+                               placeholder="0">
+                        <span class="quantity-max">/ ${item.totalQuantity}</span>
                     </div>
                 </div>
                 

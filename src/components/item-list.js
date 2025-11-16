@@ -73,9 +73,9 @@ export class ItemList {
     getFilteredItems() {
         let items = this.itemTrackerManager.getFilteredItems(this.currentFilter);
         
-        // Apply hide collected filter
+        // Apply hide collected filter (hide items with full quantity collected)
         if (this.hideCollected) {
-            items = items.filter(item => !item.collected);
+            items = items.filter(item => item.collectedQuantity < item.totalQuantity);
         }
         
         // Sort by priority (NEEDED_SOON first), then by name
@@ -117,13 +117,18 @@ export class ItemList {
      * Attach event listeners to item cards
      */
     attachCardEventListeners() {
-        // Collection checkboxes
-        const checkboxes = this.container.querySelectorAll('.item-collection-checkbox');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', (e) => {
+        // Collection quantity inputs
+        const quantityInputs = this.container.querySelectorAll('.item-quantity-input');
+        quantityInputs.forEach(input => {
+            input.addEventListener('change', (e) => {
                 const itemId = e.target.dataset.itemId;
-                const collected = e.target.checked;
-                this.handleCollectionToggle(itemId, collected);
+                const quantity = parseInt(e.target.value, 10) || 0;
+                this.handleQuantityChange(itemId, quantity);
+            });
+            
+            // Prevent click from opening detail modal
+            input.addEventListener('click', (e) => {
+                e.stopPropagation();
             });
         });
         
@@ -131,8 +136,8 @@ export class ItemList {
         const cards = this.container.querySelectorAll('.item-card');
         cards.forEach(card => {
             card.addEventListener('click', (e) => {
-                // Don't open detail if clicking checkbox
-                if (e.target.classList.contains('item-collection-checkbox')) {
+                // Don't open detail if clicking quantity input
+                if (e.target.classList.contains('item-quantity-input')) {
                     return;
                 }
                 
@@ -143,16 +148,19 @@ export class ItemList {
     }
 
     /**
-     * Handle collection checkbox toggle
+     * Handle quantity input change
      * @param {string} itemId
-     * @param {boolean} collected
+     * @param {number} quantity
      */
-    handleCollectionToggle(itemId, collected) {
+    handleQuantityChange(itemId, quantity) {
         const item = this.itemTrackerManager.getItem(itemId);
         if (!item) return;
         
-        // Toggle collection status
-        ItemStorageService.toggleCollected(itemId, collected, item.totalQuantity);
+        // Clamp quantity to valid range
+        const clampedQuantity = Math.max(0, Math.min(quantity, item.totalQuantity));
+        
+        // Update collection status
+        ItemStorageService.setQuantity(itemId, clampedQuantity);
         
         // Update display
         this.refresh();
