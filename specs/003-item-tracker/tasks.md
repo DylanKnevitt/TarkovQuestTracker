@@ -85,37 +85,37 @@ This document breaks down the Item Tracker feature into atomic, executable tasks
 
 ### Component Structure
 
-- [ ] T031 [P] [US1] Create src/components/item-tracker.js with ItemTracker class skeleton
-- [ ] T032 [P] [US1] Create src/components/item-list.js with ItemList class skeleton
-- [ ] T033 [P] [US1] Create src/components/item-card.js with ItemCard class skeleton
+- [X] T031 [P] [US1] Create src/components/item-tracker.js with ItemTracker class skeleton
+- [X] T032 [P] [US1] Create src/components/item-list.js with ItemList class skeleton
+- [X] T033 [P] [US1] Create src/components/item-card.js with ItemCard class skeleton
 
 ### ItemTracker Component
 
-- [ ] T034 [US1] Implement ItemTracker.initialize() method in src/components/item-tracker.js
-- [ ] T035 [US1] Implement ItemTracker.loadItems() calling API in parallel in src/components/item-tracker.js
-- [ ] T036 [US1] Implement ItemTracker.render() method generating HTML in src/components/item-tracker.js
-- [ ] T037 [US1] Add event listener for questUpdated event in src/components/item-tracker.js
-- [ ] T038 [US1] Add event listener for hideoutUpdated event in src/components/item-tracker.js
+- [X] T034 [US1] Implement ItemTracker.initialize() method in src/components/item-tracker.js
+- [X] T035 [US1] Implement ItemTracker.loadItems() calling API in parallel in src/components/item-tracker.js
+- [X] T036 [US1] Implement ItemTracker.render() method generating HTML in src/components/item-tracker.js
+- [X] T037 [US1] Add event listener for questUpdated event in src/components/item-tracker.js
+- [X] T038 [US1] Add event listener for hideoutUpdated event in src/components/item-tracker.js
 
 ### ItemList Component
 
-- [ ] T039 [US1] Implement ItemList.render() generating item card grid in src/components/item-list.js
-- [ ] T040 [US1] Implement ItemList.applyFilters() method in src/components/item-list.js
-- [ ] T041 [US1] Add empty state handling ("All items collected!") in src/components/item-list.js
+- [X] T039 [US1] Implement ItemList.render() generating item card grid in src/components/item-list.js
+- [X] T040 [US1] Implement ItemList.applyFilters() method in src/components/item-list.js
+- [X] T041 [US1] Add empty state handling ("All items collected!") in src/components/item-list.js
 
 ### ItemCard Component
 
-- [ ] T042 [US1] Implement ItemCard.render() generating card HTML with icon, name, quantity in src/components/item-card.js
-- [ ] T043 [US1] Add priority badge display (⚠️ Needed Soon / 🕐 Needed Later) in src/components/item-card.js
-- [ ] T044 [US1] Add source subtitle (e.g., "Needed for: Setup, Lavatory 2") in src/components/item-card.js
-- [ ] T045 [US1] Add FiR indicator badge (🔍 icon) when isFiR=true in src/components/item-card.js
+- [X] T042 [US1] Implement ItemCard.render() generating card HTML with icon, name, quantity in src/components/item-card.js
+- [X] T043 [US1] Add priority badge display (⚠️ Needed Soon / 🕐 Needed Later) in src/components/item-card.js
+- [X] T044 [US1] Add source subtitle (e.g., "Needed for: Setup, Lavatory 2") in src/components/item-card.js
+- [X] T045 [US1] Add FiR indicator badge (🔍 icon) when isFiR=true in src/components/item-card.js
 
 ### Integration
 
-- [ ] T046 [US1] Import ItemTracker in src/index.js
-- [ ] T047 [US1] Initialize ItemTracker in TarkovQuestApp.init() in src/index.js
-- [ ] T048 [US1] Add tab switching logic for item tracker in src/index.js
-- [ ] T049 [US1] Pass questManager and hideoutManager to ItemTracker constructor in src/index.js
+- [X] T046 [US1] Import ItemTracker in src/index.js
+- [X] T047 [US1] Initialize ItemTracker in TarkovQuestApp.init() in src/index.js
+- [X] T048 [US1] Add tab switching logic for item tracker in src/index.js
+- [X] T049 [US1] Pass questManager and hideoutManager to ItemTracker constructor in src/index.js
 
 ---
 
@@ -129,18 +129,18 @@ This document breaks down the Item Tracker feature into atomic, executable tasks
 
 ### Filter UI
 
-- [ ] T050 [P] [US2] Add filter button group HTML to src/components/item-tracker.js template
-- [ ] T051 [P] [US2] Style filter buttons in styles/item-tracker.css (active state highlighting)
+- [X] T050 [P] [US2] Add filter button group HTML to src/components/item-tracker.js template
+- [X] T051 [P] [US2] Style filter buttons in styles/item-tracker.css (active state highlighting)
 
 ### Filter Logic
 
-- [ ] T052 [US2] Implement matchesCategory() method in src/models/item-tracker-manager.js
-- [ ] T053 [US2] Add filter state to ItemTracker.filters object in src/components/item-tracker.js
-- [ ] T054 [US2] Implement filter button click handlers in src/components/item-tracker.js
-- [ ] T055 [US2] Call ItemList.applyFilters() on filter change in src/components/item-tracker.js
-- [ ] T056 [US2] Add active filter visual feedback (button styling) in src/components/item-tracker.js
-- [ ] T057 [US2] Implement filter persistence to localStorage (item-tracker-filters key) in src/components/item-tracker.js
-- [ ] T058 [US2] Load saved filter state on initialization in src/components/item-tracker.js
+- [X] T052 [US2] Implement matchesCategory() method in src/models/item-tracker-manager.js
+- [X] T053 [US2] Add filter state to ItemTracker.filters object in src/components/item-tracker.js
+- [X] T054 [US2] Implement filter button click handlers in src/components/item-tracker.js
+- [X] T055 [US2] Call ItemList.applyFilters() on filter change in src/components/item-tracker.js
+- [X] T056 [US2] Add active filter visual feedback (button styling) in src/components/item-tracker.js
+- [X] T057 [US2] Implement filter persistence to localStorage (item-tracker-filters key) in src/components/item-tracker.js
+- [X] T058 [US2] Load saved filter state on initialization in src/components/item-tracker.js
 
 ---
 
@@ -154,17 +154,17 @@ This document breaks down the Item Tracker feature into atomic, executable tasks
 
 ### Priority Calculation
 
-- [ ] T059 [US3] Implement PriorityService.calculate() checking quest unlock status in src/services/priority-service.js
-- [ ] T060 [US3] Add hideout buildable check to PriorityService.calculate() in src/services/priority-service.js
-- [ ] T061 [US3] Call calculatePriorities() in ItemTrackerManager.initialize() in src/models/item-tracker-manager.js
-- [ ] T062 [US3] Call calculatePriorities() on questUpdated event in src/components/item-tracker.js
-- [ ] T063 [US3] Call calculatePriorities() on hideoutUpdated event in src/components/item-tracker.js
+- [X] T059 [US3] Implement PriorityService.calculate() checking quest unlock status in src/services/priority-service.js
+- [X] T060 [US3] Add hideout buildable check to PriorityService.calculate() in src/services/priority-service.js
+- [X] T061 [US3] Call calculatePriorities() in ItemTrackerManager.initialize() in src/models/item-tracker-manager.js
+- [X] T062 [US3] Call calculatePriorities() on questUpdated event in src/components/item-tracker.js
+- [X] T063 [US3] Call calculatePriorities() on hideoutUpdated event in src/components/item-tracker.js
 
 ### Priority Display
 
-- [ ] T064 [P] [US3] Style NEEDED SOON badge as red/orange in styles/item-tracker.css
-- [ ] T065 [P] [US3] Style NEEDED LATER badge as blue/gray in styles/item-tracker.css
-- [ ] T066 [US3] Update ItemCard.render() to show priority badge with correct styling in src/components/item-card.js
+- [X] T064 [P] [US3] Style NEEDED SOON badge as red/orange in styles/item-tracker.css
+- [X] T065 [P] [US3] Style NEEDED LATER badge as blue/gray in styles/item-tracker.css
+- [X] T066 [US3] Update ItemCard.render() to show priority badge with correct styling in src/components/item-card.js
 
 ---
 
