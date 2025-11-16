@@ -27,6 +27,9 @@ export class ItemTracker {
         
         this.currentFilter = 'all';
         this.hideCollected = false;
+        
+        // T057: Storage key for filter persistence
+        this.STORAGE_KEY = 'item-tracker-filters';
     }
 
     /**
@@ -40,6 +43,9 @@ export class ItemTracker {
         console.log('Initializing ItemTracker...');
         
         try {
+            // T058: Load saved filter state
+            this.loadFilters();
+            
             // T035: Load items from API
             await this.loadItems();
             
@@ -84,6 +90,9 @@ export class ItemTracker {
         
         this.container.innerHTML = this.getTemplate();
         
+        // Restore saved filter state to UI
+        this.restoreFilterState();
+        
         // Render item list
         const itemListContainer = this.container.querySelector('#item-list-container');
         if (itemListContainer) {
@@ -93,6 +102,9 @@ export class ItemTracker {
         
         // Attach event listeners
         this.attachEventListeners();
+        
+        // Apply saved filters
+        this.applyFilters();
     }
 
     /**
@@ -165,6 +177,7 @@ export class ItemTracker {
         });
         
         this.applyFilters();
+        this.saveFilters(); // T057: Persist filter state
     }
 
     /**
@@ -176,6 +189,7 @@ export class ItemTracker {
         }
         
         this.updateStats();
+        this.saveFilters(); // T057: Persist filter state
     }
 
     /**
@@ -266,5 +280,54 @@ export class ItemTracker {
                 <p>Loading items...</p>
             </div>
         `;
+    }
+
+    /**
+     * T058: Load saved filter state from localStorage
+     */
+    loadFilters() {
+        try {
+            const saved = localStorage.getItem(this.STORAGE_KEY);
+            if (saved) {
+                const filters = JSON.parse(saved);
+                this.currentFilter = filters.currentFilter || 'all';
+                this.hideCollected = filters.hideCollected || false;
+                console.log('Loaded saved filters:', filters);
+            }
+        } catch (error) {
+            console.error('Failed to load filters:', error);
+        }
+    }
+
+    /**
+     * Restore filter state to UI elements
+     */
+    restoreFilterState() {
+        // Set active filter button
+        const filterButtons = this.container.querySelectorAll('.filter-btn');
+        filterButtons.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.filter === this.currentFilter);
+        });
+        
+        // Set hide collected checkbox
+        const hideCollectedCheckbox = this.container.querySelector('#hide-collected-checkbox');
+        if (hideCollectedCheckbox) {
+            hideCollectedCheckbox.checked = this.hideCollected;
+        }
+    }
+
+    /**
+     * T057: Save filter state to localStorage
+     */
+    saveFilters() {
+        try {
+            const filters = {
+                currentFilter: this.currentFilter,
+                hideCollected: this.hideCollected
+            };
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filters));
+        } catch (error) {
+            console.error('Failed to save filters:', error);
+        }
     }
 }

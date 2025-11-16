@@ -6,6 +6,7 @@
 
 import { fetchItems } from '../api/tarkov-items-api.js';
 import { Item, ItemRequirement, AggregatedItem } from './item.js';
+import { PriorityService } from '../services/priority-service.js';
 
 /**
  * T021-T025: ItemTrackerManager class
@@ -46,6 +47,9 @@ export class ItemTrackerManager {
             
             // Aggregate requirements from quests and hideout
             this.aggregateRequirements();
+            
+            // T061: Calculate priorities for all items
+            this.calculatePriorities();
             
             console.log(`ItemTrackerManager initialized: ${this.aggregatedItems.size} items needed`);
         } catch (error) {
@@ -243,11 +247,21 @@ export class ItemTrackerManager {
     }
 
     /**
+     * T061: Calculate priorities for all items
+     */
+    calculatePriorities() {
+        const items = this.getAllItems();
+        PriorityService.recalculateAll(items, this.questManager, this.hideoutManager);
+        console.log('Priorities calculated for all items');
+    }
+
+    /**
      * Refresh aggregated items (call after quest/hideout updates)
      */
     refresh() {
         console.log('Refreshing item requirements...');
         this.aggregateRequirements();
+        this.calculatePriorities();
     }
 
     /**
