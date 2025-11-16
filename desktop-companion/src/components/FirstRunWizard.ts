@@ -369,11 +369,9 @@ export class FirstRunWizard {
             status.textContent = 'Testing connection...';
             status.className = 'status-message info';
 
-            const { createClient } = await import('@supabase/supabase-js');
-            const supabase = createClient(url, key);
-            const { error } = await supabase.from('profiles').select('id').limit(1);
-
-            if (error) throw error;
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(url, key);
+      const { error } = await supabase.from('quest_progress').select('quest_id').limit(1);            if (error) throw error;
 
             this.config.supabase_url = url;
             this.config.supabase_key = key;

@@ -165,14 +165,12 @@ export class SettingsComponent {
             this.elements.testConnectionBtn.textContent = 'Testing...';
             this.showConnectionInfo('Testing connection...');
 
-            // Test connection by attempting a simple query
-            const { createClient } = await import('@supabase/supabase-js');
-            const supabase = createClient(url, key);
-
-            // Try to fetch from a table (assuming 'profiles' exists from web app)
-            const { error } = await supabase.from('profiles').select('id').limit(1);
-
-            if (error) {
+      // Test connection by attempting a simple query
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(url, key);
+      
+      // Try to fetch from quest_progress table to verify connection
+      const { error } = await supabase.from('quest_progress').select('quest_id').limit(1);            if (error) {
                 throw error;
             }
 
