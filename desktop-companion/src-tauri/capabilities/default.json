@@ -7,10 +7,10 @@
     "core:default",
     "opener:default",
     "dialog:default",
-    "dialog:open",
+    "dialog:allow-open",
     "fs:default",
-    "fs:read-all",
-    "fs:read-dir",
-    "fs:read-file"
+    "fs:allow-read-dir",
+    "fs:allow-read-file",
+    "fs:allow-read-text-file"
   ]
 }
