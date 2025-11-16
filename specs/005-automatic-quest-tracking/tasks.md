@@ -308,12 +308,12 @@ Tasks are organized by **user story** to enable independent implementation and t
 
 ### Error Handling
 
-- [ ] T133 Create SyncError structure with code, message, details, recoverable flag
-- [ ] T134 Handle Supabase timeout errors → mark as recoverable, retry
-- [ ] T135 Handle authentication errors → mark as non-recoverable, show notification
-- [ ] T136 Handle quest not found errors → log warning, skip event
-- [ ] T137 Handle Tarkov.dev API rate limit → backoff and retry
-- [ ] T138 Handle network errors → queue event, wait for connection
+- [X] T133 Create SyncError structure with code, message, details, recoverable flag
+- [X] T134 Handle Supabase timeout errors → mark as recoverable, retry
+- [X] T135 Handle authentication errors → mark as non-recoverable, show notification
+- [X] T136 Handle quest not found errors → log warning, skip event
+- [X] T137 Handle Tarkov.dev API rate limit → backoff and retry
+- [X] T138 Handle network errors → queue event, wait for connection
 - [ ] T139 Add error notification in UI for non-recoverable errors
 - [ ] T140 Log all errors to console/file for debugging (if debug mode enabled)
 
@@ -361,8 +361,8 @@ Tasks are organized by **user story** to enable independent implementation and t
 
 - [ ] T157 Profile memory usage: ensure < 50MB RAM when idle
 - [ ] T158 Profile CPU usage: ensure < 1% CPU when idle
-- [ ] T159 Add circular buffer for log lines (keep last 1000 in memory)
-- [ ] T160 Implement log line batching (emit every 100ms instead of per line)
+- [X] T159 Add circular buffer for log lines (keep last 1000 in memory)
+- [X] T160 Implement log line batching (emit every 100ms instead of per line)
 - [ ] T161 Lazy-load Supabase SDK only when connection needed
 - [ ] T162 Tree-shake unused dependencies in production build
 - [ ] T163 Test sync latency: ensure < 5 seconds from log event to database update
@@ -379,19 +379,19 @@ Tasks are organized by **user story** to enable independent implementation and t
 
 ### Documentation
 
-- [ ] T171 Update README.md with installation instructions and screenshots
-- [ ] T172 Document all IPC commands in contracts/ipc-commands.md
-- [ ] T173 Add troubleshooting section for common issues (log not found, auth failed, etc.)
-- [ ] T174 Create user guide: how to set up, configure, and use desktop app
+- [X] T171 Update README.md with installation instructions and screenshots
+- [X] T172 Document all IPC commands in contracts/ipc-commands.md
+- [X] T173 Add troubleshooting section for common issues (log not found, auth failed, etc.)
+- [X] T174 Create user guide: how to set up, configure, and use desktop app
 - [ ] T175 Document log file format and regex patterns in research.md
 - [ ] T176 Add contributing guidelines for open-source contributors
 
 ### Build & Distribution
 
-- [ ] T177 Configure Windows installer with NSIS or WiX in tauri.conf.json
-- [ ] T178 Create macOS .dmg bundle with app icon and branding
-- [ ] T179 Create Linux .AppImage or .deb package
-- [ ] T180 [P] Set up GitHub Actions workflow for automated builds on tag push
+- [X] T177 Configure Windows installer with NSIS or WiX in tauri.conf.json
+- [X] T178 Create macOS .dmg bundle with app icon and branding
+- [X] T179 Create Linux .AppImage or .deb package
+- [X] T180 [P] Set up GitHub Actions workflow for automated builds on tag push
 - [ ] T181 [P] Add code signing for Windows and macOS (if certificate available)
 - [ ] T182 Create release notes template with changelog
 - [ ] T183 Test installer on clean Windows VM, macOS VM, and Linux VM
