@@ -1,10 +1,9 @@
-use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
+use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 use std::path::Path;
-use std::sync::mpsc::{channel, Receiver, Sender};
-use std::sync::Arc;
 use tauri::{AppHandle, Emitter};
+use tokio::sync::mpsc;
 use tokio::task;
-use tokio::time::{sleep, Duration};
+use tokio::time::Duration;
 
 /// Log event data sent to frontend
 #[derive(Clone, serde::Serialize)]
@@ -24,7 +23,8 @@ pub fn start_log_watcher(
         return Err(format!("Log directory not found: {}", log_directory));
     }
 
-    let (tx, rx): (Sender<Result<Event, notify::Error>>, Receiver<Result<Event, notify::Error>>) = channel();
+    // Use tokio's mpsc channel for async compatibility
+    let (tx, mut rx) = mpsc::unbounded_channel();
 
     // Create watcher with recommended configuration
     let mut watcher = RecommendedWatcher::new(
@@ -52,7 +52,7 @@ pub fn start_log_watcher(
         loop {
             tokio::select! {
                 // Process file system events
-                Ok(res) = async { rx.recv() } => {
+                Some(res) = rx.recv() => {
                     match res {
                         Ok(event) => {
                             // Filter for modify events on .log files

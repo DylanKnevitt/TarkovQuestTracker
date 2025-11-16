@@ -1,199 +1,200 @@
 /* Main Application Styles */
 
 :root {
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2a2a2a;
-  --bg-tertiary: #3a3a3a;
-  --text-primary: #ffffff;
-  --text-secondary: #b0b0b0;
-  --text-muted: #808080;
-  --border-color: #404040;
-  --accent-color: #3b82f6;
-  --accent-hover: #2563eb;
-  --success-color: #10b981;
-  --error-color: #ef4444;
-  --warning-color: #f59e0b;
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2a2a2a;
+    --bg-tertiary: #3a3a3a;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-muted: #808080;
+    --border-color: #404040;
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+    --success-color: #10b981;
+    --error-color: #ef4444;
+    --warning-color: #f59e0b;
 }
 
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.6;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
 }
 
 .container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
 }
 
 /* Header */
 header {
-  text-align: center;
-  margin-bottom: 3rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid var(--border-color);
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
 header h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
 }
 
 .status-bar {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
 }
 
 .status-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .status-item .label {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
 }
 
 .status {
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
 }
 
 .status.connected {
-  background: rgba(16, 185, 129, 0.2);
-  color: var(--success-color);
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success-color);
 }
 
 .status.disconnected {
-  background: rgba(239, 68, 68, 0.2);
-  color: var(--error-color);
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--error-color);
 }
 
 .status.syncing {
-  background: rgba(245, 158, 11, 0.2);
-  color: var(--warning-color);
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--warning-color);
 }
 
 .status.watching {
-  background: rgba(16, 185, 129, 0.2);
-  color: var(--success-color);
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success-color);
 }
 
 .status.stopped {
-  background: rgba(128, 128, 128, 0.2);
-  color: var(--text-muted);
+    background: rgba(128, 128, 128, 0.2);
+    color: var(--text-muted);
 }
 
 /* Dashboard */
 .dashboard {
-  margin-bottom: 2rem;
+    margin-bottom: 2rem;
 }
 
 .dashboard h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
 }
 
-.dashboard > p {
-  color: var(--text-secondary);
-  margin-bottom: 2rem;
+.dashboard>p {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
 }
 
 /* Info Cards */
 .info-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 1.5rem;
-  transition: transform 0.2s, border-color 0.2s;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: transform 0.2s, border-color 0.2s;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent-color);
+    transform: translateY(-2px);
+    border-color: var(--accent-color);
 }
 
 .card h3 {
-  font-size: 1.125rem;
-  margin-bottom: 0.75rem;
+    font-size: 1.125rem;
+    margin-bottom: 0.75rem;
 }
 
 .card p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  line-height: 1.6;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
 }
 
 /* Actions */
 .actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
 }
 
 /* Buttons */
 .btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .btn-primary {
-  background: var(--accent-color);
-  color: white;
+    background: var(--accent-color);
+    color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
+    background: var(--accent-hover);
+    transform: translateY(-1px);
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .container {
-  animation: fadeIn 0.3s ease-out;
+    animation: fadeIn 0.3s ease-out;
 }

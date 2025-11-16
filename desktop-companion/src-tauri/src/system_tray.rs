@@ -1,11 +1,10 @@
 use tauri::{
-    image::Image,
     menu::{Menu, MenuItem},
-    tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent},
-    AppHandle, Manager, Runtime,
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    AppHandle, Emitter, Manager, Runtime,
 };
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub enum ConnectionStatus {
     Connected,
     Disconnected,

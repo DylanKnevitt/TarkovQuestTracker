@@ -1,93 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Import Quest History - Tarkov Quest Companion</title>
-  <link rel="stylesheet" href="/src/styles/import.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Quest History - Tarkov Quest Companion</title>
+    <link rel="stylesheet" href="/src/styles/import.css">
 </head>
+
 <body>
-  <div class="import-container">
-    <header class="import-header">
-      <h1>Import Quest History</h1>
-      <p>Scan your Tarkov log files to import previously completed quests</p>
-    </header>
+    <div class="import-container">
+        <header class="import-header">
+            <h1>Import Quest History</h1>
+            <p>Scan your Tarkov log files to import previously completed quests</p>
+        </header>
 
-    <main class="import-content">
-      <!-- Step 1: Select Directory -->
-      <section class="import-section">
-        <h2>1. Select Log Directory</h2>
-        <p class="section-description">
-          Choose your Tarkov Logs directory to scan for quest completions.
-        </p>
-        
-        <button id="select-dir-btn" class="btn btn-primary btn-large">
-          📁 Select Directory
-        </button>
-        
-        <div class="selected-path">
-          <span class="label">Selected:</span>
-          <span id="directory-path" class="path">No directory selected</span>
-        </div>
-      </section>
+        <main class="import-content">
+            <!-- Step 1: Select Directory -->
+            <section class="import-section">
+                <h2>1. Select Log Directory</h2>
+                <p class="section-description">
+                    Choose your Tarkov Logs directory to scan for quest completions.
+                </p>
 
-      <!-- Step 2: Scan Logs -->
-      <section class="import-section">
-        <h2>2. Scan Log Files</h2>
-        <p class="section-description">
-          Scan all log files in the directory to find completed quests.
-        </p>
-        
-        <button id="scan-logs-btn" class="btn btn-primary" disabled>
-          🔍 Scan Logs
-        </button>
-        
-        <div id="scan-status" class="status-message" style="display: none;"></div>
-        
-        <div class="quest-summary">
-          <span class="label">Quests Found:</span>
-          <span id="quest-count" class="count">0</span>
-        </div>
-        
-        <div id="quest-list" class="quest-list"></div>
-      </section>
+                <button id="select-dir-btn" class="btn btn-primary btn-large">
+                    📁 Select Directory
+                </button>
 
-      <!-- Step 3: Import -->
-      <section class="import-section">
-        <h2>3. Import to Database</h2>
-        <p class="section-description">
-          Import all found quests to your cloud database.
-        </p>
-        
-        <button id="import-btn" class="btn btn-primary btn-large" disabled>
-          ☁️ Import Quests
-        </button>
-        
-        <div id="import-progress" class="progress-container" style="display: none;">
-          <div class="progress-bar-wrapper">
-            <div id="progress-bar" class="progress-bar"></div>
-          </div>
-          <p id="progress-text" class="progress-text">0 / 0 quests (0%)</p>
-        </div>
-      </section>
+                <div class="selected-path">
+                    <span class="label">Selected:</span>
+                    <span id="directory-path" class="path">No directory selected</span>
+                </div>
+            </section>
 
-      <!-- Info Box -->
-      <div class="info-box">
-        <h3>ℹ️ Important Notes</h3>
-        <ul>
-          <li>Only <strong>completed</strong> quests (MessageType 12) will be imported</li>
-          <li>Duplicate quests will be automatically handled</li>
-          <li>This process may take a few minutes for large log files</li>
-          <li>Your game does not need to be running during import</li>
-        </ul>
-      </div>
-    </main>
+            <!-- Step 2: Scan Logs -->
+            <section class="import-section">
+                <h2>2. Scan Log Files</h2>
+                <p class="section-description">
+                    Scan all log files in the directory to find completed quests.
+                </p>
 
-    <footer class="import-footer">
-      <button id="cancel-btn" class="btn btn-secondary">Cancel</button>
-    </footer>
-  </div>
+                <button id="scan-logs-btn" class="btn btn-primary" disabled>
+                    🔍 Scan Logs
+                </button>
 
-  <script type="module" src="/src/import.ts"></script>
+                <div id="scan-status" class="status-message" style="display: none;"></div>
+
+                <div class="quest-summary">
+                    <span class="label">Quests Found:</span>
+                    <span id="quest-count" class="count">0</span>
+                </div>
+
+                <div id="quest-list" class="quest-list"></div>
+            </section>
+
+            <!-- Step 3: Import -->
+            <section class="import-section">
+                <h2>3. Import to Database</h2>
+                <p class="section-description">
+                    Import all found quests to your cloud database.
+                </p>
+
+                <button id="import-btn" class="btn btn-primary btn-large" disabled>
+                    ☁️ Import Quests
+                </button>
+
+                <div id="import-progress" class="progress-container" style="display: none;">
+                    <div class="progress-bar-wrapper">
+                        <div id="progress-bar" class="progress-bar"></div>
+                    </div>
+                    <p id="progress-text" class="progress-text">0 / 0 quests (0%)</p>
+                </div>
+            </section>
+
+            <!-- Info Box -->
+            <div class="info-box">
+                <h3>ℹ️ Important Notes</h3>
+                <ul>
+                    <li>Only <strong>completed</strong> quests (MessageType 12) will be imported</li>
+                    <li>Duplicate quests will be automatically handled</li>
+                    <li>This process may take a few minutes for large log files</li>
+                    <li>Your game does not need to be running during import</li>
+                </ul>
+            </div>
+        </main>
+
+        <footer class="import-footer">
+            <button id="cancel-btn" class="btn btn-secondary">Cancel</button>
+        </footer>
+    </div>
+
+    <script type="module" src="/src/import.ts"></script>
 </body>
+
 </html>
