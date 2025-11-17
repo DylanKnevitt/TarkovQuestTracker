@@ -25,55 +25,61 @@ export class QuestList {
             return;
         }
 
-        // Group quests by level
-        const grouped = this.groupByLevel(questsToRender);
+        // Group quests by availability
+        const grouped = this.groupByAvailability(questsToRender);
 
         let html = '';
-        for (const [level, levelQuests] of Object.entries(grouped).sort((a, b) => parseInt(a[0]) - parseInt(b[0]))) {
-            html += this.renderLevelSection(level, levelQuests);
+        // Render Available section first, then Locked
+        if (grouped.available && grouped.available.length > 0) {
+            html += this.renderAvailabilitySection('available', grouped.available);
+        }
+        if (grouped.locked && grouped.locked.length > 0) {
+            html += this.renderAvailabilitySection('locked', grouped.locked);
         }
 
         this.container.innerHTML = html;
         this.attachEventListeners();
     }
 
-    groupByLevel(quests) {
-        const grouped = {};
+    groupByAvailability(quests) {
+        const grouped = {
+            available: [],
+            locked: []
+        };
+
         quests.forEach(quest => {
-            const level = quest.minLevel || 1;
-            if (!grouped[level]) grouped[level] = [];
-            grouped[level].push(quest);
+            if (quest.unlocked && !quest.completed) {
+                grouped.available.push(quest);
+            } else if (!quest.unlocked && !quest.completed) {
+                grouped.locked.push(quest);
+            } else if (quest.completed) {
+                // Completed quests go in available section
+                grouped.available.push(quest);
+            }
         });
 
-        // Sort quests within each level: available first, then by trader
-        Object.keys(grouped).forEach(level => {
-            grouped[level].sort((a, b) => {
-                // Sort by availability (unlocked/available first)
-                if (a.unlocked !== b.unlocked) return b.unlocked - a.unlocked;
-                // Then by completion status (incomplete first)
-                if (a.completed !== b.completed) return a.completed - b.completed;
-                // Then alphabetically by trader
-                return a.trader.localeCompare(b.trader);
-            });
-        });
+        // Sort within each group by level, then trader
+        const sortQuests = (a, b) => {
+            if (a.minLevel !== b.minLevel) return a.minLevel - b.minLevel;
+            return a.trader.localeCompare(b.trader);
+        };
+
+        grouped.available.sort(sortQuests);
+        grouped.locked.sort(sortQuests);
 
         return grouped;
     }
 
-    renderLevelSection(level, quests) {
-        const availableCount = quests.filter(q => q.unlocked && !q.completed).length;
+    renderAvailabilitySection(status, quests) {
+        const sectionTitle = status === 'available' ? 'Available Quests' : 'Locked Quests';
+        const questCount = quests.length;
         const completedCount = quests.filter(q => q.completed).length;
-        const lockedCount = quests.filter(q => !q.unlocked && !q.completed).length;
 
         return `
-            <div class="level-section">
-                <h2 class="level-header">
-                    <span class="level-number">Level ${level}</span>
-                    <span class="level-stats">
-                        ${availableCount > 0 ? `<span class="stat-available">${availableCount} available</span>` : ''}
-                        ${completedCount > 0 ? `<span class="stat-completed">${completedCount} completed</span>` : ''}
-                        ${lockedCount > 0 ? `<span class="stat-locked">${lockedCount} locked</span>` : ''}
-                    </span>
+            <div class="availability-section">
+                <h2 class="availability-header">
+                    <span class="section-title">${sectionTitle}</span>
+                    <span class="quest-count">(${status === 'available' && completedCount > 0 ? `${completedCount} completed, ` : ''}${questCount - completedCount} ${status === 'available' ? 'active' : 'locked'})</span>
                 </h2>
                 <div class="quest-cards">
                     ${quests.map(q => this.renderQuestCard(q)).join('')}

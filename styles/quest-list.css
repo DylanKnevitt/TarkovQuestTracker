@@ -6,11 +6,11 @@
     gap: 2rem;
 }
 
-.trader-section {
-    margin-bottom: 1rem;
+.availability-section {
+    margin-bottom: 2rem;
 }
 
-.trader-header {
+.availability-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -19,6 +19,10 @@
     border-radius: 6px;
     margin-bottom: 1rem;
     font-size: 1.3rem;
+}
+
+.section-title {
+    font-weight: 600;
 }
 
 .quest-count {
