@@ -200,7 +200,7 @@ export class QuestList {
                 e.preventDefault();
                 const url = e.target.dataset.wikiUrl;
                 const questName = e.target.dataset.questName;
-                
+
                 // Import and use wiki modal
                 const { wikiModal } = await import('../services/wiki-modal.js');
                 wikiModal.open(url, questName);

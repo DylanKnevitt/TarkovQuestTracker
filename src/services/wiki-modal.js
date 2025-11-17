@@ -11,11 +11,11 @@ export class WikiModal {
         this.backBtn = document.getElementById('wiki-back');
         this.forwardBtn = document.getElementById('wiki-forward');
         this.closeBtn = document.getElementById('wiki-close');
-        
+
         this.history = [];
         this.currentIndex = -1;
         this.recentPages = this.loadRecentPages();
-        
+
         this.init();
     }
 
@@ -30,7 +30,7 @@ export class WikiModal {
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (!this.modal.classList.contains('active')) return;
-            
+
             if (e.key === 'Escape') {
                 this.close();
             } else if (e.altKey && e.key === 'ArrowLeft') {
@@ -58,14 +58,14 @@ export class WikiModal {
 
         // Load page
         this.iframe.src = url;
-        
+
         // Show modal
         this.modal.classList.add('active');
         document.body.style.overflow = 'hidden';
 
         // Update recent pages
         this.addToRecentPages(url, title);
-        
+
         // Update navigation buttons
         this.updateNavigationButtons();
         this.updateBreadcrumb();
@@ -109,7 +109,7 @@ export class WikiModal {
         }
 
         const currentPage = this.history[this.currentIndex];
-        
+
         // Show last 3 pages in breadcrumb
         const startIndex = Math.max(0, this.currentIndex - 2);
         const visibleHistory = this.history.slice(startIndex, this.currentIndex + 1);
@@ -117,7 +117,7 @@ export class WikiModal {
         this.breadcrumb.innerHTML = visibleHistory.map((page, index) => {
             const isLast = startIndex + index === this.currentIndex;
             const displayTitle = page.title || this.extractPageTitle(page.url);
-            
+
             if (isLast) {
                 return `<span class="breadcrumb-item" style="font-weight: 600;">${displayTitle}</span>`;
             } else {
@@ -161,19 +161,19 @@ export class WikiModal {
 
     addToRecentPages(url, title) {
         const displayTitle = title || this.extractPageTitle(url);
-        
+
         // Remove duplicate if exists
         this.recentPages = this.recentPages.filter(page => page.url !== url);
-        
+
         // Add to front
         this.recentPages.unshift({ url, title: displayTitle });
-        
+
         // Keep only last 5
         this.recentPages = this.recentPages.slice(0, 5);
-        
+
         // Save to localStorage
         this.saveRecentPages();
-        
+
         // Update UI
         this.renderRecentPages();
     }
@@ -198,14 +198,14 @@ export class WikiModal {
     renderRecentPages() {
         const container = document.getElementById('recent-wiki-links');
         const section = document.getElementById('recent-wiki-section');
-        
+
         if (this.recentPages.length === 0) {
             section.style.display = 'none';
             return;
         }
 
         section.style.display = 'block';
-        
+
         container.innerHTML = this.recentPages.map(page => `
             <a href="#" class="recent-wiki-link" data-url="${page.url}" title="${page.title}">
                 ${page.title}
