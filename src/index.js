@@ -188,6 +188,10 @@ class TarkovQuestApp {
             this.questList.updateFilters({ showCompleted: e.target.checked });
         });
 
+        document.getElementById('show-fence').addEventListener('change', (e) => {
+            this.questList.updateFilters({ showFence: e.target.checked });
+        });
+
         document.getElementById('kappa-only').addEventListener('change', (e) => {
             this.questList.updateFilters({ kappaOnly: e.target.checked });
         });
@@ -286,8 +290,15 @@ class TarkovQuestApp {
 
     resetFilters() {
         // Reset checkboxes
-        document.querySelectorAll('.trader-filter').forEach(cb => cb.checked = true);
+        document.querySelectorAll('.trader-filter').forEach(cb => {
+            if (cb.value === 'fence') {
+                cb.checked = false;
+            } else {
+                cb.checked = true;
+            }
+        });
         document.getElementById('show-completed').checked = true;
+        document.getElementById('show-fence').checked = false;
         document.getElementById('kappa-only').checked = false;
         document.getElementById('show-locked').checked = true;
 
@@ -298,11 +309,12 @@ class TarkovQuestApp {
 
         // Reset filters
         this.questList.filters = {
-            traders: new Set(['prapor', 'therapist', 'fence', 'skier', 'peacekeeper', 'mechanic', 'ragman', 'jaeger', 'lightkeeper']),
+            traders: new Set(['prapor', 'therapist', 'skier', 'peacekeeper', 'mechanic', 'ragman', 'jaeger', 'lightkeeper']),
             minLevel: 1,
             maxLevel: 79,
             searchTerm: '',
             showCompleted: true,
+            showFence: false,
             kappaOnly: false,
             showLocked: true
         };

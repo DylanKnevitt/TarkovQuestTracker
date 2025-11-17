@@ -7,11 +7,12 @@ export class QuestList {
         this.container = document.getElementById(containerId);
         this.questManager = questManager;
         this.filters = {
-            traders: new Set(['prapor', 'therapist', 'fence', 'skier', 'peacekeeper', 'mechanic', 'ragman', 'jaeger', 'lightkeeper']),
+            traders: new Set(['prapor', 'therapist', 'skier', 'peacekeeper', 'mechanic', 'ragman', 'jaeger', 'lightkeeper']),
             minLevel: 1,
             maxLevel: 79,
             searchTerm: '',
             showCompleted: true,
+            showFence: false,
             kappaOnly: false,
             showLocked: true
         };
@@ -133,6 +134,11 @@ export class QuestList {
 
         // Filter by traders
         quests = quests.filter(q => this.filters.traders.has(q.trader.toLowerCase()));
+
+        // Filter out Fence quests unless explicitly shown
+        if (!this.filters.showFence) {
+            quests = quests.filter(q => q.trader.toLowerCase() !== 'fence');
+        }
 
         // Filter by level
         quests = quests.filter(q =>
