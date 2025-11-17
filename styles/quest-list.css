@@ -6,11 +6,11 @@
     gap: 2rem;
 }
 
-.level-section {
+.trader-section {
     margin-bottom: 1rem;
 }
 
-.level-header {
+.trader-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -19,29 +19,6 @@
     border-radius: 6px;
     margin-bottom: 1rem;
     font-size: 1.3rem;
-}
-
-.level-number {
-    font-weight: 600;
-}
-
-.level-stats {
-    display: flex;
-    gap: 1rem;
-    font-size: 0.9rem;
-    font-weight: normal;
-}
-
-.stat-available {
-    color: var(--success);
-}
-
-.stat-completed {
-    color: var(--accent);
-}
-
-.stat-locked {
-    color: var(--text-secondary);
 }
 
 .quest-count {
@@ -77,7 +54,7 @@
     background-color: rgba(72, 187, 120, 0.1);
 }
 
-.quest-card.available {
+.quest-card.unlocked {
     border-color: var(--accent);
 }
 
@@ -124,21 +101,6 @@
 
 .badge-path {
     background-color: var(--accent);
-    color: white;
-}
-
-.badge-completed {
-    background-color: var(--success);
-    color: white;
-}
-
-.badge-available {
-    background-color: var(--accent);
-    color: white;
-}
-
-.badge-locked {
-    background-color: var(--danger);
     color: white;
 }
 
@@ -218,13 +180,8 @@
     flex: 1;
 }
 
-.btn-toggle-complete:hover:not(:disabled) {
+.btn-toggle-complete:hover {
     background-color: #38a169;
-}
-
-.btn-toggle-complete:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
 }
 
 .quest-card.completed .btn-toggle-complete {

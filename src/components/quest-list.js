@@ -83,34 +83,23 @@ export class QuestList {
     }
 
     renderQuestCard(quest) {
-        const statusClass = quest.completed ? 'completed' : quest.unlocked ? 'available' : 'locked';
+        const statusClass = quest.completed ? 'completed' : quest.unlocked ? 'unlocked' : 'locked';
         const badges = [];
 
         if (quest.kappaRequired) badges.push('<span class="badge badge-kappa">Kappa</span>');
         if (quest.lightkeeperRequired) badges.push('<span class="badge badge-lightkeeper">Lightkeeper</span>');
         if (quest.isLightkeeperPath) badges.push('<span class="badge badge-path">LK Path</span>');
 
-        // Add availability status badge
-        let statusBadge = '';
-        if (quest.completed) {
-            statusBadge = '<span class="badge badge-completed">✓ Completed</span>';
-        } else if (quest.unlocked) {
-            statusBadge = '<span class="badge badge-available">Available</span>';
-        } else {
-            statusBadge = '<span class="badge badge-locked">🔒 Locked</span>';
-        }
-
         return `
             <div class="quest-card ${statusClass}" data-quest-id="${quest.id}">
                 <div class="quest-header">
                     <h3 class="quest-name">${quest.name}</h3>
                     <div class="quest-badges">
-                        ${statusBadge}
                         ${badges.join('')}
                     </div>
                 </div>
                 <div class="quest-meta">
-                    <span class="quest-trader trader-${quest.trader}">${quest.trader.charAt(0).toUpperCase() + quest.trader.slice(1)}</span>
+                    <span class="quest-level">Level ${quest.minLevel}</span>
                     <span class="quest-exp">+${quest.experience.toLocaleString()} XP</span>
                 </div>
                 <div class="quest-objectives">
@@ -123,7 +112,7 @@ export class QuestList {
                     </ul>
                 </div>
                 <div class="quest-actions">
-                    <button class="btn-toggle-complete" data-quest-id="${quest.id}" ${!quest.unlocked && !quest.completed ? 'disabled' : ''}>
+                    <button class="btn-toggle-complete" data-quest-id="${quest.id}">
                         ${quest.completed ? '✓ Completed' : 'Mark Complete'}
                     </button>
                     <button class="btn-view-details" data-quest-id="${quest.id}">View Details</button>

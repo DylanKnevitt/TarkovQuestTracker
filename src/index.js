@@ -15,6 +15,7 @@ import { UserComparison } from './components/user-comparison.js';
 import { ItemTracker } from './components/item-tracker.js';
 import { HideoutManager } from './models/hideout-manager.js';
 import { ItemTrackerManager } from './models/item-tracker-manager.js';
+import { userProfileService } from './services/user-profile-service.js';
 
 class TarkovQuestApp {
     constructor() {
@@ -53,12 +54,20 @@ class TarkovQuestApp {
         this.comparisonService = getComparisonService();
         console.log('Comparison service initialized');
 
-        // Listen for auth state changes to reload progress
+        // Listen for auth state changes to reload progress and user level
         const { authService } = await import('./services/auth-service.js');
         authService.onAuthStateChange(async (user) => {
             if (user && this.questManager) {
-                console.log('Auth state changed, reloading progress...');
+                console.log('Auth state changed, reloading progress and user level...');
                 await this.questManager.loadProgress();
+                
+                // Load user's saved level
+                const { level } = await userProfileService.getUserProfile(user.id);
+                if (level) {
+                    document.getElementById('user-level').value = level;
+                    this.updateLevelFilters(level);
+                }
+                
                 if (this.questList) {
                     this.questList.render();
                 }
@@ -66,6 +75,11 @@ class TarkovQuestApp {
                     this.questGraph.buildGraph(this.questManager.quests);
                 }
                 this.updateStats();
+            } else {
+                // User signed out, clear profile cache
+                userProfileService.clearCache();
+                document.getElementById('user-level').value = 1;
+                this.updateLevelFilters(1);
             }
         });
 
@@ -147,6 +161,12 @@ class TarkovQuestApp {
             checkbox.addEventListener('change', () => {
                 this.updateTraderFilters();
             });
+        });
+
+        // User level selector in header
+        document.getElementById('user-level').addEventListener('change', async (e) => {
+            const newLevel = parseInt(e.target.value);
+            await this.updateUserLevel(newLevel);
         });
 
         // Level filters
@@ -620,6 +640,58 @@ class TarkovQuestApp {
             }
         } catch (error) {
             console.error('Error loading optimizer settings:', error);
+        }
+    }
+
+    async updateUserLevel(level) {
+        // Update all level-based filters to use the new level
+        this.updateLevelFilters(level);
+        
+        // Save to database if user is authenticated
+        const { authService } = await import('./services/auth-service.js');
+        const user = authService.currentUser;
+        
+        if (user) {
+            const { success, error } = await userProfileService.updateUserLevel(user.id, level);
+            if (!success) {
+                console.error('Failed to save user level:', error);
+            } else {
+                console.log('User level saved:', level);
+            }
+        }
+    }
+
+    updateLevelFilters(level) {
+        // Update quest manager unlock status based on level
+        this.questManager.updateUnlockedStatus(level);
+        
+        // Update max level filter to match user level
+        const maxLevelInput = document.getElementById('max-level');
+        if (maxLevelInput) {
+            maxLevelInput.value = level;
+            this.questList.updateFilters({ maxLevel: level });
+        }
+        
+        // Update optimizer level
+        const optimizerLevelInput = document.getElementById('optimizer-level');
+        if (optimizerLevelInput) {
+            optimizerLevelInput.value = level;
+        }
+        
+        // Update path finder level
+        const pathFinderLevelInput = document.getElementById('current-level');
+        if (pathFinderLevelInput) {
+            pathFinderLevelInput.value = level;
+        }
+        
+        // Re-render quest list with updated unlock status
+        if (this.questList) {
+            this.questList.render();
+        }
+        
+        // Update graph if visible
+        if (this.currentTab === 'graph' && this.questGraph) {
+            this.questGraph.buildGraph(this.questManager.quests);
         }
     }
 

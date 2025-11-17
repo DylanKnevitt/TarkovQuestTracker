@@ -60,6 +60,35 @@ body {
     flex-grow: 1;
 }
 
+.header-level-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.header-level-selector label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.header-level-selector input[type="number"] {
+    width: 60px;
+    padding: 0.4rem 0.6rem;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.header-level-selector input[type="number"]:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
 .header-auth-section {
     display: flex;
     align-items: center;
