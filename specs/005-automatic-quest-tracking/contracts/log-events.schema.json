@@ -1,0 +1,510 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Tarkov Log Events Schema",
+    "description": "Defines log parsing patterns and IPC command contracts for the desktop companion app",
+    "logPatterns": {
+        "questCompleted": {
+            "regex": "^\\[\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\] \\[INFO\\] Quest completed: (.+) \\(ID: (.+)\\)$",
+            "groups": [
+                "questName",
+                "questId"
+            ],
+            "note": "UNVERIFIED - actual log format to be determined through game testing"
+        },
+        "profileDetected": {
+            "regex": "^\\[\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\] \\[INFO\\] Profile loaded: (.+)$",
+            "groups": [
+                "profileId"
+            ],
+            "note": "UNVERIFIED"
+        }
+    },
+    "ipcCommands": {
+        "start_log_watcher": {
+            "description": "Start monitoring log directory for changes",
+            "input": {
+                "type": "object",
+                "properties": {
+                    "logDirectory": {
+                        "type": "string",
+                        "description": "Absolute path to Tarkov logs directory"
+                    }
+                },
+                "required": [
+                    "logDirectory"
+                ]
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                }
+            }
+        },
+        "stop_log_watcher": {
+            "description": "Stop monitoring log files",
+            "input": {
+                "type": "object"
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    }
+                }
+            }
+        },
+        "get_app_config": {
+            "description": "Retrieve current application configuration",
+            "input": {
+                "type": "object"
+            },
+            "output": {
+                "$ref": "#/definitions/AppConfig"
+            }
+        },
+        "save_app_config": {
+            "description": "Save application configuration",
+            "input": {
+                "$ref": "#/definitions/AppConfig"
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                }
+            }
+        },
+        "auto_detect_log_directory": {
+            "description": "Attempt to auto-detect Tarkov installation and log directory",
+            "input": {
+                "type": "object"
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "found": {
+                        "type": "boolean"
+                    },
+                    "path": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "method": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "enum": [
+                            "registry",
+                            "steam",
+                            "common_path",
+                            null
+                        ]
+                    }
+                }
+            }
+        },
+        "validate_log_directory": {
+            "description": "Check if a directory contains valid Tarkov log files",
+            "input": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "path"
+                ]
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "valid": {
+                        "type": "boolean"
+                    },
+                    "reason": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                }
+            }
+        },
+        "test_supabase_connection": {
+            "description": "Test Supabase connection with provided credentials",
+            "input": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string"
+                    },
+                    "anonKey": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "url",
+                    "anonKey"
+                ]
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "connected": {
+                        "type": "boolean"
+                    },
+                    "error": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                }
+            }
+        },
+        "get_sync_queue_status": {
+            "description": "Get current sync queue status",
+            "input": {
+                "type": "object"
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "queueSize": {
+                        "type": "number"
+                    },
+                    "pendingCount": {
+                        "type": "number"
+                    },
+                    "failedCount": {
+                        "type": "number"
+                    },
+                    "oldestEvent": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                }
+            }
+        },
+        "manual_sync": {
+            "description": "Manually trigger sync queue processing",
+            "input": {
+                "type": "object"
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "synced": {
+                        "type": "number"
+                    },
+                    "failed": {
+                        "type": "number"
+                    }
+                }
+            }
+        },
+        "clear_sync_queue": {
+            "description": "Clear all completed entries from sync queue",
+            "input": {
+                "type": "object"
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "removed": {
+                        "type": "number"
+                    }
+                }
+            }
+        },
+        "import_historical_logs": {
+            "description": "Import quest progress from historical log files",
+            "input": {
+                "type": "object",
+                "properties": {
+                    "startDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Wipe date or start date for import"
+                    },
+                    "profileId": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "startDate",
+                    "profileId"
+                ]
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "filesProcessed": {
+                        "type": "number"
+                    },
+                    "eventsFound": {
+                        "type": "number"
+                    },
+                    "questsCompleted": {
+                        "type": "number"
+                    }
+                }
+            }
+        }
+    },
+    "ipcEvents": {
+        "log-line": {
+            "description": "Emitted when a new log line is detected (Rust → JS)",
+            "payload": {
+                "type": "object",
+                "properties": {
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "filePath": {
+                        "type": "string"
+                    },
+                    "lineNumber": {
+                        "type": "number"
+                    },
+                    "content": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "quest-completed": {
+            "description": "Emitted when a quest completion is detected (JS → UI)",
+            "payload": {
+                "$ref": "#/definitions/QuestCompletedEvent"
+            }
+        },
+        "quest-turn-in": {
+            "description": "Emitted when quest with items is completed (JS → UI)",
+            "payload": {
+                "$ref": "#/definitions/QuestTurnInEvent"
+            }
+        },
+        "sync-status-changed": {
+            "description": "Emitted when Supabase connection status changes",
+            "payload": {
+                "type": "object",
+                "properties": {
+                    "connected": {
+                        "type": "boolean"
+                    },
+                    "lastSync": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                }
+            }
+        },
+        "watcher-status-changed": {
+            "description": "Emitted when log watcher starts or stops",
+            "payload": {
+                "type": "object",
+                "properties": {
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "watchingPath": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "AppConfig": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "string"
+                },
+                "logDirectory": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "autoDetect": {
+                    "type": "boolean"
+                },
+                "autoStart": {
+                    "type": "boolean"
+                },
+                "startMinimized": {
+                    "type": "boolean"
+                },
+                "notifications": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "sound": {
+                            "type": "boolean"
+                        },
+                        "questCompleted": {
+                            "type": "boolean"
+                        },
+                        "syncError": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "supabase": {
+                    "type": "object",
+                    "properties": {
+                        "url": {
+                            "type": "string"
+                        },
+                        "anonKey": {
+                            "type": "string"
+                        },
+                        "connected": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "profileId": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "profileName": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "watchInterval": {
+                    "type": "number"
+                },
+                "syncInterval": {
+                    "type": "number"
+                },
+                "maxRetries": {
+                    "type": "number"
+                },
+                "debugMode": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "QuestCompletedEvent": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "const": "QUEST_COMPLETED"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "profileId": {
+                    "type": "string"
+                },
+                "questId": {
+                    "type": "string"
+                },
+                "questInternalName": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string",
+                    "enum": [
+                        "log_file",
+                        "manual",
+                        "imported"
+                    ]
+                }
+            },
+            "required": [
+                "type",
+                "timestamp",
+                "profileId",
+                "questId"
+            ]
+        },
+        "QuestTurnInEvent": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "const": "QUEST_TURN_IN"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "profileId": {
+                    "type": "string"
+                },
+                "questId": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "itemId": {
+                                "type": "string"
+                            },
+                            "quantity": {
+                                "type": "number"
+                            },
+                            "itemName": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "itemId",
+                            "quantity"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "type",
+                "timestamp",
+                "profileId",
+                "questId",
+                "items"
+            ]
+        }
+    }
+}
