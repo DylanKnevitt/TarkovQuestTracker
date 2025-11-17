@@ -123,7 +123,7 @@ export class QuestList {
                         ${quest.completed ? '✓ Completed' : 'Mark Complete'}
                     </button>
                     <button class="btn-view-details" data-quest-id="${quest.id}">View Details</button>
-                    ${quest.wikiLink ? `<a href="${quest.wikiLink}" target="_blank" class="btn-wiki">Wiki</a>` : ''}
+                    ${quest.wikiLink ? `<button class="btn-wiki" data-wiki-url="${quest.wikiLink}" data-quest-name="${quest.name}">Wiki</button>` : ''}
                 </div>
             </div>
         `;
@@ -194,6 +194,19 @@ export class QuestList {
             });
         });
 
+        // Wiki buttons
+        this.container.querySelectorAll('.btn-wiki').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const url = e.target.dataset.wikiUrl;
+                const questName = e.target.dataset.questName;
+                
+                // Import and use wiki modal
+                const { wikiModal } = await import('../services/wiki-modal.js');
+                wikiModal.open(url, questName);
+            });
+        });
+
         // Quest card clicks
         this.container.querySelectorAll('.quest-card').forEach(card => {
             card.addEventListener('click', (e) => {
@@ -248,10 +261,24 @@ export class QuestList {
                 </ul>
             ` : ''}
 
-            ${quest.wikiLink ? `<p><a href="${quest.wikiLink}" target="_blank" class="btn-wiki-large">View on Wiki →</a></p>` : ''}
+            ${quest.wikiLink ? `<p><button class="btn-wiki-large" data-wiki-url="${quest.wikiLink}" data-quest-name="${quest.name}">View on Wiki →</button></p>` : ''}
         `;
 
         this.showModal(modalContent);
+
+        // Add wiki button handler in modal
+        if (quest.wikiLink) {
+            const wikiBtn = document.querySelector('#quest-modal .btn-wiki-large');
+            if (wikiBtn) {
+                wikiBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const { wikiModal } = await import('../services/wiki-modal.js');
+                    wikiModal.open(quest.wikiLink, quest.name);
+                    // Close the quest detail modal
+                    document.getElementById('quest-modal').style.display = 'none';
+                });
+            }
+        }
     }
 
     showModal(content) {

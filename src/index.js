@@ -16,6 +16,7 @@ import { ItemTracker } from './components/item-tracker.js';
 import { HideoutManager } from './models/hideout-manager.js';
 import { ItemTrackerManager } from './models/item-tracker-manager.js';
 import { userProfileService } from './services/user-profile-service.js';
+import { wikiModal } from './services/wiki-modal.js';
 
 class TarkovQuestApp {
     constructor() {
@@ -28,6 +29,7 @@ class TarkovQuestApp {
         this.itemTracker = null;
         this.authUI = null;
         this.syncIndicator = null;
+        this.wikiModal = wikiModal;
         this.comparisonService = null;
         this.userComparison = null;
         this.currentTab = 'list';
@@ -140,6 +142,9 @@ class TarkovQuestApp {
 
             // Load optimizer settings
             this.loadOptimizerSettings();
+
+            // Initialize wiki modal recent pages
+            this.wikiModal.renderRecentPages();
 
             console.log('Initialization complete!');
         } catch (error) {

@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="styles/user-comparison.css">
     <link rel="stylesheet" href="styles/item-tracker.css">
     <link rel="stylesheet" href="styles/hideout-tracker.css">
+    <link rel="stylesheet" href="styles/wiki-modal.css">
 </head>
 
 <body>
@@ -87,6 +88,11 @@
                     <button class="path-btn" data-target="lightkeeper">Path to Lightkeeper</button>
                     <button class="path-btn" data-target="setup">Path to Setup</button>
                     <button class="path-btn" data-target="test-drive">Path to Test Drive</button>
+                </div>
+
+                <div class="recent-wiki" id="recent-wiki-section" style="display: none;">
+                    <h4>Recent Wiki Pages</h4>
+                    <div id="recent-wiki-links"></div>
                 </div>
             </aside>
 
@@ -202,6 +208,19 @@
             <span class="close">&times;</span>
             <div id="modal-body"></div>
         </div>
+    </div>
+
+    <!-- Wiki Modal -->
+    <div id="wiki-modal" class="wiki-modal">
+        <div class="wiki-modal-header">
+            <div class="wiki-breadcrumb" id="wiki-breadcrumb"></div>
+            <div class="wiki-controls">
+                <button id="wiki-back" class="wiki-nav-btn" title="Go Back">←</button>
+                <button id="wiki-forward" class="wiki-nav-btn" title="Go Forward">→</button>
+                <button id="wiki-close" class="wiki-close-btn">✕</button>
+            </div>
+        </div>
+        <iframe id="wiki-iframe" class="wiki-iframe"></iframe>
     </div>
 
     <!-- Scripts -->
