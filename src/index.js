@@ -60,14 +60,14 @@ class TarkovQuestApp {
             if (user && this.questManager) {
                 console.log('Auth state changed, reloading progress and user level...');
                 await this.questManager.loadProgress();
-                
+
                 // Load user's saved level
                 const { level } = await userProfileService.getUserProfile(user.id);
                 if (level) {
                     document.getElementById('user-level').value = level;
                     this.updateLevelFilters(level);
                 }
-                
+
                 if (this.questList) {
                     this.questList.render();
                 }
@@ -646,11 +646,11 @@ class TarkovQuestApp {
     async updateUserLevel(level) {
         // Update all level-based filters to use the new level
         this.updateLevelFilters(level);
-        
+
         // Save to database if user is authenticated
         const { authService } = await import('./services/auth-service.js');
         const user = authService.currentUser;
-        
+
         if (user) {
             const { success, error } = await userProfileService.updateUserLevel(user.id, level);
             if (!success) {
@@ -664,31 +664,31 @@ class TarkovQuestApp {
     updateLevelFilters(level) {
         // Update quest manager unlock status based on level
         this.questManager.updateUnlockedStatus(level);
-        
+
         // Update max level filter to match user level
         const maxLevelInput = document.getElementById('max-level');
         if (maxLevelInput) {
             maxLevelInput.value = level;
             this.questList.updateFilters({ maxLevel: level });
         }
-        
+
         // Update optimizer level
         const optimizerLevelInput = document.getElementById('optimizer-level');
         if (optimizerLevelInput) {
             optimizerLevelInput.value = level;
         }
-        
+
         // Update path finder level
         const pathFinderLevelInput = document.getElementById('current-level');
         if (pathFinderLevelInput) {
             pathFinderLevelInput.value = level;
         }
-        
+
         // Re-render quest list with updated unlock status
         if (this.questList) {
             this.questList.render();
         }
-        
+
         // Update graph if visible
         if (this.currentTab === 'graph' && this.questGraph) {
             this.questGraph.buildGraph(this.questManager.quests);
