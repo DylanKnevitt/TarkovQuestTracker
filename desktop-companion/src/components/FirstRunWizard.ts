@@ -1,81 +1,81 @@
 // import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import {
-    getAppConfig,
-    saveAppConfig,
-    autoDetectLogDirectory,
-    validateLogDirectory,
-    type AppConfig,
+  getAppConfig,
+  saveAppConfig,
+  autoDetectLogDirectory,
+  validateLogDirectory,
+  type AppConfig,
 } from '../services/tauri-commands';
 
 type WizardStep = 'welcome' | 'detect-tarkov' | 'configure-database' | 'auth' | 'complete';
 
 export class FirstRunWizard {
-    private currentStep: WizardStep = 'welcome';
-    private config: Partial<AppConfig> = {
-        auto_start: true,
-        notifications_enabled: true,
-        sync_enabled: true,
-    };
+  private currentStep: WizardStep = 'welcome';
+  private config: Partial<AppConfig> = {
+    auto_start: true,
+    notifications_enabled: true,
+    sync_enabled: true,
+  };
 
-    private elements = {
-        wizardContainer: document.getElementById('wizard-container') as HTMLDivElement,
-        stepIndicator: document.getElementById('step-indicator') as HTMLDivElement,
-        contentArea: document.getElementById('content-area') as HTMLDivElement,
-        prevBtn: document.getElementById('prev-btn') as HTMLButtonElement,
-        nextBtn: document.getElementById('next-btn') as HTMLButtonElement,
-        skipBtn: document.getElementById('skip-btn') as HTMLButtonElement,
-    };
+  private elements = {
+    wizardContainer: document.getElementById('wizard-container') as HTMLDivElement,
+    stepIndicator: document.getElementById('step-indicator') as HTMLDivElement,
+    contentArea: document.getElementById('content-area') as HTMLDivElement,
+    prevBtn: document.getElementById('prev-btn') as HTMLButtonElement,
+    nextBtn: document.getElementById('next-btn') as HTMLButtonElement,
+    skipBtn: document.getElementById('skip-btn') as HTMLButtonElement,
+  };
 
-    constructor() {
-        this.init();
+  constructor() {
+    this.init();
+  }
+
+  private async init() {
+    // Check if already configured
+    const existingConfig = await getAppConfig();
+    if (existingConfig.log_directory && existingConfig.supabase_url) {
+      // Already configured, close wizard
+      window.location.href = '/index.html';
+      return;
     }
 
-    private async init() {
-        // Check if already configured
-        const existingConfig = await getAppConfig();
-        if (existingConfig.log_directory && existingConfig.supabase_url) {
-            // Already configured, close wizard
-            window.location.href = '/index.html';
-            return;
-        }
+    this.attachEventListeners();
+    this.renderStep();
+  }
 
-        this.attachEventListeners();
-        this.renderStep();
+  private attachEventListeners() {
+    this.elements.prevBtn.addEventListener('click', () => this.handlePrev());
+    this.elements.nextBtn.addEventListener('click', () => this.handleNext());
+    this.elements.skipBtn.addEventListener('click', () => this.handleSkip());
+  }
+
+  private renderStep() {
+    this.updateStepIndicator();
+    this.updateButtons();
+
+    switch (this.currentStep) {
+      case 'welcome':
+        this.renderWelcome();
+        break;
+      case 'detect-tarkov':
+        this.renderDetectTarkov();
+        break;
+      case 'configure-database':
+        this.renderConfigureDatabase();
+        break;
+      case 'auth':
+        this.renderAuth();
+        this.initializeSupabaseForAuth();
+        break;
+      case 'complete':
+        this.renderComplete();
+        break;
     }
+  }
 
-    private attachEventListeners() {
-        this.elements.prevBtn.addEventListener('click', () => this.handlePrev());
-        this.elements.nextBtn.addEventListener('click', () => this.handleNext());
-        this.elements.skipBtn.addEventListener('click', () => this.handleSkip());
-    }
-
-    private renderStep() {
-        this.updateStepIndicator();
-        this.updateButtons();
-
-        switch (this.currentStep) {
-            case 'welcome':
-                this.renderWelcome();
-                break;
-            case 'detect-tarkov':
-                this.renderDetectTarkov();
-                break;
-            case 'configure-database':
-                this.renderConfigureDatabase();
-                break;
-            case 'auth':
-                this.renderAuth();
-                this.initializeSupabaseForAuth();
-                break;
-            case 'complete':
-                this.renderComplete();
-                break;
-        }
-    }
-
-    private renderWelcome() {
-        this.elements.contentArea.innerHTML = `
+  private renderWelcome() {
+    this.elements.contentArea.innerHTML = `
       <div class="wizard-step">
         <div class="wizard-icon">🎮</div>
         <h1>Welcome to Tarkov Quest Companion</h1>
@@ -114,10 +114,10 @@ export class FirstRunWizard {
         </p>
       </div>
     `;
-    }
+  }
 
-    private renderDetectTarkov() {
-        this.elements.contentArea.innerHTML = `
+  private renderDetectTarkov() {
+    this.elements.contentArea.innerHTML = `
       <div class="wizard-step">
         <h1>Locate Tarkov Logs Directory</h1>
         <p class="lead">
@@ -159,14 +159,14 @@ export class FirstRunWizard {
       </div>
     `;
 
-        // Attach event listeners for this step
-        document.getElementById('auto-detect-wizard')?.addEventListener('click', () => this.handleAutoDetectWizard());
-        document.getElementById('browse-wizard')?.addEventListener('click', () => this.handleBrowseWizard());
-        document.getElementById('validate-wizard')?.addEventListener('click', () => this.handleValidateWizard());
-    }
+    // Attach event listeners for this step
+    document.getElementById('auto-detect-wizard')?.addEventListener('click', () => this.handleAutoDetectWizard());
+    document.getElementById('browse-wizard')?.addEventListener('click', () => this.handleBrowseWizard());
+    document.getElementById('validate-wizard')?.addEventListener('click', () => this.handleValidateWizard());
+  }
 
-    private renderConfigureDatabase() {
-        this.elements.contentArea.innerHTML = `
+  private renderConfigureDatabase() {
+    this.elements.contentArea.innerHTML = `
       <div class="wizard-step">
         <h1>Connect to Supabase</h1>
         <p class="lead">
@@ -216,12 +216,12 @@ export class FirstRunWizard {
       </div>
     `;
 
-        // Attach event listeners for this step
-        document.getElementById('test-connection-wizard')?.addEventListener('click', () => this.handleTestConnectionWizard());
-    }
+    // Attach event listeners for this step
+    document.getElementById('test-connection-wizard')?.addEventListener('click', () => this.handleTestConnectionWizard());
+  }
 
-    private renderAuth() {
-        this.elements.contentArea.innerHTML = `
+  private renderAuth() {
+    this.elements.contentArea.innerHTML = `
       <div class="wizard-step">
         <h1>Sign In to Your Account</h1>
         <p class="lead">
@@ -305,15 +305,15 @@ export class FirstRunWizard {
       </div>
     `;
 
-        // Attach event listeners for tabs
-        document.getElementById('signin-tab')?.addEventListener('click', () => this.switchAuthTab('signin'));
-        document.getElementById('signup-tab')?.addEventListener('click', () => this.switchAuthTab('signup'));
-        document.getElementById('signin-btn')?.addEventListener('click', () => this.handleSignIn());
-        document.getElementById('signup-btn')?.addEventListener('click', () => this.handleSignUp());
-    }
+    // Attach event listeners for tabs
+    document.getElementById('signin-tab')?.addEventListener('click', () => this.switchAuthTab('signin'));
+    document.getElementById('signup-tab')?.addEventListener('click', () => this.switchAuthTab('signup'));
+    document.getElementById('signin-btn')?.addEventListener('click', () => this.handleSignIn());
+    document.getElementById('signup-btn')?.addEventListener('click', () => this.handleSignUp());
+  }
 
-    private renderComplete() {
-        this.elements.contentArea.innerHTML = `
+  private renderComplete() {
+    this.elements.contentArea.innerHTML = `
       <div class="wizard-step">
         <div class="wizard-icon success">✓</div>
         <h1>Setup Complete!</h1>
@@ -354,358 +354,358 @@ export class FirstRunWizard {
       </div>
     `;
 
-        // Attach event listener for final button
-        document.getElementById('start-monitoring')?.addEventListener('click', () => this.handleStartMonitoring());
-    }
+    // Attach event listener for final button
+    document.getElementById('start-monitoring')?.addEventListener('click', () => this.handleStartMonitoring());
+  }
 
-    private async handleAutoDetectWizard() {
-        const btn = document.getElementById('auto-detect-wizard') as HTMLButtonElement;
-        const status = document.getElementById('detection-status') as HTMLDivElement;
+  private async handleAutoDetectWizard() {
+    const btn = document.getElementById('auto-detect-wizard') as HTMLButtonElement;
+    const status = document.getElementById('detection-status') as HTMLDivElement;
+    const input = document.getElementById('manual-path') as HTMLInputElement;
+
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Detecting...';
+      status.textContent = 'Searching for Tarkov installation...';
+      status.className = 'status-message info';
+
+      const detectedPath = await autoDetectLogDirectory();
+
+      if (detectedPath && detectedPath !== 'not found') {
+        this.config.log_directory = detectedPath;
+        input.value = detectedPath;
+        status.textContent = '✓ Tarkov logs directory found!';
+        status.className = 'status-message success';
+        this.elements.nextBtn.disabled = false;
+      } else {
+        status.textContent = '✗ Could not auto-detect. Please select manually.';
+        status.className = 'status-message error';
+      }
+    } catch (error) {
+      console.error('Auto-detect failed:', error);
+      status.textContent = '✗ Auto-detection failed. Please select manually.';
+      status.className = 'status-message error';
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<span class="btn-icon">🔍</span> Auto-detect Installation';
+    }
+  }
+
+  private async handleBrowseWizard() {
+    try {
+      const selected = await open({
+        directory: true,
+        multiple: false,
+        title: 'Select Tarkov Logs Directory',
+      });
+
+      if (selected && typeof selected === 'string') {
         const input = document.getElementById('manual-path') as HTMLInputElement;
+        input.value = selected;
+        await this.handleValidateWizard();
+      }
+    } catch (error) {
+      console.error('Browse failed:', error);
+    }
+  }
 
-        try {
-            btn.disabled = true;
-            btn.textContent = 'Detecting...';
-            status.textContent = 'Searching for Tarkov installation...';
-            status.className = 'status-message info';
+  private async handleValidateWizard() {
+    const input = document.getElementById('manual-path') as HTMLInputElement;
+    const status = document.getElementById('detection-status') as HTMLDivElement;
+    const path = input.value.trim();
 
-            const detectedPath = await autoDetectLogDirectory();
-
-            if (detectedPath && detectedPath !== 'not found') {
-                this.config.log_directory = detectedPath;
-                input.value = detectedPath;
-                status.textContent = '✓ Tarkov logs directory found!';
-                status.className = 'status-message success';
-                this.elements.nextBtn.disabled = false;
-            } else {
-                status.textContent = '✗ Could not auto-detect. Please select manually.';
-                status.className = 'status-message error';
-            }
-        } catch (error) {
-            console.error('Auto-detect failed:', error);
-            status.textContent = '✗ Auto-detection failed. Please select manually.';
-            status.className = 'status-message error';
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<span class="btn-icon">🔍</span> Auto-detect Installation';
-        }
+    if (!path) {
+      status.textContent = 'Please enter a directory path';
+      status.className = 'status-message error';
+      return;
     }
 
-    private async handleBrowseWizard() {
-        try {
-            const selected = await open({
-                directory: true,
-                multiple: false,
-                title: 'Select Tarkov Logs Directory',
-            });
+    try {
+      status.textContent = 'Validating...';
+      status.className = 'status-message info';
 
-            if (selected && typeof selected === 'string') {
-                const input = document.getElementById('manual-path') as HTMLInputElement;
-                input.value = selected;
-                await this.handleValidateWizard();
-            }
-        } catch (error) {
-            console.error('Browse failed:', error);
-        }
+      const isValid = await validateLogDirectory(path);
+
+      if (isValid) {
+        this.config.log_directory = path;
+        status.textContent = '✓ Valid Tarkov directory!';
+        status.className = 'status-message success';
+        this.elements.nextBtn.disabled = false;
+      } else {
+        status.textContent = '✗ Invalid directory. Make sure it contains Tarkov log files.';
+        status.className = 'status-message error';
+        this.elements.nextBtn.disabled = true;
+      }
+    } catch (error) {
+      console.error('Validation failed:', error);
+      status.textContent = '✗ Validation error. Please check the path.';
+      status.className = 'status-message error';
+      this.elements.nextBtn.disabled = true;
+    }
+  }
+
+  private async handleTestConnectionWizard() {
+    const urlInput = document.getElementById('supabase-url-wizard') as HTMLInputElement;
+    const keyInput = document.getElementById('supabase-key-wizard') as HTMLInputElement;
+    const btn = document.getElementById('test-connection-wizard') as HTMLButtonElement;
+    const status = document.getElementById('connection-status-wizard') as HTMLDivElement;
+
+    const url = urlInput.value.trim();
+    const key = keyInput.value.trim();
+
+    if (!url || !key) {
+      status.textContent = 'Please enter both URL and API key';
+      status.className = 'status-message error';
+      return;
     }
 
-    private async handleValidateWizard() {
-        const input = document.getElementById('manual-path') as HTMLInputElement;
-        const status = document.getElementById('detection-status') as HTMLDivElement;
-        const path = input.value.trim();
-
-        if (!path) {
-            status.textContent = 'Please enter a directory path';
-            status.className = 'status-message error';
-            return;
-        }
-
-        try {
-            status.textContent = 'Validating...';
-            status.className = 'status-message info';
-
-            const isValid = await validateLogDirectory(path);
-
-            if (isValid) {
-                this.config.log_directory = path;
-                status.textContent = '✓ Valid Tarkov directory!';
-                status.className = 'status-message success';
-                this.elements.nextBtn.disabled = false;
-            } else {
-                status.textContent = '✗ Invalid directory. Make sure it contains Tarkov log files.';
-                status.className = 'status-message error';
-                this.elements.nextBtn.disabled = true;
-            }
-        } catch (error) {
-            console.error('Validation failed:', error);
-            status.textContent = '✗ Validation error. Please check the path.';
-            status.className = 'status-message error';
-            this.elements.nextBtn.disabled = true;
-        }
-    }
-
-    private async handleTestConnectionWizard() {
-        const urlInput = document.getElementById('supabase-url-wizard') as HTMLInputElement;
-        const keyInput = document.getElementById('supabase-key-wizard') as HTMLInputElement;
-        const btn = document.getElementById('test-connection-wizard') as HTMLButtonElement;
-        const status = document.getElementById('connection-status-wizard') as HTMLDivElement;
-
-        const url = urlInput.value.trim();
-        const key = keyInput.value.trim();
-
-        if (!url || !key) {
-            status.textContent = 'Please enter both URL and API key';
-            status.className = 'status-message error';
-            return;
-        }
-
-        try {
-            btn.disabled = true;
-            btn.textContent = 'Testing...';
-            status.textContent = 'Testing connection...';
-            status.className = 'status-message info';
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Testing...';
+      status.textContent = 'Testing connection...';
+      status.className = 'status-message info';
 
       const { createClient } = await import('@supabase/supabase-js');
       const supabase = createClient(url, key);
-      const { error } = await supabase.from('quest_progress').select('quest_id').limit(1);            if (error) throw error;
+      const { error } = await supabase.from('quest_progress').select('quest_id').limit(1); if (error) throw error;
 
-            this.config.supabase_url = url;
-            this.config.supabase_key = key;
-            status.textContent = '✓ Connection successful!';
-            status.className = 'status-message success';
-            this.elements.nextBtn.disabled = false;
-        } catch (error: any) {
-            console.error('Connection test failed:', error);
-            status.textContent = `✗ Connection failed: ${error.message || 'Unknown error'}`;
-            status.className = 'status-message error';
-            this.elements.nextBtn.disabled = true;
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Test Connection';
-        }
+      this.config.supabase_url = url;
+      this.config.supabase_key = key;
+      status.textContent = '✓ Connection successful!';
+      status.className = 'status-message success';
+      this.elements.nextBtn.disabled = false;
+    } catch (error: any) {
+      console.error('Connection test failed:', error);
+      status.textContent = `✗ Connection failed: ${error.message || 'Unknown error'}`;
+      status.className = 'status-message error';
+      this.elements.nextBtn.disabled = true;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Test Connection';
+    }
+  }
+
+  private async handleStartMonitoring() {
+    const btn = document.getElementById('start-monitoring') as HTMLButtonElement;
+
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Starting...';
+
+      // Save configuration
+      const fullConfig: AppConfig = {
+        log_directory: this.config.log_directory || '',
+        supabase_url: this.config.supabase_url || '',
+        supabase_key: this.config.supabase_key || '',
+        auto_start: this.config.auto_start ?? true,
+        notifications_enabled: this.config.notifications_enabled ?? true,
+        sync_enabled: this.config.sync_enabled ?? true,
+      };
+
+      await saveAppConfig(fullConfig);
+
+      // Redirect to main app
+      window.location.href = '/index.html';
+    } catch (error) {
+      console.error('Failed to save config:', error);
+      alert('Failed to save configuration. Please try again.');
+      btn.disabled = false;
+      btn.innerHTML = '<span class="btn-icon">🚀</span> Start Monitoring';
+    }
+  }
+
+  private async initializeSupabaseForAuth() {
+    // Initialize Supabase client before auth step
+    if (this.config.supabase_url && this.config.supabase_key) {
+      try {
+        const { supabaseService } = await import('../services/SupabaseService');
+        supabaseService.initialize(this.config.supabase_url, this.config.supabase_key);
+        console.log('Supabase client initialized for authentication');
+      } catch (error) {
+        console.error('Failed to initialize Supabase:', error);
+      }
+    }
+  }
+
+  private switchAuthTab(tab: 'signin' | 'signup') {
+    const signinTab = document.getElementById('signin-tab');
+    const signupTab = document.getElementById('signup-tab');
+    const signinForm = document.getElementById('signin-form');
+    const signupForm = document.getElementById('signup-form');
+
+    if (tab === 'signin') {
+      signinTab?.classList.add('active');
+      signupTab?.classList.remove('active');
+      signinForm?.classList.add('active');
+      signupForm?.classList.remove('active');
+    } else {
+      signinTab?.classList.remove('active');
+      signupTab?.classList.add('active');
+      signinForm?.classList.remove('active');
+      signupForm?.classList.add('active');
+    }
+  }
+
+  private async handleSignIn() {
+    const emailInput = document.getElementById('email-signin') as HTMLInputElement;
+    const passwordInput = document.getElementById('password-signin') as HTMLInputElement;
+    const btn = document.getElementById('signin-btn') as HTMLButtonElement;
+    const status = document.getElementById('auth-status') as HTMLDivElement;
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!email || !password) {
+      status.textContent = 'Please enter email and password';
+      status.className = 'status-message error';
+      return;
     }
 
-    private async handleStartMonitoring() {
-        const btn = document.getElementById('start-monitoring') as HTMLButtonElement;
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+      status.textContent = 'Authenticating...';
+      status.className = 'status-message info';
 
-        try {
-            btn.disabled = true;
-            btn.textContent = 'Starting...';
+      const { supabaseService } = await import('../services/SupabaseService');
+      const result = await supabaseService.signIn(email, password);
 
-            // Save configuration
-            const fullConfig: AppConfig = {
-                log_directory: this.config.log_directory || '',
-                supabase_url: this.config.supabase_url || '',
-                supabase_key: this.config.supabase_key || '',
-                auto_start: this.config.auto_start ?? true,
-                notifications_enabled: this.config.notifications_enabled ?? true,
-                sync_enabled: this.config.sync_enabled ?? true,
-            };
+      if (result.success) {
+        status.textContent = '✓ Signed in successfully!';
+        status.className = 'status-message success';
+        this.elements.nextBtn.disabled = false;
+      } else {
+        status.textContent = `✗ ${result.error || 'Sign in failed'}`;
+        status.className = 'status-message error';
+      }
+    } catch (error: any) {
+      console.error('Sign in failed:', error);
+      status.textContent = `✗ ${error.message || 'Sign in failed'}`;
+      status.className = 'status-message error';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  }
 
-            await saveAppConfig(fullConfig);
+  private async handleSignUp() {
+    const emailInput = document.getElementById('email-signup') as HTMLInputElement;
+    const passwordInput = document.getElementById('password-signup') as HTMLInputElement;
+    const confirmInput = document.getElementById('password-confirm') as HTMLInputElement;
+    const btn = document.getElementById('signup-btn') as HTMLButtonElement;
+    const status = document.getElementById('auth-status') as HTMLDivElement;
 
-            // Redirect to main app
-            window.location.href = '/index.html';
-        } catch (error) {
-            console.error('Failed to save config:', error);
-            alert('Failed to save configuration. Please try again.');
-            btn.disabled = false;
-            btn.innerHTML = '<span class="btn-icon">🚀</span> Start Monitoring';
-        }
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const confirm = confirmInput.value;
+
+    if (!email || !password || !confirm) {
+      status.textContent = 'Please fill in all fields';
+      status.className = 'status-message error';
+      return;
     }
 
-    private async initializeSupabaseForAuth() {
-        // Initialize Supabase client before auth step
-        if (this.config.supabase_url && this.config.supabase_key) {
-            try {
-                const { supabaseService } = await import('../services/SupabaseService');
-                supabaseService.initialize(this.config.supabase_url, this.config.supabase_key);
-                console.log('Supabase client initialized for authentication');
-            } catch (error) {
-                console.error('Failed to initialize Supabase:', error);
-            }
-        }
+    if (password !== confirm) {
+      status.textContent = 'Passwords do not match';
+      status.className = 'status-message error';
+      return;
     }
 
-    private switchAuthTab(tab: 'signin' | 'signup') {
-        const signinTab = document.getElementById('signin-tab');
-        const signupTab = document.getElementById('signup-tab');
-        const signinForm = document.getElementById('signin-form');
-        const signupForm = document.getElementById('signup-form');
-
-        if (tab === 'signin') {
-            signinTab?.classList.add('active');
-            signupTab?.classList.remove('active');
-            signinForm?.classList.add('active');
-            signupForm?.classList.remove('active');
-        } else {
-            signinTab?.classList.remove('active');
-            signupTab?.classList.add('active');
-            signinForm?.classList.remove('active');
-            signupForm?.classList.add('active');
-        }
+    if (password.length < 6) {
+      status.textContent = 'Password must be at least 6 characters';
+      status.className = 'status-message error';
+      return;
     }
 
-    private async handleSignIn() {
-        const emailInput = document.getElementById('email-signin') as HTMLInputElement;
-        const passwordInput = document.getElementById('password-signin') as HTMLInputElement;
-        const btn = document.getElementById('signin-btn') as HTMLButtonElement;
-        const status = document.getElementById('auth-status') as HTMLDivElement;
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Creating account...';
+      status.textContent = 'Creating your account...';
+      status.className = 'status-message info';
 
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
+      const { supabaseService } = await import('../services/SupabaseService');
+      const result = await supabaseService.signUp(email, password);
 
-        if (!email || !password) {
-            status.textContent = 'Please enter email and password';
-            status.className = 'status-message error';
-            return;
-        }
+      if (result.success) {
+        status.textContent = '✓ Account created! Check your email to verify.';
+        status.className = 'status-message success';
+        // Switch to sign in tab
+        this.switchAuthTab('signin');
+        emailInput.value = email;
+      } else {
+        status.textContent = `✗ ${result.error || 'Sign up failed'}`;
+        status.className = 'status-message error';
+      }
+    } catch (error: any) {
+      console.error('Sign up failed:', error);
+      status.textContent = `✗ ${error.message || 'Sign up failed'}`;
+      status.className = 'status-message error';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Sign Up';
+    }
+  }
 
-        try {
-            btn.disabled = true;
-            btn.textContent = 'Signing in...';
-            status.textContent = 'Authenticating...';
-            status.className = 'status-message info';
+  private handlePrev() {
+    const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'auth', 'complete'];
+    const currentIndex = steps.indexOf(this.currentStep);
+    if (currentIndex > 0) {
+      this.currentStep = steps[currentIndex - 1];
+      this.renderStep();
+    }
+  }
 
-            const { supabaseService } = await import('../services/SupabaseService');
-            const result = await supabaseService.signIn(email, password);
+  private handleNext() {
+    const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'auth', 'complete'];
+    const currentIndex = steps.indexOf(this.currentStep);
 
-            if (result.success) {
-                status.textContent = '✓ Signed in successfully!';
-                status.className = 'status-message success';
-                this.elements.nextBtn.disabled = false;
-            } else {
-                status.textContent = `✗ ${result.error || 'Sign in failed'}`;
-                status.className = 'status-message error';
-            }
-        } catch (error: any) {
-            console.error('Sign in failed:', error);
-            status.textContent = `✗ ${error.message || 'Sign in failed'}`;
-            status.className = 'status-message error';
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Sign In';
-        }
+    // Validate before proceeding
+    if (this.currentStep === 'detect-tarkov' && !this.config.log_directory) {
+      alert('Please configure the Tarkov directory before continuing.');
+      return;
     }
 
-    private async handleSignUp() {
-        const emailInput = document.getElementById('email-signup') as HTMLInputElement;
-        const passwordInput = document.getElementById('password-signup') as HTMLInputElement;
-        const confirmInput = document.getElementById('password-confirm') as HTMLInputElement;
-        const btn = document.getElementById('signup-btn') as HTMLButtonElement;
-        const status = document.getElementById('auth-status') as HTMLDivElement;
-
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
-        const confirm = confirmInput.value;
-
-        if (!email || !password || !confirm) {
-            status.textContent = 'Please fill in all fields';
-            status.className = 'status-message error';
-            return;
-        }
-
-        if (password !== confirm) {
-            status.textContent = 'Passwords do not match';
-            status.className = 'status-message error';
-            return;
-        }
-
-        if (password.length < 6) {
-            status.textContent = 'Password must be at least 6 characters';
-            status.className = 'status-message error';
-            return;
-        }
-
-        try {
-            btn.disabled = true;
-            btn.textContent = 'Creating account...';
-            status.textContent = 'Creating your account...';
-            status.className = 'status-message info';
-
-            const { supabaseService } = await import('../services/SupabaseService');
-            const result = await supabaseService.signUp(email, password);
-
-            if (result.success) {
-                status.textContent = '✓ Account created! Check your email to verify.';
-                status.className = 'status-message success';
-                // Switch to sign in tab
-                this.switchAuthTab('signin');
-                emailInput.value = email;
-            } else {
-                status.textContent = `✗ ${result.error || 'Sign up failed'}`;
-                status.className = 'status-message error';
-            }
-        } catch (error: any) {
-            console.error('Sign up failed:', error);
-            status.textContent = `✗ ${error.message || 'Sign up failed'}`;
-            status.className = 'status-message error';
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Sign Up';
-        }
+    if (this.currentStep === 'configure-database' && (!this.config.supabase_url || !this.config.supabase_key)) {
+      alert('Please test the database connection before continuing.');
+      return;
     }
 
-    private handlePrev() {
-        const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'auth', 'complete'];
-        const currentIndex = steps.indexOf(this.currentStep);
-        if (currentIndex > 0) {
-            this.currentStep = steps[currentIndex - 1];
-            this.renderStep();
-        }
+    if (currentIndex < steps.length - 1) {
+      this.currentStep = steps[currentIndex + 1];
+      this.renderStep();
     }
+  }
 
-    private handleNext() {
-        const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'auth', 'complete'];
-        const currentIndex = steps.indexOf(this.currentStep);
+  private handleSkip() {
+    window.location.href = '/index.html';
+  }
 
-        // Validate before proceeding
-        if (this.currentStep === 'detect-tarkov' && !this.config.log_directory) {
-            alert('Please configure the Tarkov directory before continuing.');
-            return;
-        }
+  private updateStepIndicator() {
+    const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'auth', 'complete'];
+    const currentIndex = steps.indexOf(this.currentStep);
 
-        if (this.currentStep === 'configure-database' && (!this.config.supabase_url || !this.config.supabase_key)) {
-            alert('Please test the database connection before continuing.');
-            return;
-        }
-
-        if (currentIndex < steps.length - 1) {
-            this.currentStep = steps[currentIndex + 1];
-            this.renderStep();
-        }
-    }
-
-    private handleSkip() {
-        window.location.href = '/index.html';
-    }
-
-    private updateStepIndicator() {
-        const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'auth', 'complete'];
-        const currentIndex = steps.indexOf(this.currentStep);
-
-        this.elements.stepIndicator.innerHTML = steps.map((_, index) => `
+    this.elements.stepIndicator.innerHTML = steps.map((_, index) => `
       <div class="step-dot ${index <= currentIndex ? 'active' : ''}"></div>
     `).join('');
+  }
+
+  private updateButtons() {
+    const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'auth', 'complete'];
+    const currentIndex = steps.indexOf(this.currentStep);
+
+    // Previous button
+    this.elements.prevBtn.style.display = currentIndex > 0 && currentIndex < steps.length - 1 ? 'inline-block' : 'none';
+
+    // Next button
+    if (currentIndex === steps.length - 1) {
+      this.elements.nextBtn.style.display = 'none';
+    } else {
+      this.elements.nextBtn.style.display = 'inline-block';
+      this.elements.nextBtn.textContent = currentIndex === 0 ? "Let's Go!" : 'Next';
+      this.elements.nextBtn.disabled = currentIndex === 1 && !this.config.log_directory;
     }
 
-    private updateButtons() {
-        const steps: WizardStep[] = ['welcome', 'detect-tarkov', 'configure-database', 'auth', 'complete'];
-        const currentIndex = steps.indexOf(this.currentStep);
-
-        // Previous button
-        this.elements.prevBtn.style.display = currentIndex > 0 && currentIndex < steps.length - 1 ? 'inline-block' : 'none';
-
-        // Next button
-        if (currentIndex === steps.length - 1) {
-            this.elements.nextBtn.style.display = 'none';
-        } else {
-            this.elements.nextBtn.style.display = 'inline-block';
-            this.elements.nextBtn.textContent = currentIndex === 0 ? "Let's Go!" : 'Next';
-            this.elements.nextBtn.disabled = currentIndex === 1 && !this.config.log_directory;
-        }
-
-        // Skip button
-        this.elements.skipBtn.style.display = currentIndex < steps.length - 1 ? 'inline-block' : 'none';
-    }
+    // Skip button
+    this.elements.skipBtn.style.display = currentIndex < steps.length - 1 ? 'inline-block' : 'none';
+  }
 }

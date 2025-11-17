@@ -25,41 +25,55 @@ export class QuestList {
             return;
         }
 
-        // Group quests by trader
-        const grouped = this.groupByTrader(questsToRender);
+        // Group quests by level
+        const grouped = this.groupByLevel(questsToRender);
 
         let html = '';
-        for (const [trader, traderQuests] of Object.entries(grouped)) {
-            html += this.renderTraderSection(trader, traderQuests);
+        for (const [level, levelQuests] of Object.entries(grouped).sort((a, b) => parseInt(a[0]) - parseInt(b[0]))) {
+            html += this.renderLevelSection(level, levelQuests);
         }
 
         this.container.innerHTML = html;
         this.attachEventListeners();
     }
 
-    groupByTrader(quests) {
+    groupByLevel(quests) {
         const grouped = {};
         quests.forEach(quest => {
-            const trader = quest.trader || 'unknown';
-            if (!grouped[trader]) grouped[trader] = [];
-            grouped[trader].push(quest);
+            const level = quest.minLevel || 1;
+            if (!grouped[level]) grouped[level] = [];
+            grouped[level].push(quest);
         });
 
-        // Sort quests within each trader by level
-        Object.keys(grouped).forEach(trader => {
-            grouped[trader].sort((a, b) => a.minLevel - b.minLevel);
+        // Sort quests within each level: available first, then by trader
+        Object.keys(grouped).forEach(level => {
+            grouped[level].sort((a, b) => {
+                // Sort by availability (unlocked/available first)
+                if (a.unlocked !== b.unlocked) return b.unlocked - a.unlocked;
+                // Then by completion status (incomplete first)
+                if (a.completed !== b.completed) return a.completed - b.completed;
+                // Then alphabetically by trader
+                return a.trader.localeCompare(b.trader);
+            });
         });
 
         return grouped;
     }
 
-    renderTraderSection(trader, quests) {
-        const traderName = trader.charAt(0).toUpperCase() + trader.slice(1);
+    renderLevelSection(level, quests) {
+        const availableCount = quests.filter(q => q.unlocked && !q.completed).length;
+        const completedCount = quests.filter(q => q.completed).length;
+        const lockedCount = quests.filter(q => !q.unlocked && !q.completed).length;
+
         return `
-            <div class="trader-section">
-                <h2 class="trader-header trader-${trader}">
-                    ${traderName}
-                    <span class="quest-count">${quests.length} quests</span>
+            <div class="level-section">
+                <h2 class="level-header">
+                    <span class="level-number">Level ${level}</span>
+                    <span class="level-stats">
+                        ${availableCount > 0 ? `<span class="stat-available">${availableCount} available</span>` : ''}
+                        ${completedCount > 0 ? `<span class="stat-completed">${completedCount} completed</span>` : ''}
+                        ${lockedCount > 0 ? `<span class="stat-locked">${lockedCount} locked</span>` : ''}
+                    </span>
                 </h2>
                 <div class="quest-cards">
                     ${quests.map(q => this.renderQuestCard(q)).join('')}
@@ -69,23 +83,35 @@ export class QuestList {
     }
 
     renderQuestCard(quest) {
-        const statusClass = quest.completed ? 'completed' : quest.unlocked ? 'unlocked' : 'locked';
+        const statusClass = quest.completed ? 'completed' : quest.unlocked ? 'available' : 'locked';
         const badges = [];
 
         if (quest.kappaRequired) badges.push('<span class="badge badge-kappa">Kappa</span>');
         if (quest.lightkeeperRequired) badges.push('<span class="badge badge-lightkeeper">Lightkeeper</span>');
         if (quest.isLightkeeperPath) badges.push('<span class="badge badge-path">LK Path</span>');
 
+        // Add availability status badge
+        let statusBadge = '';
+        if (quest.completed) {
+            statusBadge = '<span class="badge badge-completed">✓ Completed</span>';
+        } else if (quest.unlocked) {
+            statusBadge = '<span class="badge badge-available">Available</span>';
+        } else {
+            statusBadge = '<span class="badge badge-locked">🔒 Locked</span>';
+        }
+
         return `
             <div class="quest-card ${statusClass}" data-quest-id="${quest.id}">
                 <div class="quest-header">
                     <h3 class="quest-name">${quest.name}</h3>
-                    <div class="quest-badges">${badges.join('')}</div>
+                    <div class="quest-badges">
+                        ${statusBadge}
+                        ${badges.join('')}
+                    </div>
                 </div>
                 <div class="quest-meta">
-                    <span class="quest-level">Level ${quest.minLevel}</span>
+                    <span class="quest-trader trader-${quest.trader}">${quest.trader.charAt(0).toUpperCase() + quest.trader.slice(1)}</span>
                     <span class="quest-exp">+${quest.experience.toLocaleString()} XP</span>
-                    <span class="quest-trader trader-${quest.trader}">${quest.trader}</span>
                 </div>
                 <div class="quest-objectives">
                     <strong>Objectives:</strong>
@@ -97,7 +123,7 @@ export class QuestList {
                     </ul>
                 </div>
                 <div class="quest-actions">
-                    <button class="btn-toggle-complete" data-quest-id="${quest.id}">
+                    <button class="btn-toggle-complete" data-quest-id="${quest.id}" ${!quest.unlocked && !quest.completed ? 'disabled' : ''}>
                         ${quest.completed ? '✓ Completed' : 'Mark Complete'}
                     </button>
                     <button class="btn-view-details" data-quest-id="${quest.id}">View Details</button>
