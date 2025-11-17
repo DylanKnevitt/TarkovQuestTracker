@@ -35,6 +35,47 @@
             </div>
         </header>
 
+        <!-- Filters Bar -->
+        <div class="filters-bar">
+            <div class="filters-container">
+                <div class="filter-group">
+                    <input type="text" id="quest-search" placeholder="Search quests..." class="search-input">
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Traders:</label>
+                    <div class="trader-checkboxes">
+                        <label><input type="checkbox" class="trader-filter" value="prapor" checked> Prapor</label>
+                        <label><input type="checkbox" class="trader-filter" value="therapist" checked> Therapist</label>
+                        <label><input type="checkbox" class="trader-filter" value="fence"> Fence</label>
+                        <label><input type="checkbox" class="trader-filter" value="skier" checked> Skier</label>
+                        <label><input type="checkbox" class="trader-filter" value="peacekeeper" checked> Peacekeeper</label>
+                        <label><input type="checkbox" class="trader-filter" value="mechanic" checked> Mechanic</label>
+                        <label><input type="checkbox" class="trader-filter" value="ragman" checked> Ragman</label>
+                        <label><input type="checkbox" class="trader-filter" value="jaeger" checked> Jaeger</label>
+                        <label><input type="checkbox" class="trader-filter" value="lightkeeper" checked> Lightkeeper</label>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Level Range:</label>
+                    <input type="number" id="min-level" value="1" min="1" max="79" class="level-input">
+                    <span class="filter-separator">to</span>
+                    <input type="number" id="max-level" value="79" min="1" max="79" class="level-input">
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Options:</label>
+                    <label><input type="checkbox" id="show-completed"> Completed</label>
+                    <label><input type="checkbox" id="show-fence"> Fence</label>
+                    <label><input type="checkbox" id="kappa-only"> Kappa</label>
+                    <label><input type="checkbox" id="show-locked"> Locked</label>
+                </div>
+
+                <button class="reset-btn">Reset</button>
+            </div>
+        </div>
+
         <!-- Main Content -->
         <div class="main-content">
             <!-- Sidebar -->
@@ -45,40 +86,6 @@
                     <button class="path-btn" data-target="setup">Path to Setup</button>
                     <button class="path-btn" data-target="test-drive">Path to Test Drive</button>
                 </div>
-
-                <div class="filter-section">
-                    <h3>Filter by Trader</h3>
-                    <label><input type="checkbox" class="trader-filter" value="prapor" checked> Prapor</label>
-                    <label><input type="checkbox" class="trader-filter" value="therapist" checked> Therapist</label>
-                    <label><input type="checkbox" class="trader-filter" value="fence"> Fence</label>
-                    <label><input type="checkbox" class="trader-filter" value="skier" checked> Skier</label>
-                    <label><input type="checkbox" class="trader-filter" value="peacekeeper" checked> Peacekeeper</label>
-                    <label><input type="checkbox" class="trader-filter" value="mechanic" checked> Mechanic</label>
-                    <label><input type="checkbox" class="trader-filter" value="ragman" checked> Ragman</label>
-                    <label><input type="checkbox" class="trader-filter" value="jaeger" checked> Jaeger</label>
-                    <label><input type="checkbox" class="trader-filter" value="lightkeeper" checked> Lightkeeper</label>
-                </div>
-
-                <div class="filter-section">
-                    <h3>Level Filter</h3>
-                    <label>Min Level: <input type="number" id="min-level" value="1" min="1" max="79"></label>
-                    <label>Max Level: <input type="number" id="max-level" value="79" min="1" max="79"></label>
-                </div>
-
-                <div class="filter-section">
-                    <h3>Search</h3>
-                    <input type="text" id="quest-search" placeholder="Search quests...">
-                </div>
-
-                <div class="filter-section">
-                    <h3>View Options</h3>
-                    <label><input type="checkbox" id="show-completed"> Show Completed</label>
-                    <label><input type="checkbox" id="show-fence"> Show Fence Quests</label>
-                    <label><input type="checkbox" id="kappa-only"> Kappa Required Only</label>
-                    <label><input type="checkbox" id="show-locked"> Show Locked</label>
-                </div>
-
-                <button class="reset-btn">Reset All Filters</button>
             </aside>
 
             <!-- Quest Content -->
