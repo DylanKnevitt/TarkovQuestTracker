@@ -1,11 +1,12 @@
 /**
  * Item List Component
- * Feature: 003-item-tracker
+ * Feature: 003-item-tracker + 006-all-quests-item-tracker
  * Renders grid of item cards
  */
 
 import { ItemCard } from './item-card.js';
 import { ItemCollectionService } from '../services/item-collection-service.js';
+import { ViewingMode, ItemStatus, StatusFilter } from '../models/item.js'; // T024: Import enums, T037: Add StatusFilter
 
 /**
  * T032, T039-T041: ItemList component
@@ -20,6 +21,8 @@ export class ItemList {
         this.container = null;
         this.currentFilter = 'all';
         this.hideCollected = false;
+        this.viewingMode = ViewingMode.ACTIVE; // T024: Track viewing mode
+        this.statusFilter = StatusFilter.BOTH; // T037: Track status filter
         this.collectionLoaded = false;
     }
 
@@ -47,9 +50,11 @@ export class ItemList {
         }
 
         // Render item grid
+        // T025-T028: Pass viewingMode and questManager to ItemCard for status badges
+        // T060: Pass hideoutManager for hideout badge rendering
         const html = `
             <div class="item-grid">
-                ${filteredItems.map(item => new ItemCard(item).render()).join('')}
+                ${filteredItems.map(item => new ItemCard(item, this.viewingMode, this.itemTrackerManager.questManager, this.itemTrackerManager.hideoutManager).render()).join('')}
             </div>
         `;
 
@@ -61,22 +66,53 @@ export class ItemList {
 
     /**
      * T040: Apply filters to item list
+     * T028: Enhanced to accept viewingMode
+     * T043: Enhanced to accept statusFilter
      * @param {string} filter - 'all', 'quest', 'hideout', 'keys'
      * @param {boolean} hideCollected
+     * @param {string} viewingMode - ViewingMode.ACTIVE or ViewingMode.ALL
+     * @param {string} statusFilter - StatusFilter.ACTIVE, StatusFilter.COMPLETED, or StatusFilter.BOTH
      */
-    applyFilters(filter, hideCollected) {
+    applyFilters(filter, hideCollected, viewingMode = ViewingMode.ACTIVE, statusFilter = StatusFilter.BOTH) {
         this.currentFilter = filter;
         this.hideCollected = hideCollected;
+        this.viewingMode = viewingMode; // T028: Store viewing mode
+        this.statusFilter = statusFilter; // T043: Store status filter
         // Fire and forget refresh (will await internally)
         this.refresh().catch(err => console.error('Failed to refresh:', err));
     }
 
     /**
      * Get filtered items based on current filter
+     * T044-T046: Enhanced with status filtering for All Quests mode
      * @returns {Array<AggregatedItem>}
      */
     getFilteredItems() {
         let items = this.itemTrackerManager.getFilteredItems(this.currentFilter);
+
+        // T044-T046: Apply status filter in All Quests mode
+        if (this.viewingMode === ViewingMode.ALL && this.statusFilter !== StatusFilter.BOTH) {
+            items = items.filter(item => {
+                // Only apply status filter to items with quest sources
+                if (!item.hasQuestSources()) {
+                    return true; // Keep hideout-only items
+                }
+
+                const status = item.getQuestSourceStatus(this.itemTrackerManager.questManager);
+
+                // T045: Show only items from active quests
+                if (this.statusFilter === StatusFilter.ACTIVE) {
+                    return status === ItemStatus.ACTIVE || status === ItemStatus.BOTH;
+                }
+
+                // T046: Show only items from completed quests
+                if (this.statusFilter === StatusFilter.COMPLETED) {
+                    return status === ItemStatus.COMPLETED || status === ItemStatus.BOTH;
+                }
+
+                return true;
+            });
+        }
 
         // Apply hide collected filter (hide items with full quantity collected)
         if (this.hideCollected) {
@@ -263,15 +299,22 @@ export class ItemList {
 
     /**
      * Handle item card click (open detail modal)
+     * T032: Enhanced to pass viewingMode and questManager
      * @param {string} itemId
      */
     handleCardClick(itemId) {
         const item = this.itemTrackerManager.getItem(itemId);
         if (!item) return;
 
-        // Dispatch event to open item detail modal
+        // T032: Dispatch event with viewingMode and questManager for modal grouping
+        // T061: Add hideoutManager for hideout source grouping
         const event = new CustomEvent('openItemDetail', {
-            detail: { item }
+            detail: {
+                item,
+                viewingMode: this.viewingMode,
+                questManager: this.itemTrackerManager.questManager,
+                hideoutManager: this.itemTrackerManager.hideoutManager
+            }
         });
         window.dispatchEvent(event);
     }

@@ -765,3 +765,254 @@
 .item-detail-content::-webkit-scrollbar-thumb:hover {
     background: var(--text-secondary, #666);
 }
+
+/* 
+ * Feature: 006-all-quests-item-tracker
+ * T022-T023: Viewing Mode Toggle Styles
+ * T033-T036: Status Badge Styles
+ */
+
+/* Viewing Mode Toggle Container */
+.viewing-mode-toggle {
+    display: flex;
+    gap: 0;
+    margin: 16px 0;
+    border-radius: 6px;
+    overflow: hidden;
+    width: fit-content;
+}
+
+/* T022: Mode Button Base Styles */
+.mode-btn {
+    padding: 10px 20px;
+    border: 1px solid var(--border-color, #444);
+    background: var(--button-bg, #2a2a2a);
+    color: var(--text-primary, #e0e0e0);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+    border-right: none;
+}
+
+.mode-btn:last-child {
+    border-right: 1px solid var(--border-color, #444);
+}
+
+.mode-btn:first-child {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+.mode-btn:last-child {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.mode-btn:hover:not(.active) {
+    background: var(--button-hover-bg, #3a3a3a);
+}
+
+/* T023: Active Mode Button State */
+.mode-btn.active {
+    background: var(--primary-color, #4fc3f7);
+    border-color: var(--primary-color, #4fc3f7);
+    color: #000;
+    font-weight: 600;
+}
+
+.mode-btn:focus {
+    outline: 2px solid var(--primary-color, #4fc3f7);
+    outline-offset: 2px;
+}
+
+/* T048: Status Filter Dropdown Styles */
+
+.status-filter-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.status-filter-container label {
+    color: var(--text-secondary, #9e9e9e);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.status-filter-select {
+    padding: 6px 12px;
+    background: var(--button-bg, #2a2a2a);
+    color: var(--text-primary, #e0e0e0);
+    border: 1px solid var(--border-color, #444);
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.status-filter-select:hover {
+    background: var(--button-hover-bg, #3a3a3a);
+    border-color: var(--primary-color, #4fc3f7);
+}
+
+.status-filter-select:focus {
+    outline: 2px solid var(--primary-color, #4fc3f7);
+    outline-offset: 2px;
+    border-color: var(--primary-color, #4fc3f7);
+}
+
+/* T033-T036: Status Badge Styles */
+
+/* Badge Container */
+.item-badges {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+/* Base Badge Styles */
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+/* T033: Completed Badge - Gray with reduced opacity */
+.badge-completed {
+    background-color: rgba(158, 158, 158, 0.3);
+    color: #9e9e9e;
+    border: 1px solid rgba(158, 158, 158, 0.5);
+}
+
+/* T034: Mixed Badge - Split status indicator */
+.badge-mixed {
+    background: linear-gradient(90deg,
+            rgba(79, 195, 247, 0.3) 0%,
+            rgba(79, 195, 247, 0.3) 50%,
+            rgba(158, 158, 158, 0.3) 50%,
+            rgba(158, 158, 158, 0.3) 100%);
+    color: var(--text-primary, #e0e0e0);
+    border: 1px solid rgba(79, 195, 247, 0.5);
+    font-size: 11px;
+}
+
+/* T036: Completed Item Card Styling - Faded appearance */
+.item-card.completed-quest-item {
+    opacity: 0.7;
+}
+
+.item-card.completed-quest-item .item-icon {
+    opacity: 0.7;
+    filter: grayscale(30%);
+}
+
+/* T063: Hideout-Specific Badge Styles - User Story 5 */
+
+.badge-hideout-completed {
+    background-color: rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.5);
+}
+
+.hideout-inclusion-container {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background-color: rgba(79, 195, 247, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(79, 195, 247, 0.3);
+}
+
+.hideout-inclusion-container .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-primary, #e0e0e0);
+}
+
+.hideout-inclusion-container input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* T053: Quest Count Badge Styles - User Story 4 */
+
+.quest-count-info {
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+
+.quest-name-single {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--text-secondary, #9e9e9e);
+    font-style: italic;
+}
+
+.quest-count-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.quest-count-badge.quest-count-active {
+    background-color: rgba(79, 195, 247, 0.2);
+    color: #4fc3f7;
+    border: 1px solid rgba(79, 195, 247, 0.4);
+}
+
+.quest-count-badge.quest-count-completed {
+    background-color: rgba(158, 158, 158, 0.2);
+    color: #9e9e9e;
+    border: 1px solid rgba(158, 158, 158, 0.4);
+}
+
+.quest-count-badge.quest-count-mixed {
+    background: linear-gradient(90deg,
+            rgba(79, 195, 247, 0.2) 0%,
+            rgba(79, 195, 247, 0.2) 50%,
+            rgba(158, 158, 158, 0.2) 50%,
+            rgba(158, 158, 158, 0.2) 100%);
+    color: var(--text-primary, #e0e0e0);
+    border: 1px solid rgba(79, 195, 247, 0.4);
+}
+
+/* T035: Quest Source Grouping Styles for Detail Modal */
+
+.source-group-header {
+    font-size: 16px;
+    color: var(--text-primary, #e0e0e0);
+    margin-top: 16px;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border-color, #444);
+}
+
+.source-group-header.completed-group {
+    color: var(--text-secondary, #9e9e9e);
+    opacity: 0.8;
+}
+
+.sources-list.completed-sources {
+    opacity: 0.7;
+}
+
+.source-item.completed-source {
+    color: var(--text-secondary, #9e9e9e);
+}
+
+.source-item.completed-source .source-name {
+    text-decoration: line-through;
+}

@@ -3,6 +3,8 @@
 Auto-generated from all feature plans. Last updated: 2025-01-16
 
 ## Active Technologies
+- JavaScript ES6+ (Modern browsers: Chrome 90+, Firefox 88+, Safari 14+) + Cytoscape.js 3.28.1+ (graph), Vanilla JS (no framework), Tarkov.dev GraphQL API (006-all-quests-item-tracker)
+- LocalStorage (quest progress, hideout progress, item collection status, viewing mode preference) (006-all-quests-item-tracker)
 
 ### Web Application
 - JavaScript ES6+ (ES2020), Node.js 18+ for build tooling (001-vercel-supabase-deployment)
@@ -84,10 +86,9 @@ cargo test            # Run Rust tests
 - **Style**: Follow Rust standard library conventions
 
 ## Recent Changes
+- 006-all-quests-item-tracker: Added JavaScript ES6+ (Modern browsers: Chrome 90+, Firefox 88+, Safari 14+) + Cytoscape.js 3.28.1+ (graph), Vanilla JS (no framework), Tarkov.dev GraphQL API
 - **005-automatic-quest-tracking** (2025-01-16): Added Tauri desktop app support (Rust 1.75+, TypeScript 5.x, Tauri 1.5+) - CONDITIONAL on log file verification
 - **003-item-tracker**: Added JavaScript ES6+ (ES2020 target), no transpilation + Vite 5.0.0 (build), Cytoscape.js 3.28.1 (unused for this feature), @supabase/supabase-js 2.81.1 (optional)
-- **002-user-quest-comparison**: Added JavaScript ES6+ (ES2020), existing codebase
-- **001-vercel-supabase-deployment**: Added JavaScript ES6+ (ES2020), Node.js 18+ for build tooling
 
 
 <!-- MANUAL ADDITIONS START -->

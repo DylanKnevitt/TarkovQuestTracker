@@ -31,26 +31,26 @@ export class ItemTrackerManager {
      */
     async initialize() {
         console.log('Initializing ItemTrackerManager...');
-        
+
         try {
             // Fetch items from API
             const itemsData = await fetchItems();
-            
+
             // Build items map for quick lookup
             this.itemsMap.clear();
             for (const itemData of itemsData) {
                 const item = new Item(itemData);
                 this.itemsMap.set(item.id, item);
             }
-            
+
             console.log(`Loaded ${this.itemsMap.size} items`);
-            
+
             // Aggregate requirements from quests and hideout
             this.aggregateRequirements();
-            
+
             // T061: Calculate priorities for all items
             this.calculatePriorities();
-            
+
             console.log(`ItemTrackerManager initialized: ${this.aggregatedItems.size} items needed`);
         } catch (error) {
             console.error('Failed to initialize ItemTrackerManager:', error);
@@ -60,14 +60,18 @@ export class ItemTrackerManager {
 
     /**
      * T022: Aggregate requirements from quests and hideout
+     * T006: Added includeCompleted parameter for Feature 006
+     * T057: Enhanced to accept separate flags for quests and hideout
+     * @param {boolean} includeCompletedQuests - If true, include items from completed quests
+     * @param {boolean} includeCompletedHideout - If true, include items from completed hideout modules
      */
-    aggregateRequirements() {
+    aggregateRequirements(includeCompletedQuests = false, includeCompletedHideout = false) {
         this.aggregatedItems.clear();
 
-        // Extract requirements from quests and hideout
+        // Extract requirements from quests and hideout with separate flags
         const requirements = [
-            ...this.extractQuestRequirements(),
-            ...this.extractHideoutRequirements()
+            ...this.extractQuestRequirements(includeCompletedQuests),
+            ...this.extractHideoutRequirements(includeCompletedHideout)
         ];
 
         console.log(`Extracted ${requirements.length} item requirements`);
@@ -90,14 +94,16 @@ export class ItemTrackerManager {
 
     /**
      * T023: Extract item requirements from quest objectives
+     * T004: Added includeCompleted parameter for Feature 006
+     * @param {boolean} includeCompleted - If true, include items from completed quests
      * @returns {Array<ItemRequirement>}
      */
-    extractQuestRequirements() {
+    extractQuestRequirements(includeCompleted = false) {
         const requirements = [];
 
         for (const quest of this.questManager.quests) {
-            // Skip completed quests
-            if (quest.completed) {
+            // T005: Conditionally skip completed quests based on viewing mode
+            if (!includeCompleted && quest.completed) {
                 continue;
             }
 
@@ -145,14 +151,16 @@ export class ItemTrackerManager {
 
     /**
      * T024: Extract item requirements from hideout modules
+     * T057: Enhanced to optionally include completed modules
+     * @param {boolean} includeCompleted - Whether to include completed modules
      * @returns {Array<ItemRequirement>}
      */
-    extractHideoutRequirements() {
+    extractHideoutRequirements(includeCompleted = false) {
         const requirements = [];
 
         for (const module of this.hideoutManager.stations) {
-            // Skip completed modules
-            if (module.completed) {
+            // Skip completed modules unless includeCompleted is true
+            if (!includeCompleted && module.completed) {
                 continue;
             }
 
@@ -189,8 +197,8 @@ export class ItemTrackerManager {
         // Method 2: Check description for FiR indicators
         const desc = objective.description.toLowerCase();
         return desc.includes('fir') ||
-               desc.includes('found in raid') ||
-               desc.includes('find in raid');
+            desc.includes('found in raid') ||
+            desc.includes('find in raid');
     }
 
     /**
@@ -257,10 +265,14 @@ export class ItemTrackerManager {
 
     /**
      * Refresh aggregated items (call after quest/hideout updates)
+     * T008: Added includeCompleted parameter for Feature 006
+     * T057: Enhanced to accept separate flags for quests and hideout
+     * @param {boolean} includeCompletedQuests - If true, include items from completed quests
+     * @param {boolean} includeCompletedHideout - If true, include items from completed hideout modules
      */
-    refresh() {
+    refresh(includeCompletedQuests = false, includeCompletedHideout = false) {
         console.log('Refreshing item requirements...');
-        this.aggregateRequirements();
+        this.aggregateRequirements(includeCompletedQuests, includeCompletedHideout);
         this.calculatePriorities();
     }
 
@@ -270,7 +282,7 @@ export class ItemTrackerManager {
      */
     getStats() {
         const items = this.getAllItems();
-        
+
         return {
             total: items.length,
             questItems: items.filter(i => i.hasQuestSources()).length,
@@ -290,7 +302,7 @@ export class ItemTrackerManager {
         if (!searchTerm) return this.getAllItems();
 
         const term = searchTerm.toLowerCase();
-        return this.getAllItems().filter(aggItem => 
+        return this.getAllItems().filter(aggItem =>
             aggItem.item.name.toLowerCase().includes(term) ||
             aggItem.item.shortName.toLowerCase().includes(term)
         );
@@ -303,5 +315,16 @@ export class ItemTrackerManager {
      */
     getItemsByPriority(priority) {
         return this.getAllItems().filter(item => item.priority === priority);
+    }
+
+    /**
+     * T010: Get completion status of a quest by ID
+     * Feature: 006-all-quests-item-tracker
+     * @param {string} questId - Quest ID to check
+     * @returns {boolean} - true if quest is completed, false otherwise
+     */
+    getQuestStatus(questId) {
+        const quest = this.questManager.getQuestById(questId);
+        return quest ? quest.completed : false;
     }
 }
