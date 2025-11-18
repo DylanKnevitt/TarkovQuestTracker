@@ -43,6 +43,7 @@ export class WikiModal {
         // Track iframe navigation
         this.iframe.addEventListener('load', () => {
             if (this.iframe.src && this.iframe.src !== 'about:blank') {
+                this.iframe.classList.add('loaded');
                 this.updateBreadcrumb();
             }
         });
@@ -50,6 +51,9 @@ export class WikiModal {
 
     open(url, title = '') {
         if (!url) return;
+
+        // Remove loaded class while loading new page
+        this.iframe.classList.remove('loaded');
 
         // Add to history
         this.currentIndex++;
@@ -74,11 +78,13 @@ export class WikiModal {
     close() {
         this.modal.classList.remove('active');
         document.body.style.overflow = '';
+        this.iframe.classList.remove('loaded');
         this.iframe.src = 'about:blank';
     }
 
     goBack() {
         if (this.currentIndex > 0) {
+            this.iframe.classList.remove('loaded');
             this.currentIndex--;
             const page = this.history[this.currentIndex];
             this.iframe.src = page.url;
@@ -89,6 +95,7 @@ export class WikiModal {
 
     goForward() {
         if (this.currentIndex < this.history.length - 1) {
+            this.iframe.classList.remove('loaded');
             this.currentIndex++;
             const page = this.history[this.currentIndex];
             this.iframe.src = page.url;
@@ -140,6 +147,7 @@ export class WikiModal {
 
     navigateToIndex(index) {
         if (index >= 0 && index < this.history.length) {
+            this.iframe.classList.remove('loaded');
             this.currentIndex = index;
             const page = this.history[this.currentIndex];
             this.iframe.src = page.url;

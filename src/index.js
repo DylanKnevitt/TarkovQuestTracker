@@ -302,7 +302,7 @@ class TarkovQuestApp {
                 cb.checked = true;
             }
         });
-        document.getElementById('show-completed').checked = true;
+        document.getElementById('show-completed').checked = false;
         document.getElementById('show-fence').checked = false;
         document.getElementById('kappa-only').checked = false;
         document.getElementById('show-locked').checked = true;
@@ -318,7 +318,7 @@ class TarkovQuestApp {
             minLevel: 1,
             maxLevel: 79,
             searchTerm: '',
-            showCompleted: true,
+            showCompleted: false,
             showFence: false,
             kappaOnly: false,
             showLocked: true

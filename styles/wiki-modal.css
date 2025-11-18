@@ -123,7 +123,13 @@
     flex: 1;
     width: 100%;
     border: none;
-    background-color: white;
+    background-color: var(--bg-primary);
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+}
+
+.wiki-iframe.loaded {
+    opacity: 1;
 }
 
 /* Recent Wiki Pages Breadcrumb in Sidebar */

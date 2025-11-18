@@ -11,7 +11,7 @@ export class QuestList {
             minLevel: 1,
             maxLevel: 79,
             searchTerm: '',
-            showCompleted: true,
+            showCompleted: false,
             showFence: false,
             kappaOnly: false,
             showLocked: true
