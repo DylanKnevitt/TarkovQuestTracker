@@ -22,6 +22,42 @@ export const Priority = {
 };
 
 /**
+ * T001: ViewingMode enum
+ * Feature: 006-all-quests-item-tracker
+ * 
+ * ACTIVE: Show items from incomplete quests only (current behavior)
+ * ALL: Show items from all quests (completed + incomplete)
+ */
+export const ViewingMode = {
+    ACTIVE: 'active',
+    ALL: 'all'
+};
+
+/**
+ * T002: ItemStatus enum
+ * Feature: 006-all-quests-item-tracker
+ * 
+ * Indicates whether an item is needed by active, completed, or both quest types
+ */
+export const ItemStatus = {
+    ACTIVE: 'active',
+    COMPLETED: 'completed',
+    BOTH: 'both'
+};
+
+/**
+ * T003: StatusFilter enum
+ * Feature: 006-all-quests-item-tracker
+ * 
+ * Filter option available within All Quests mode
+ */
+export const StatusFilter = {
+    ACTIVE: 'active',
+    COMPLETED: 'completed',
+    BOTH: 'both'
+};
+
+/**
  * T010: Item class - represents a game item
  * Per data-model.md
  */
@@ -257,5 +293,93 @@ export class AggregatedItem {
             collected: this.collected,
             collectedQuantity: this.collectedQuantity
         };
+    }
+
+    /**
+     * T011: Get the completion status of quest sources
+     * Feature: 006-all-quests-item-tracker
+     * @param {QuestManager} questManager - Needed to check quest completion
+     * @returns {string} - ItemStatus.ACTIVE, ItemStatus.COMPLETED, or ItemStatus.BOTH
+     */
+    getQuestSourceStatus(questManager) {
+        if (!questManager) {
+            console.warn('QuestManager missing, defaulting to ACTIVE status');
+            return ItemStatus.ACTIVE;
+        }
+
+        let hasActive = false;
+        let hasCompleted = false;
+
+        for (const source of this.sources) {
+            if (source.type === 'quest') {
+                const quest = questManager.getQuestById(source.id);
+                if (quest) {
+                    if (quest.completed) {
+                        hasCompleted = true;
+                    } else {
+                        hasActive = true;
+                    }
+                }
+            }
+        }
+
+        if (hasActive && hasCompleted) return ItemStatus.BOTH;
+        if (hasActive) return ItemStatus.ACTIVE;
+        if (hasCompleted) return ItemStatus.COMPLETED;
+        return ItemStatus.ACTIVE; // Default
+    }
+
+    /**
+     * T012: Get count of quest sources by completion status
+     * Feature: 006-all-quests-item-tracker
+     * @param {QuestManager} questManager - Needed to check quest completion
+     * @returns {Object} - { active: number, completed: number }
+     */
+    getQuestSourceCounts(questManager) {
+        if (!questManager) {
+            console.warn('QuestManager missing, returning zero counts');
+            return { active: 0, completed: 0 };
+        }
+
+        let active = 0;
+        let completed = 0;
+
+        for (const source of this.sources) {
+            if (source.type === 'quest') {
+                const quest = questManager.getQuestById(source.id);
+                if (quest) {
+                    if (quest.completed) {
+                        completed++;
+                    } else {
+                        active++;
+                    }
+                }
+            }
+        }
+
+        return { active, completed };
+    }
+
+    /**
+     * T060: Check if all hideout sources are completed
+     * Feature: 006-all-quests-item-tracker (User Story 5)
+     * @param {HideoutManager} hideoutManager - Needed to check module completion
+     * @returns {boolean} - True if all hideout sources are completed
+     */
+    areHideoutSourcesCompleted(hideoutManager) {
+        if (!hideoutManager) {
+            return false;
+        }
+
+        const hideoutSources = this.getHideoutSources();
+        if (hideoutSources.length === 0) {
+            return false;
+        }
+
+        // Check if ALL hideout sources are completed
+        return hideoutSources.every(source => {
+            const module = hideoutManager.stations.find(m => m.getModuleKey() === source.id);
+            return module && module.completed;
+        });
     }
 }

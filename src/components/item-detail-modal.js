@@ -1,38 +1,52 @@
 /**
  * Item Detail Modal Component
- * Feature: 003-item-tracker
+ * Feature: 003-item-tracker + 006-all-quests-item-tracker
  * Shows detailed item information with sources and wiki link
  */
 
+import { ViewingMode, ItemStatus } from '../models/item.js'; // T029: Import enums
+
 /**
  * T078-T084: ItemDetailModal component
+ * T029-T032: Enhanced with quest source grouping for All Quests mode
  * Displays item details in a modal overlay
  */
 export class ItemDetailModal {
     constructor() {
         this.modalElement = null;
         this.currentItem = null;
+        this.viewingMode = ViewingMode.ACTIVE; // T029: Track viewing mode
+        this.questManager = null; // T029: Store quest manager for status checks
+        this.hideoutManager = null; // T061: Store hideout manager for hideout source grouping
     }
 
     /**
      * T079: Show modal with item details
+     * T029: Enhanced to accept viewingMode and questManager
+     * T061: Enhanced to accept hideoutManager for hideout source grouping
      * @param {AggregatedItem} aggregatedItem
+     * @param {string} viewingMode - ViewingMode.ACTIVE or ViewingMode.ALL
+     * @param {QuestManager} questManager - Needed for quest completion status
+     * @param {HideoutManager} hideoutManager - Needed for hideout source status
      */
-    show(aggregatedItem) {
+    show(aggregatedItem, viewingMode = ViewingMode.ACTIVE, questManager = null, hideoutManager = null) {
         this.currentItem = aggregatedItem;
-        
+        this.viewingMode = viewingMode; // T029: Store viewing mode
+        this.questManager = questManager; // T029: Store quest manager
+        this.hideoutManager = hideoutManager; // T061: Store hideout manager
+
         // Create or update modal
         if (!this.modalElement) {
             this.createModal();
         }
-        
+
         // Render item details
         this.render();
-        
+
         // Show modal
         this.modalElement.classList.add('active');
         document.body.style.overflow = 'hidden'; // Prevent background scroll
-        
+
         // Focus trap
         this.modalElement.querySelector('.modal-close-btn')?.focus();
     }
@@ -61,19 +75,19 @@ export class ItemDetailModal {
                 <div class="modal-body"></div>
             </div>
         `;
-        
+
         document.body.appendChild(this.modalElement);
-        
+
         // T087: Add close button handler
         this.modalElement.querySelector('.modal-close-btn')?.addEventListener('click', () => {
             this.hide();
         });
-        
+
         // T089: Add overlay click handler
         this.modalElement.querySelector('.modal-overlay')?.addEventListener('click', () => {
             this.hide();
         });
-        
+
         // T088: Add Escape key handler
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.modalElement?.classList.contains('active')) {
@@ -87,12 +101,12 @@ export class ItemDetailModal {
      */
     render() {
         if (!this.currentItem || !this.modalElement) return;
-        
+
         const modalBody = this.modalElement.querySelector('.modal-body');
         if (!modalBody) return;
-        
+
         const item = this.currentItem.item;
-        
+
         modalBody.innerHTML = `
             <div class="item-detail-header">
                 ${this.renderItemIcon()}
@@ -163,7 +177,7 @@ export class ItemDetailModal {
         const priorityClass = this.currentItem.getPriorityCssClass();
         const priorityText = this.currentItem.getPriorityDisplay();
         const icon = this.currentItem.priority === 'NEEDED_SOON' ? '⚠️' : '🕐';
-        
+
         return `
             <div class="priority-badge ${priorityClass}">
                 <span class="priority-icon">${icon}</span>
@@ -174,15 +188,66 @@ export class ItemDetailModal {
 
     /**
      * T082: Render quest sources list
+     * T030-T031: Enhanced to group by completion status in All Quests mode
      * @returns {string}
      */
     renderQuestSources() {
         const questSources = this.currentItem.getQuestSources();
-        
+
         if (questSources.length === 0) {
             return '';
         }
-        
+
+        // T030: Group quest sources by completion status in All Quests mode
+        if (this.viewingMode === ViewingMode.ALL && this.questManager) {
+            const activeSources = [];
+            const completedSources = [];
+
+            for (const source of questSources) {
+                const quest = this.questManager.getQuestById(source.id);
+                if (quest && quest.completed) {
+                    completedSources.push(source);
+                } else {
+                    activeSources.push(source);
+                }
+            }
+
+            // T031: Render grouped sections with headers
+            let html = '<div class="sources-section">';
+
+            if (activeSources.length > 0) {
+                html += `
+                    <h3 class="sources-title source-group-header">Active Quests</h3>
+                    <ul class="sources-list">
+                        ${activeSources.map(source => `
+                            <li class="source-item">
+                                <span class="source-name">${source.name}</span>
+                                <span class="source-quantity">${source.quantity}x</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+            }
+
+            if (completedSources.length > 0) {
+                html += `
+                    <h3 class="sources-title source-group-header completed-group">Completed Quests</h3>
+                    <ul class="sources-list completed-sources">
+                        ${completedSources.map(source => `
+                            <li class="source-item completed-source">
+                                <span class="source-name">${source.name}</span>
+                                <span class="source-quantity">${source.quantity}x</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        // T082: Default rendering (Active mode or no quest manager)
         return `
             <div class="sources-section">
                 <h3 class="sources-title">Quest Requirements</h3>
@@ -200,15 +265,65 @@ export class ItemDetailModal {
 
     /**
      * T083: Render hideout sources list
+     * T061: Enhanced to group by completion status in All Quests mode
      * @returns {string}
      */
     renderHideoutSources() {
         const hideoutSources = this.currentItem.getHideoutSources();
-        
+
         if (hideoutSources.length === 0) {
             return '';
         }
-        
+
+        // T061: Group hideout sources by completion status in All Quests mode
+        if (this.viewingMode === ViewingMode.ALL && this.hideoutManager) {
+            const activeSources = [];
+            const completedSources = [];
+
+            for (const source of hideoutSources) {
+                const module = this.hideoutManager.stations.find(m => m.getModuleKey() === source.id);
+                if (module && module.completed) {
+                    completedSources.push(source);
+                } else {
+                    activeSources.push(source);
+                }
+            }
+
+            let html = '<div class="sources-section">';
+
+            if (activeSources.length > 0) {
+                html += `
+                    <h3 class="sources-title source-group-header">Active Hideout</h3>
+                    <ul class="sources-list">
+                        ${activeSources.map(source => `
+                            <li class="source-item">
+                                <span class="source-name">${source.name}</span>
+                                <span class="source-quantity">${source.quantity}x</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+            }
+
+            if (completedSources.length > 0) {
+                html += `
+                    <h3 class="sources-title source-group-header completed-group">Completed Hideout</h3>
+                    <ul class="sources-list completed-sources">
+                        ${completedSources.map(source => `
+                            <li class="source-item completed-source">
+                                <span class="source-name">${source.name}</span>
+                                <span class="source-quantity">${source.quantity}x</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        // Default rendering (Active mode or no hideout manager)
         return `
             <div class="sources-section">
                 <h3 class="sources-title">Hideout Requirements</h3>
@@ -230,11 +345,11 @@ export class ItemDetailModal {
      */
     renderWikiButton() {
         const item = this.currentItem.item;
-        
+
         if (!item.wikiLink) {
             return '';
         }
-        
+
         return `
             <a href="${item.wikiLink}" 
                target="_blank" 

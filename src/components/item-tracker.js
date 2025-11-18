@@ -1,12 +1,13 @@
 /**
  * Item Tracker Component
- * Feature: 003-item-tracker + 004-hideout-item-enhancements
+ * Feature: 003-item-tracker + 004-hideout-item-enhancements + 006-all-quests-item-tracker
  * Main controller for item tracker view
  */
 
 import { ItemList } from './item-list.js';
 import { ItemDetailModal } from './item-detail-modal.js';
 import { HideoutList } from './hideout-list.js'; // T013: Import HideoutList
+import { ViewingMode, StatusFilter } from '../models/item.js'; // T014: Import ViewingMode enum, T037: Import StatusFilter
 
 /**
  * T031-T038: ItemTracker component
@@ -32,6 +33,9 @@ export class ItemTracker {
         this.currentFilter = 'all';
         this.hideCollected = false;
         this.currentSubtab = 'items'; // T013: Track active subtab
+        this.viewingMode = ViewingMode.ACTIVE; // T014: Default to Active Quests mode
+        this.statusFilter = StatusFilter.BOTH; // T037: Default to show both active and completed
+        this.includeAllHideout = false; // T054: Default to not include completed hideout
 
         // T057: Storage key for filter persistence
         this.STORAGE_KEY = 'item-tracker-filters';
@@ -79,9 +83,14 @@ export class ItemTracker {
             window.addEventListener('itemCollectionUpdated', () => this.handleCollectionUpdate());
 
             // T086: Add item detail modal open listener
+            // T032: Enhanced to pass viewingMode and questManager to modal
+            // T061: Enhanced to pass hideoutManager for hideout source grouping
             window.addEventListener('openItemDetail', (e) => {
                 if (this.itemDetailModal && e.detail?.item) {
-                    this.itemDetailModal.show(e.detail.item);
+                    const viewingMode = e.detail.viewingMode || this.viewingMode;
+                    const questManager = e.detail.questManager || this.questManager;
+                    const hideoutManager = e.detail.hideoutManager || this.hideoutManager;
+                    this.itemDetailModal.show(e.detail.item, viewingMode, questManager, hideoutManager);
                 }
             });
 
@@ -133,6 +142,7 @@ export class ItemTracker {
 
     /**
      * T013: Get HTML template for item tracker (ENHANCED with subtabs)
+     * T019: Added viewing mode toggle buttons
      * @returns {string}
      */
     getTemplate() {
@@ -146,6 +156,30 @@ export class ItemTracker {
                 <div class="tracker-subtabs">
                     <button class="subtab-btn active" data-subtab="items">Items</button>
                     <button class="subtab-btn" data-subtab="hideout">Hideout Progress</button>
+                </div>
+                
+                <!-- T019: Viewing mode toggle -->
+                <div class="viewing-mode-toggle">
+                    <button class="mode-btn ${this.viewingMode === ViewingMode.ACTIVE ? 'active' : ''}" data-mode="active">Active Quests</button>
+                    <button class="mode-btn ${this.viewingMode === ViewingMode.ALL ? 'active' : ''}" data-mode="all">All Quests</button>
+                </div>
+                
+                <!-- T041: Status filter dropdown (visible only in All Quests mode) -->
+                <div class="status-filter-container" style="display: ${this.viewingMode === ViewingMode.ALL ? 'flex' : 'none'};">
+                    <label for="status-filter-select">Show:</label>
+                    <select id="status-filter-select" class="status-filter-select">
+                        <option value="${StatusFilter.BOTH}" ${this.statusFilter === StatusFilter.BOTH ? 'selected' : ''}>All Quests</option>
+                        <option value="${StatusFilter.ACTIVE}" ${this.statusFilter === StatusFilter.ACTIVE ? 'selected' : ''}>Active Only</option>
+                        <option value="${StatusFilter.COMPLETED}" ${this.statusFilter === StatusFilter.COMPLETED ? 'selected' : ''}>Completed Only</option>
+                    </select>
+                </div>
+                
+                <!-- T058: Include All Hideout checkbox (visible only in All Quests mode) -->
+                <div class="hideout-inclusion-container" style="display: ${this.viewingMode === ViewingMode.ALL ? 'flex' : 'none'};">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="include-all-hideout-checkbox" ${this.includeAllHideout ? 'checked' : ''}>
+                        <span>Include All Hideout</span>
+                    </label>
                 </div>
                 
                 <div class="item-tracker-filters">
@@ -174,8 +208,58 @@ export class ItemTracker {
 
     /**
      * T013: Attach event listeners to UI elements (ENHANCED with subtabs)
+     * T020: Added mode toggle button listeners
      */
     attachEventListeners() {
+        // T020-T021: Mode toggle buttons
+        const modeButtons = this.container.querySelectorAll('.mode-btn');
+        modeButtons.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const mode = e.target.dataset.mode;
+                await this.switchViewingMode(mode);
+
+                // T021: Update button active states
+                this.container.querySelectorAll('.mode-btn').forEach(b => {
+                    b.classList.toggle('active', b.dataset.mode === mode);
+                });
+
+                // T041-T042: Toggle status filter visibility
+                const statusFilterContainer = this.container.querySelector('.status-filter-container');
+                if (statusFilterContainer) {
+                    statusFilterContainer.style.display = (mode === ViewingMode.ALL) ? 'flex' : 'none';
+                }
+
+                // T058-T059: Toggle hideout inclusion checkbox visibility
+                const hideoutInclusionContainer = this.container.querySelector('.hideout-inclusion-container');
+                if (hideoutInclusionContainer) {
+                    hideoutInclusionContainer.style.display = (mode === ViewingMode.ALL) ? 'flex' : 'none';
+                }
+            });
+        });
+
+        // T042: Status filter dropdown
+        const statusFilterSelect = this.container.querySelector('#status-filter-select');
+        if (statusFilterSelect) {
+            statusFilterSelect.addEventListener('change', async (e) => {
+                const filter = e.target.value;
+                await this.applyStatusFilter(filter);
+            });
+        }
+
+        // T059: Include All Hideout checkbox
+        const includeAllHideoutCheckbox = this.container.querySelector('#include-all-hideout-checkbox');
+        if (includeAllHideoutCheckbox) {
+            includeAllHideoutCheckbox.addEventListener('change', async (e) => {
+                this.includeAllHideout = e.target.checked;
+                this.saveFilters();
+                // T062: Refresh with separate flags
+                const includeCompletedQuests = (this.viewingMode === ViewingMode.ALL);
+                const includeCompletedHideout = e.target.checked;
+                await this.itemTrackerManager.refresh(includeCompletedQuests, includeCompletedHideout);
+                await this.refresh();
+            });
+        }
+
         // Subtab buttons
         const subtabButtons = this.container.querySelectorAll('.subtab-btn');
         subtabButtons.forEach(btn => {
@@ -259,10 +343,12 @@ export class ItemTracker {
 
     /**
      * Apply current filters to item list
+     * T028: Enhanced to pass viewingMode to ItemList
+     * T043: Enhanced to pass statusFilter to ItemList
      */
     applyFilters() {
         if (this.itemList) {
-            this.itemList.applyFilters(this.currentFilter, this.hideCollected);
+            this.itemList.applyFilters(this.currentFilter, this.hideCollected, this.viewingMode, this.statusFilter);
         }
 
         this.updateStats();
@@ -287,31 +373,81 @@ export class ItemTracker {
     }
 
     /**
+     * T017: Switch viewing mode between Active and All Quests
+     * T047: Enhanced to reset statusFilter when switching to Active mode
+     * T062: Enhanced to consider includeAllHideout flag
+     * Feature: 006-all-quests-item-tracker (User Story 1 & 5)
+     * @param {string} mode - ViewingMode.ACTIVE or ViewingMode.ALL
+     */
+    async switchViewingMode(mode) {
+        this.viewingMode = mode;
+
+        // T047: Reset status filter when switching to Active Quests mode
+        if (mode === ViewingMode.ACTIVE) {
+            this.statusFilter = StatusFilter.BOTH;
+            this.includeAllHideout = false; // Reset hideout inclusion
+        }
+
+        this.saveFilters(); // T017: Persist mode selection
+
+        // T062: Pass separate flags for quests and hideout
+        const includeCompletedQuests = (mode === ViewingMode.ALL);
+        const includeCompletedHideout = (mode === ViewingMode.ALL) && this.includeAllHideout;
+        this.itemTrackerManager.refresh(includeCompletedQuests, includeCompletedHideout);
+
+        await this.refresh();
+        console.log(`Switched to ${mode} viewing mode`);
+    }
+
+    /**
+     * T040: Apply status filter within All Quests mode
+     * Feature: 006-all-quests-item-tracker (User Story 3)
+     * @param {string} filter - StatusFilter.ACTIVE, StatusFilter.COMPLETED, or StatusFilter.BOTH
+     */
+    async applyStatusFilter(filter) {
+        this.statusFilter = filter;
+        this.saveFilters();
+        await this.refresh();
+        console.log(`Applied status filter: ${filter}`);
+    }
+
+    /**
      * T037: Handle quest update event
+     * T018: Enhanced to pass viewingMode flag
+     * T062: Enhanced to consider includeAllHideout flag
      */
     handleQuestUpdate() {
         console.log('Quest updated, refreshing item tracker...');
-        this.itemTrackerManager.refresh();
+        const includeCompletedQuests = (this.viewingMode === ViewingMode.ALL);
+        const includeCompletedHideout = (this.viewingMode === ViewingMode.ALL) && this.includeAllHideout;
+        this.itemTrackerManager.refresh(includeCompletedQuests, includeCompletedHideout);
         // Fire and forget refresh (will await internally)
         this.refresh().catch(err => console.error('Failed to refresh:', err));
     }
 
     /**
      * T038: Handle hideout update event
+     * T018: Enhanced to pass viewingMode flag
      */
     handleHideoutUpdate() {
         console.log('Hideout updated, refreshing item tracker...');
-        this.itemTrackerManager.refresh();
+        const includeCompletedQuests = (this.viewingMode === ViewingMode.ALL);
+        const includeCompletedHideout = (this.viewingMode === ViewingMode.ALL) && this.includeAllHideout;
+        this.itemTrackerManager.refresh(includeCompletedQuests, includeCompletedHideout);
         // Fire and forget refresh (will await internally)
         this.refresh().catch(err => console.error('Failed to refresh:', err));
     }
 
     /**
      * T015: Handle hideout progress update event (priority recalculation)
+     * T018: Enhanced to pass viewingMode flag
+     * T062: Enhanced to pass separate flags
      */
     handleHideoutProgressUpdate() {
         console.log('Hideout progress updated, recalculating priorities...');
-        this.itemTrackerManager.refresh();
+        const includeCompletedQuests = (this.viewingMode === ViewingMode.ALL);
+        const includeCompletedHideout = (this.viewingMode === ViewingMode.ALL) && this.includeAllHideout;
+        this.itemTrackerManager.refresh(includeCompletedQuests, includeCompletedHideout);
         // Fire and forget refresh (will await internally)
         this.refresh().catch(err => console.error('Failed to refresh:', err));
     }
@@ -374,6 +510,8 @@ export class ItemTracker {
 
     /**
      * T058: Load saved filter state from localStorage
+     * T015: Enhanced to load viewingMode
+     * T038: Enhanced to load statusFilter
      */
     loadFilters() {
         try {
@@ -382,6 +520,9 @@ export class ItemTracker {
                 const filters = JSON.parse(saved);
                 this.currentFilter = filters.currentFilter || 'all';
                 this.hideCollected = filters.hideCollected || false;
+                this.viewingMode = filters.viewingMode || ViewingMode.ACTIVE; // T015: Load viewing mode
+                this.statusFilter = filters.statusFilter || StatusFilter.BOTH; // T038: Load status filter
+                this.includeAllHideout = filters.includeAllHideout || false; // T055: Load hideout inclusion
                 console.log('Loaded saved filters:', filters);
             }
         } catch (error) {
@@ -408,12 +549,18 @@ export class ItemTracker {
 
     /**
      * T057: Save filter state to localStorage
+     * T016: Enhanced to save viewingMode
+     * T039: Enhanced to save statusFilter
+     * T056: Enhanced to save includeAllHideout
      */
     saveFilters() {
         try {
             const filters = {
                 currentFilter: this.currentFilter,
-                hideCollected: this.hideCollected
+                hideCollected: this.hideCollected,
+                viewingMode: this.viewingMode, // T016: Save viewing mode
+                statusFilter: this.statusFilter, // T039: Save status filter
+                includeAllHideout: this.includeAllHideout // T056: Save hideout inclusion
             };
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filters));
         } catch (error) {
