@@ -8,6 +8,12 @@ import { ItemList } from './item-list.js';
 import { ItemDetailModal } from './item-detail-modal.js';
 import { HideoutList } from './hideout-list.js'; // T013: Import HideoutList
 import { ViewingMode, StatusFilter } from '../models/item.js'; // T014: Import ViewingMode enum, T037: Import StatusFilter
+import { ScreenshotUploader } from './screenshot-uploader.js'; // T048: Import ScreenshotUploader
+import { OCRResultsViewer } from './ocr-results-viewer.js'; // T048: Import OCRResultsViewer
+import { OCRService } from '../services/ocr-service.js'; // T049: Import OCRService
+import { ItemMatchingService } from '../services/item-matching-service.js'; // T049: Import ItemMatchingService
+import { RecommendationService } from '../services/recommendation-service.js'; // T049: Import RecommendationService
+import { AnalysisSession } from '../models/analysis-session.js'; // T049: Import AnalysisSession
 
 /**
  * T031-T038: ItemTracker component
@@ -36,6 +42,13 @@ export class ItemTracker {
         this.viewingMode = ViewingMode.ACTIVE; // T014: Default to Active Quests mode
         this.statusFilter = StatusFilter.BOTH; // T037: Default to show both active and completed
         this.includeAllHideout = false; // T054: Default to not include completed hideout
+
+        // T048: OCR components
+        this.screenshotUploader = null;
+        this.ocrResultsViewer = null;
+        this.ocrService = null;
+        this.itemMatchingService = null;
+        this.recommendationService = null;
 
         // T057: Storage key for filter persistence
         this.STORAGE_KEY = 'item-tracker-filters';
@@ -156,6 +169,7 @@ export class ItemTracker {
                 <div class="tracker-subtabs">
                     <button class="subtab-btn active" data-subtab="items">Items</button>
                     <button class="subtab-btn" data-subtab="hideout">Hideout Progress</button>
+                    <button class="subtab-btn" data-subtab="screenshot">📷 Screenshot</button>
                 </div>
                 
                 <!-- T019: Viewing mode toggle -->
@@ -201,6 +215,13 @@ export class ItemTracker {
                 <div id="item-tracker-content">
                     <div id="item-list-container"></div>
                     <div id="hideout-progress-content" style="display:none;"></div>
+                    <div id="screenshot-content" style="display:none;">
+                        <div class="screenshot-tab-description">
+                            <p>Upload a screenshot of your in-game inventory to automatically detect items and get keep/sell recommendations based on your quest and hideout progress.</p>
+                        </div>
+                        <div id="screenshot-uploader-container"></div>
+                        <div id="ocr-results-container"></div>
+                    </div>
                 </div>
             </div>
         `;
@@ -289,8 +310,9 @@ export class ItemTracker {
     }
 
     /**
-     * T013: Switch between Items and Hideout Progress subtabs
-     * @param {string} subtabName - 'items' or 'hideout'
+     * T013: Switch between Items, Hideout Progress, and Screenshot subtabs
+     * T048: Enhanced to support screenshot tab
+     * @param {string} subtabName - 'items', 'hideout', or 'screenshot'
      */
     switchSubtab(subtabName) {
         this.currentSubtab = subtabName;
@@ -304,21 +326,45 @@ export class ItemTracker {
         // Toggle content visibility
         const itemListContainer = this.container.querySelector('#item-list-container');
         const hideoutProgressContainer = this.container.querySelector('#hideout-progress-content');
+        const screenshotContainer = this.container.querySelector('#screenshot-content');
         const filterSection = this.container.querySelector('.item-tracker-filters');
+        const viewingModeToggle = this.container.querySelector('.viewing-mode-toggle');
+        const statusFilterContainer = this.container.querySelector('.status-filter-container');
+        const hideoutInclusionContainer = this.container.querySelector('.hideout-inclusion-container');
 
         if (subtabName === 'items') {
             itemListContainer.style.display = '';
             hideoutProgressContainer.style.display = 'none';
+            screenshotContainer.style.display = 'none';
             filterSection.style.display = '';
+            if (viewingModeToggle) viewingModeToggle.style.display = '';
+            if (statusFilterContainer) statusFilterContainer.style.display = this.viewingMode === ViewingMode.ALL ? 'flex' : 'none';
+            if (hideoutInclusionContainer) hideoutInclusionContainer.style.display = this.viewingMode === ViewingMode.ALL ? 'flex' : 'none';
         } else if (subtabName === 'hideout') {
             itemListContainer.style.display = 'none';
             hideoutProgressContainer.style.display = '';
+            screenshotContainer.style.display = 'none';
             filterSection.style.display = 'none'; // Hide filters on hideout tab
+            if (viewingModeToggle) viewingModeToggle.style.display = 'none';
+            if (statusFilterContainer) statusFilterContainer.style.display = 'none';
+            if (hideoutInclusionContainer) hideoutInclusionContainer.style.display = 'none';
 
             // Render hideout list if not already rendered
             if (this.hideoutList && this.hideoutManager) {
                 this.hideoutList.render(this.hideoutManager.stations, this.hideoutManager);
             }
+        } else if (subtabName === 'screenshot') {
+            // T048: Screenshot tab
+            itemListContainer.style.display = 'none';
+            hideoutProgressContainer.style.display = 'none';
+            screenshotContainer.style.display = '';
+            filterSection.style.display = 'none';
+            if (viewingModeToggle) viewingModeToggle.style.display = 'none';
+            if (statusFilterContainer) statusFilterContainer.style.display = 'none';
+            if (hideoutInclusionContainer) hideoutInclusionContainer.style.display = 'none';
+
+            // T049: Initialize OCR components if not already done
+            this.initializeOCRComponents();
         }
 
         console.log(`[ItemTracker] Switched to ${subtabName} subtab`);
@@ -565,6 +611,193 @@ export class ItemTracker {
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filters));
         } catch (error) {
             console.error('Failed to save filters:', error);
+        }
+    }
+
+    /**
+     * T049: Initialize OCR components for screenshot analysis
+     */
+    async initializeOCRComponents() {
+        if (this.screenshotUploader && this.ocrResultsViewer) {
+            // Already initialized
+            return;
+        }
+
+        try {
+            console.log('[OCR] Initializing OCR components...');
+
+            // Initialize services
+            this.ocrService = new OCRService();
+            this.itemMatchingService = new ItemMatchingService(this.itemTrackerManager.items);
+            this.recommendationService = new RecommendationService(
+                this.itemTrackerManager,
+                this.questManager,
+                this.hideoutManager
+            );
+
+            // Initialize UI components
+            const uploaderContainer = this.container.querySelector('#screenshot-uploader-container');
+            const resultsContainer = this.container.querySelector('#ocr-results-container');
+
+            if (uploaderContainer) {
+                this.screenshotUploader = new ScreenshotUploader(
+                    uploaderContainer,
+                    (screenshot) => this.handleScreenshotUpload(screenshot)
+                );
+            }
+
+            if (resultsContainer) {
+                this.ocrResultsViewer = new OCRResultsViewer(
+                    resultsContainer,
+                    this.itemTrackerManager.items
+                );
+                
+                // T052: Attach event handlers
+                this.ocrResultsViewer.onNewAnalysis = () => {
+                    this.screenshotUploader.reset();
+                    this.ocrResultsViewer.clear();
+                };
+                
+                this.ocrResultsViewer.onAcceptAll = (session) => {
+                    this.handleAcceptResults(session);
+                };
+                
+                this.ocrResultsViewer.onRetry = () => {
+                    this.screenshotUploader.reset();
+                    this.ocrResultsViewer.clear();
+                };
+            }
+
+            console.log('[OCR] OCR components initialized successfully');
+        } catch (error) {
+            console.error('[OCR] Failed to initialize OCR components:', error);
+        }
+    }
+
+    /**
+     * T051: Handle screenshot upload and start OCR analysis
+     * @param {Object} screenshot - Screenshot object from ScreenshotService
+     */
+    async handleScreenshotUpload(screenshot) {
+        console.log('[OCR] Starting analysis for screenshot:', screenshot.filename);
+
+        try {
+            // Show loading state
+            this.ocrResultsViewer.showLoading();
+
+            // Initialize OCR engine
+            await this.ocrService.initialize();
+            this.ocrResultsViewer.updateProgress(10, 'OCR engine initialized...');
+
+            // Preprocess image
+            const preprocessed = await this.ocrService.preprocessImage(screenshot.file);
+            this.ocrResultsViewer.updateProgress(20, 'Image preprocessed...');
+
+            // Run OCR
+            this.ocrResultsViewer.updateProgress(30, 'Running text recognition...');
+            const ocrResult = await this.ocrService.recognizeText(
+                preprocessed,
+                (progress) => {
+                    // Update progress during OCR (30-70%)
+                    const ocrProgress = 30 + (progress * 0.4);
+                    this.ocrResultsViewer.updateProgress(ocrProgress, 'Recognizing text...');
+                }
+            );
+            
+            this.ocrResultsViewer.updateProgress(70, 'Text recognition complete...');
+
+            // Match items
+            this.ocrResultsViewer.updateProgress(75, 'Matching items...');
+            const detectedItems = await this.itemMatchingService.matchAllItems(ocrResult.lines);
+            this.ocrResultsViewer.updateProgress(85, `Matched ${detectedItems.length} items...`);
+
+            // Generate recommendations
+            this.ocrResultsViewer.updateProgress(90, 'Generating recommendations...');
+            const itemsWithRecommendations = await this.recommendationService.generateRecommendations(detectedItems);
+            
+            // Update OCR result with detected items
+            ocrResult.detectedItems = itemsWithRecommendations;
+
+            // Create analysis session
+            const analysisSession = new AnalysisSession(screenshot, ocrResult);
+            analysisSession.status = 'ANALYZED';
+
+            this.ocrResultsViewer.updateProgress(100, 'Analysis complete!');
+
+            // Show results
+            setTimeout(() => {
+                this.ocrResultsViewer.showResults(analysisSession);
+            }, 500);
+
+            console.log('[OCR] Analysis complete:', {
+                itemsDetected: detectedItems.length,
+                recommendations: {
+                    keep: itemsWithRecommendations.filter(i => i.recommendation.action === 'KEEP').length,
+                    sell: itemsWithRecommendations.filter(i => i.recommendation.action === 'SELL').length
+                }
+            });
+
+        } catch (error) {
+            console.error('[OCR] Analysis failed:', error);
+            this.ocrResultsViewer.showError(error);
+        } finally {
+            // Terminate OCR worker
+            if (this.ocrService) {
+                await this.ocrService.terminate();
+            }
+        }
+    }
+
+    /**
+     * T052: Handle accepting all results and update tracker
+     * @param {Object} session - Analysis session with confirmed items
+     */
+    async handleAcceptResults(session) {
+        console.log('[OCR] Results accepted:', {
+            itemCount: session.ocrResult.detectedItems.length,
+            timestamp: session.timestamp
+        });
+
+        try {
+            // Get ItemStorageService
+            const ItemStorageService = (await import('../services/item-storage-service.js')).ItemStorageService;
+            const storageService = new ItemStorageService();
+            
+            let updatedCount = 0;
+            let skippedCount = 0;
+
+            // Update each detected item in the tracker
+            for (const detectedItem of session.ocrResult.detectedItems) {
+                if (!detectedItem.matchedItem) {
+                    skippedCount++;
+                    continue;
+                }
+
+                const itemId = detectedItem.matchedItem.id;
+                const quantity = detectedItem.quantity || 1;
+
+                // Get current collection status
+                const currentQuantity = storageService.getItemQuantity(itemId);
+                
+                // Update to the detected quantity (don't add, replace)
+                await storageService.updateItemQuantity(itemId, quantity);
+                updatedCount++;
+
+                console.log(`[OCR] Updated ${detectedItem.matchedItem.name}: ${currentQuantity} → ${quantity}`);
+            }
+
+            // Dispatch event to refresh item tracker
+            window.dispatchEvent(new CustomEvent('itemCollectionUpdated'));
+
+            // Show success message
+            alert(`✅ Tracker Updated!\n\n${updatedCount} items updated\n${skippedCount} items skipped (no match)\n\nSwitch to the "Items" tab to see changes.`);
+
+            // Update session status
+            session.status = 'UPDATED';
+
+        } catch (error) {
+            console.error('[OCR] Failed to update tracker:', error);
+            alert(`❌ Failed to update tracker: ${error.message}`);
         }
     }
 }
