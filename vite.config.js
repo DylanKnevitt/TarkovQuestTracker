@@ -9,6 +9,12 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 main: './index.html'
+            },
+            output: {
+                manualChunks: {
+                    'ocr': ['tesseract.js'],
+                    'search': ['fuse.js']
+                }
             }
         }
     },
