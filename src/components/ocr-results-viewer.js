@@ -6,11 +6,14 @@
  */
 
 import { RecommendationBadge } from './recommendation-badge.js';
+import { ItemCorrectionModal } from './item-correction-modal.js';
 
 export class OCRResultsViewer {
-    constructor(container) {
+    constructor(container, allItems = []) {
         this.container = container;
         this.analysisSession = null;
+        this.allItems = allItems;
+        this.correctionModal = new ItemCorrectionModal();
         this.onAnalysisComplete = null;
     }
 
@@ -316,9 +319,56 @@ export class OCRResultsViewer {
         if (!item) return;
 
         if (action === 'edit') {
-            if (this.onEditItem) this.onEditItem(item);
+            this.showCorrectionModal(item);
         } else if (action === 'remove') {
-            if (this.onRemoveItem) this.onRemoveItem(item);
+            this.removeItem(item);
+        }
+    }
+
+    /**
+     * Show correction modal for an item
+     * @param {Object} item - Item to correct
+     */
+    showCorrectionModal(item) {
+        this.correctionModal.show(item, this.allItems, (correction) => {
+            // Apply correction
+            const itemIndex = this.analysisSession.ocrResult.detectedItems.findIndex(
+                i => i.id === item.id
+            );
+            
+            if (itemIndex !== -1) {
+                // Update the item with corrected data
+                this.analysisSession.ocrResult.detectedItems[itemIndex].matchedItem = correction.correctedItem;
+                this.analysisSession.ocrResult.detectedItems[itemIndex].quantity = correction.quantity;
+                this.analysisSession.ocrResult.detectedItems[itemIndex].confidence = 1.0; // User corrected
+                this.analysisSession.ocrResult.detectedItems[itemIndex].userCorrected = true;
+                
+                // Track correction
+                if (!this.analysisSession.corrections) {
+                    this.analysisSession.corrections = [];
+                }
+                this.analysisSession.corrections.push(correction);
+                
+                // Re-render results
+                this.showResults(this.analysisSession);
+            }
+        });
+    }
+
+    /**
+     * Remove an item from results
+     * @param {Object} item - Item to remove
+     */
+    removeItem(item) {
+        if (confirm(`Remove "${item.matchedItem?.name || item.detectedText}" from results?`)) {
+            const itemIndex = this.analysisSession.ocrResult.detectedItems.findIndex(
+                i => i.id === item.id
+            );
+            
+            if (itemIndex !== -1) {
+                this.analysisSession.ocrResult.detectedItems.splice(itemIndex, 1);
+                this.showResults(this.analysisSession);
+            }
         }
     }
 

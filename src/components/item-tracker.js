@@ -647,7 +647,10 @@ export class ItemTracker {
             }
 
             if (resultsContainer) {
-                this.ocrResultsViewer = new OCRResultsViewer(resultsContainer);
+                this.ocrResultsViewer = new OCRResultsViewer(
+                    resultsContainer,
+                    this.itemTrackerManager.items
+                );
                 
                 // T052: Attach event handlers
                 this.ocrResultsViewer.onNewAnalysis = () => {
@@ -746,19 +749,55 @@ export class ItemTracker {
     }
 
     /**
-     * T052: Handle accepting all results (placeholder for future tracker update)
+     * T052: Handle accepting all results and update tracker
      * @param {Object} session - Analysis session with confirmed items
      */
-    handleAcceptResults(session) {
+    async handleAcceptResults(session) {
         console.log('[OCR] Results accepted:', {
             itemCount: session.ocrResult.detectedItems.length,
             timestamp: session.timestamp
         });
 
-        // TODO (User Story 3): Implement tracker update functionality
-        alert(`Results accepted! ${session.ocrResult.detectedItems.length} items detected.\n\nTracker update functionality will be implemented in the next phase (User Story 3).`);
+        try {
+            // Get ItemStorageService
+            const ItemStorageService = (await import('../services/item-storage-service.js')).ItemStorageService;
+            const storageService = new ItemStorageService();
+            
+            let updatedCount = 0;
+            let skippedCount = 0;
 
-        // For now, just show a success message
-        // In User Story 3, this will call OCRUpdateService to update ItemStorageService
+            // Update each detected item in the tracker
+            for (const detectedItem of session.ocrResult.detectedItems) {
+                if (!detectedItem.matchedItem) {
+                    skippedCount++;
+                    continue;
+                }
+
+                const itemId = detectedItem.matchedItem.id;
+                const quantity = detectedItem.quantity || 1;
+
+                // Get current collection status
+                const currentQuantity = storageService.getItemQuantity(itemId);
+                
+                // Update to the detected quantity (don't add, replace)
+                await storageService.updateItemQuantity(itemId, quantity);
+                updatedCount++;
+
+                console.log(`[OCR] Updated ${detectedItem.matchedItem.name}: ${currentQuantity} → ${quantity}`);
+            }
+
+            // Dispatch event to refresh item tracker
+            window.dispatchEvent(new CustomEvent('itemCollectionUpdated'));
+
+            // Show success message
+            alert(`✅ Tracker Updated!\n\n${updatedCount} items updated\n${skippedCount} items skipped (no match)\n\nSwitch to the "Items" tab to see changes.`);
+
+            // Update session status
+            session.status = 'UPDATED';
+
+        } catch (error) {
+            console.error('[OCR] Failed to update tracker:', error);
+            alert(`❌ Failed to update tracker: ${error.message}`);
+        }
     }
 }
