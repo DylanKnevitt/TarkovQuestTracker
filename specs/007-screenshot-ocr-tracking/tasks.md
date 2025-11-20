@@ -83,31 +83,31 @@
 
 **Step 3: Upload UI Components**
 
-- [ ] T034 [P] [US1] Create ScreenshotUploader component shell in src/components/screenshot-uploader.js
-- [ ] T035 [US1] Implement drag-and-drop file upload in src/components/screenshot-uploader.js
-- [ ] T036 [US1] Implement file picker fallback in src/components/screenshot-uploader.js
-- [ ] T037 [US1] Implement preview generation and display in src/components/screenshot-uploader.js
-- [ ] T038 [US1] Add file validation error handling in src/components/screenshot-uploader.js
-- [ ] T039 [P] [US1] Style upload UI in styles/ocr-feature.css (drag-drop area, preview card)
+- [X] T034 [P] [US1] Create ScreenshotUploader component shell in src/components/screenshot-uploader.js
+- [X] T035 [US1] Implement drag-and-drop file upload in src/components/screenshot-uploader.js
+- [X] T036 [US1] Implement file picker fallback in src/components/screenshot-uploader.js
+- [X] T037 [US1] Implement preview generation and display in src/components/screenshot-uploader.js
+- [X] T038 [US1] Add file validation error handling in src/components/screenshot-uploader.js
+- [X] T039 [P] [US1] Style upload UI in styles/ocr-feature.css (drag-drop area, preview card)
 
 **Step 4: Analysis Display Components**
 
-- [ ] T040 [P] [US1] Create RecommendationBadge component in src/components/recommendation-badge.js
-- [ ] T041 [P] [US1] Style KEEP/SELL badges in styles/ocr-feature.css
-- [ ] T042 [P] [US1] Create OCRResultsViewer component shell in src/components/ocr-results-viewer.js
-- [ ] T043 [US1] Implement progress indicator in src/components/ocr-results-viewer.js
-- [ ] T044 [US1] Implement detected items list display in src/components/ocr-results-viewer.js
-- [ ] T045 [US1] Integrate RecommendationBadge into item cards in src/components/ocr-results-viewer.js
-- [ ] T046 [US1] Add confidence indicators and warnings in src/components/ocr-results-viewer.js
-- [ ] T047 [P] [US1] Style results viewer in styles/ocr-feature.css (progress bar, item cards, confidence)
+- [X] T040 [P] [US1] Create RecommendationBadge component in src/components/recommendation-badge.js
+- [X] T041 [P] [US1] Style KEEP/SELL badges in styles/ocr-feature.css
+- [X] T042 [P] [US1] Create OCRResultsViewer component shell in src/components/ocr-results-viewer.js
+- [X] T043 [US1] Implement progress indicator in src/components/ocr-results-viewer.js
+- [X] T044 [US1] Implement detected items list display in src/components/ocr-results-viewer.js
+- [X] T045 [US1] Integrate RecommendationBadge into item cards in src/components/ocr-results-viewer.js
+- [X] T046 [US1] Add confidence indicators and warnings in src/components/ocr-results-viewer.js
+- [X] T047 [P] [US1] Style results viewer in styles/ocr-feature.css (progress bar, item cards, confidence)
 
 **Step 5: Screenshot Tab Integration**
 
-- [ ] T048 [US1] Add Screenshot tab to ItemTracker component in src/components/item-tracker.js
-- [ ] T049 [US1] Create OCR workflow orchestration (upload → analyze → display results) in src/components/item-tracker.js
-- [ ] T050 [US1] Wire up ScreenshotUploader and OCRResultsViewer in Screenshot tab
-- [ ] T051 [US1] Implement "Analyze" button handler with OCR pipeline
-- [ ] T052 [US1] Add error handling and user feedback for OCR failures
+- [X] T048 [US1] Add Screenshot tab to ItemTracker component in src/components/item-tracker.js
+- [X] T049 [US1] Create OCR workflow orchestration (upload → analyze → display results) in src/components/item-tracker.js
+- [X] T050 [US1] Wire up ScreenshotUploader and OCRResultsViewer in Screenshot tab
+- [X] T051 [US1] Implement "Analyze" button handler with OCR pipeline
+- [X] T052 [US1] Add error handling and user feedback for OCR failures
 
 **Checkpoint**: User Story 1 complete - users can upload screenshots, see OCR results, and get keep/sell recommendations
 
